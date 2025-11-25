@@ -1,142 +1,128 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <title>瑄柔的專屬網站</title>
+    <meta charset="UTF-8" />
+    <title>瑄柔的專屬網站 · Ultra Edition</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <!-- ====== STYLE ====== -->
+
     <style>
         body {
             margin: 0;
-            padding: 0;
             font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
-            background: linear-gradient(135deg, #e8f3e8, #f4fff4);
+            background: linear-gradient(135deg, #e8f3e8, #f6fff6);
             color: #2f4f2f;
             overflow-x: hidden;
         }
 
-        /* Smooth Fade-in */
-        .fade {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: 1s ease;
-        }
-        .fade.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        /* Fade Animation */
+        .fade { opacity: 0; transform: translateY(20px); transition: 0.8s ease; }
+        .fade.show { opacity: 1; transform: translateY(0); }
 
-        /* Password Page */
+        /* PASSWORD PAGE */
         #password-page {
             height: 100vh;
             display: flex;
-            justify-content: center;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 20px;
+        }
+        #password-page h1 { font-size: 2rem; font-weight: 700; color: #355f35; }
+        #password-page p { color: #587a58; margin-top: 10px; }
+        input {
+            margin-top: 15px;
+            padding: 12px 20px;
+            width: 250px;
+            border-radius: 12px;
+            border: 2px solid #8fb88f;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus { border-color: #4a7c4a; }
+        button {
+            margin-top: 18px;
+            padding: 12px 36px;
+            background: #4a7c4a;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { background: #3f6a3f; }
+
+        .shake { animation: shake 0.4s; }
+        @keyframes shake {
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
         }
 
-        #password-page h1 {
-            font-size: 2rem;
-            letter-spacing: 1px;
-            color: #3a5f3a;
-            font-weight: 700;
+        /* NAV */
+        nav {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            padding: 16px 28px;
+            backdrop-filter: blur(18px);
+            background: rgba(255,255,255,0.45);
+            display: flex;
+            justify-content: space-between;
+            z-index: 50;
         }
+        nav a {
+            margin-left: 20px;
+            color: #2f4f2f;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        nav a:hover { color: #4a7c4a; }
 
-        #password-page p {
+        #content { display: none; }
+
+        /* HERO */
+        .hero {
+            padding-top: 120px;
+            padding-bottom: 80px;
+            text-align: center;
+        }
+        .hero h1 {
+            color: #355f35;
+            font-size: 2.4rem;
+            font-weight: 800;
+        }
+        .hero p {
+            font-size: 1.2rem;
             color: #587a58;
             margin-top: 10px;
         }
 
-        input {
-            padding: 12px 18px;
-            width: 260px;
-            border-radius: 12px;
-            border: 2px solid #96b896;
-            text-align: center;
-            margin-top: 18px;
-            font-size: 1rem;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input:focus {
-            border-color: #4a7c4a;
-        }
-
-        button {
-            margin-top: 20px;
-            padding: 12px 40px;
-            font-size: 1rem;
-            background: #4a7c4a;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: #3b653b;
-        }
-
-        /* Shake Error */
-        .shake {
-            animation: shake 0.4s;
-        }
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            50% { transform: translateX(10px); }
-            75% { transform: translateX(-10px); }
-            100% { transform: translateX(0); }
-        }
-
-        /* Main Content */
-        #content { display: none; }
-
-        header {
-            text-align: center;
-            padding: 70px 20px 30px;
-        }
-
-        header h1 {
-            font-size: 2.4rem;
-            color: #3a5f3a;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-
-        .subtitle {
-            font-size: 1.1rem;
-            color: #4f6f4f;
-            margin-top: 8px;
-        }
-
-        /* Section Title */
+        /* SECTION TITLE */
         .section-title {
             text-align: center;
             margin-top: 50px;
-            font-size: 1.6rem;
-            color: #3a5f3a;
+            font-size: 1.7rem;
             font-weight: 700;
+            color: #355f35;
         }
 
-        /* Card */
+        /* CARD (Glass UI) */
         .card {
             max-width: 900px;
             margin: 30px auto;
             padding: 35px;
-            border-radius: 22px;
-            background: rgba(255, 255, 255, 0.75);
+            border-radius: 20px;
+            background: rgba(255,255,255,0.7);
             backdrop-filter: blur(12px);
-            box-shadow: 0 8px 25px rgba(60, 90, 60, 0.15);
+            box-shadow: 0 6px 25px rgba(70, 100, 70, 0.15);
             line-height: 1.85;
             font-size: 1.05rem;
         }
 
-        /* Gallery */
+        /* GALLERY */
         .gallery {
             max-width: 1000px;
             margin: 30px auto 60px;
@@ -149,16 +135,13 @@
         .gallery img {
             width: 100%;
             border-radius: 16px;
-            box-shadow: 0 6px 22px rgba(60, 90, 60, 0.2);
-            transition: 0.35s;
+            box-shadow: 0 5px 20px rgba(70, 100, 70, 0.2);
+            transition: 0.3s;
             cursor: pointer;
         }
+        .gallery img:hover { transform: translateY(-6px) scale(1.02); }
 
-        .gallery img:hover {
-            transform: translateY(-6px) scale(1.02);
-        }
-
-        /* Lightbox */
+        /* LIGHTBOX */
         #lightbox {
             position: fixed;
             top: 0; left: 0;
@@ -167,32 +150,31 @@
             display: none;
             justify-content: center;
             align-items: center;
+            z-index: 100;
         }
-
         #lightbox img {
-            max-width: 80vw;
-            max-height: 80vh;
-            border-radius: 18px;
+            max-width: 85vw;
+            max-height: 85vh;
+            border-radius: 16px;
         }
 
         footer {
             text-align: center;
             padding: 40px;
-            color: #4f6f4f;
+            color: #587a58;
             font-size: 0.9rem;
         }
-
     </style>
 </head>
 
 <body>
 
-<!-- Lightbox -->
+<!-- LIGHTBOX -->
 <div id="lightbox" onclick="closeLightbox()">
     <img id="light-img">
 </div>
 
-<!-- Password Page -->
+<!-- PASSWORD PAGE -->
 <div id="password-page">
     <h1>專屬瑄柔的入口</h1>
     <p>請輸入妳與無尾熊的小密碼</p>
@@ -201,74 +183,75 @@
     <button onclick="checkPassword()">進入</button>
 </div>
 
-<!-- Main Content -->
+<!-- MAIN CONTENT -->
 <div id="content">
 
-    <header class="fade">
+    <nav>
+        <div style="font-weight:700;color:#355f35;">XuanRou × Koala</div>
+        <div>
+            <a href="#story">故事</a>
+            <a href="#photos">照片</a>
+        </div>
+    </nav>
+
+    <div class="hero fade">
         <h1>歡迎妳，瑄柔</h1>
-        <div class="subtitle">這是一個只屬於妳的空間</div>
-    </header>
-
-    <div class="section-title fade">寫給妳的一段話</div>
-    <div class="card fade">
-        瑄柔，這個網站不是為了要華麗，也不是為了要誇張的浪漫。<br><br>
-        我只是想做一個乾淨、舒服、專門為妳保留的位置，  
-        一個不需要人打擾、妳隨時都能進來看看、  
-        像是屬於妳的小小宇宙。<br><br>
-        若生活有時讓妳覺得複雜，希望這裡可以讓妳喘口氣。  
-        若心情不好，希望這裡能提醒妳有人在乎妳。<br><br>
-
-        我沒有很多華麗的詞，  
-        但我想讓妳知道：  
-        <b>我一直都在，真誠地在。</b>
+        <p>這裡是為妳保留的空間</p>
     </div>
 
-    <div class="section-title fade">我們的照片</div>
+    <div id="story" class="section-title fade">寫給妳的一段話</div>
+    <div class="card fade">
+        瑄柔，我想讓妳擁有一個只屬於妳的地方，<br>
+        一個妳心情好或不好，都能隨時來坐一下的地方。<br><br>
+        不用太華麗，也不用太多裝飾，<br>
+        就像我們相處的方式一樣——自然、舒服、真誠。<br><br>
+        謝謝妳願意讓我出現在妳的生活裡，<br>
+        而我也會一直在——穩穩的、真心的。
+    </div>
+
+    <div id="photos" class="section-title fade">我們的照片</div>
+
     <div class="gallery fade">
         <img src="photo1.jpg" onclick="openLightbox(this.src)">
         <img src="photo2.jpg" onclick="openLightbox(this.src)">
         <img src="photo3.jpg" onclick="openLightbox(this.src)">
         <img src="photo4.jpg" onclick="openLightbox(this.src)">
+        <img src="photo5.jpg" onclick="openLightbox(this.src)">
+        <img src="photo6.jpg" onclick="openLightbox(this.src)">
     </div>
 
     <footer class="fade">
         © 無尾熊為瑄柔製作 · 2025
     </footer>
-
 </div>
 
-<!-- JS -->
 <script>
-    function checkPassword() {
-        let input = document.getElementById("password").value;
-        if (input === "930614") {
-            document.getElementById("password-page").style.display = "none";
-            document.getElementById("content").style.display = "block";
-            fadeInElements();
-        } else {
-            let box = document.getElementById("password-page");
-            box.classList.add("shake");
-            setTimeout(()=> box.classList.remove("shake"),400);
-        }
+function checkPassword() {
+    let val = document.getElementById("password").value;
+    if (val === "930614") {
+        document.getElementById("password-page").style.display = "none";
+        document.getElementById("content").style.display = "block";
+        showFades();
+    } else {
+        let box = document.getElementById("password-page");
+        box.classList.add("shake");
+        setTimeout(()=> box.classList.remove("shake"), 400);
     }
+}
 
-    function fadeInElements() {
-        const items = document.querySelectorAll(".fade");
-        setTimeout(()=>{
-            items.forEach(el=>{
-                el.classList.add("show");
-            });
-        },200);
-    }
+function showFades() {
+    document.querySelectorAll(".fade").forEach((el, i)=>{
+        setTimeout(()=> el.classList.add("show"), i * 150);
+    });
+}
 
-    function openLightbox(src){
-        document.getElementById("light-img").src = src;
-        document.getElementById("lightbox").style.display = "flex";
-    }
-
-    function closeLightbox(){
-        document.getElementById("lightbox").style.display = "none";
-    }
+function openLightbox(src) {
+    document.getElementById("light-img").src = src;
+    document.getElementById("lightbox").style.display = "flex";
+}
+function closeLightbox() {
+    document.getElementById("lightbox").style.display = "none";
+}
 </script>
 
 </body>
