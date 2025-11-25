@@ -2,11 +2,11 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>瑄柔的專屬網站 · Ultra Edition</title>
+    <title>瑄柔的專屬網站 · Ultra Max Edition</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!-- ===== Global Base Style ===== -->
     <style>
-        /* RESET */
         * {
             margin: 0;
             padding: 0;
@@ -15,66 +15,45 @@
 
         body {
             font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
-            background: linear-gradient(135deg, #e8f3e8, #f6fff6);
+            background: #eef7ee;
             color: #2f4f2f;
             overflow-x: hidden;
-            line-height: 1.7;
         }
 
-        /* NAVIGATION BAR */
-        nav {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%;
-            backdrop-filter: blur(18px);
-            background: rgba(255,255,255,0.55);
-            display: flex;
-            justify-content: space-between;
-            padding: 16px 32px;
-            box-shadow: 0 4px 22px rgba(0,0,0,0.06);
-            z-index: 100;
+        /* Fade Animation */
+        .fade {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: 0.8s ease;
+        }
+        .fade.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        nav .logo {
-            font-weight: 800;
-            font-size: 1.15rem;
-            color: #355f35;
-            letter-spacing: 0.5px;
-        }
-
-        nav .links a {
-            margin-left: 22px;
-            text-decoration: none;
-            font-weight: 600;
-            color: #2f4f2f;
-            transition: 0.2s;
-        }
-
-        nav .links a:hover {
-            color: #4a7c4a;
-        }
-
-
-        /* PASSWORD PAGE */
+        /* ===========================
+           PASSWORD PAGE (Glass UI)
+        =========================== */
         #password-page {
             height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
+            backdrop-filter: blur(10px);
             padding: 20px;
         }
 
         #password-page h1 {
-            font-size: 2rem;
-            font-weight: 700;
+            font-size: 2.2rem;
             color: #355f35;
-            margin-bottom: 10px;
+            font-weight: 800;
+            margin-bottom: 12px;
         }
 
         #password-page p {
             color: #587a58;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         input {
@@ -83,19 +62,17 @@
             border-radius: 12px;
             border: 2px solid #8fb88f;
             text-align: center;
-            font-size: 1rem;
             outline: none;
             transition: 0.3s;
-            margin-top: 10px;
+            font-size: 1rem;
         }
-
         input:focus {
             border-color: #4a7c4a;
         }
 
         button {
-            margin-top: 18px;
-            padding: 12px 36px;
+            margin-top: 20px;
+            padding: 12px 40px;
             font-size: 1rem;
             background: #4a7c4a;
             border: none;
@@ -104,7 +81,6 @@
             cursor: pointer;
             transition: 0.3s;
         }
-
         button:hover {
             background: #3f6a3f;
         }
@@ -119,120 +95,153 @@
             75% { transform: translateX(-6px); }
         }
 
-        /* HIDDEN CONTENT INITIALLY */
+        /* ===========================
+           MAIN CONTENT INITIALLY HIDDEN
+        =========================== */
         #content {
             display: none;
         }
 
-        /* HERO SECTION */
+        /* ===========================
+           NAVIGATION BAR (Glass Elite)
+        =========================== */
+        nav {
+            position: fixed;
+            width: 100%;
+            top: 0; left: 0;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            backdrop-filter: blur(18px);
+            background: rgba(255,255,255,0.45);
+            z-index: 50;
+            box-shadow: 0 4px 22px rgba(0,0,0,0.06);
+        }
+
+        nav .logo {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #355f35;
+            letter-spacing: 1px;
+        }
+
+        nav .links a {
+            margin-left: 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: #2f4f2f;
+            transition: 0.25s;
+        }
+        nav .links a:hover {
+            color: #4a7c4a;
+        }
+
+        /* Hamburger For Mobile */
+        .hamburger {
+            display: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Mobile Menu */
+        #menu {
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(18px);
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        #menu a {
+            padding: 12px 0;
+            color: #2f4f2f;
+            font-size: 1rem;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* RWD Navigation */
+        @media(max-width: 720px){
+            nav .links { display: none; }
+            .hamburger { display: block; }
+        }
+
+        /* ===========================
+           HERO SECTION (Full Width)
+        =========================== */
         .hero {
-            padding-top: 130px;
+            padding-top: 140px;
             padding-bottom: 80px;
             text-align: center;
         }
 
         .hero h1 {
-            font-size: 2.6rem;
+            font-size: 2.7rem;
             font-weight: 800;
             color: #355f35;
         }
 
         .hero p {
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             color: #587a58;
-            margin-top: 10px;
+            margin-top: 12px;
         }
 
-        /* SECTION TITLE */
+        .divider {
+            width: 70px;
+            height: 4px;
+            background: #4a7c4a;
+            border-radius: 3px;
+            margin: 24px auto;
+        }
+
+        /* UNIVERSAL SECTION TITLE */
         .section-title {
+            margin-top: 60px;
             text-align: center;
-            margin-top: 50px;
-            font-size: 1.7rem;
-            font-weight: 700;
+            font-size: 1.8rem;
+            font-weight: 800;
             color: #355f35;
         }
 
-        /* CARD GLASS UI */
+        /* GLASS CARD */
         .card {
             max-width: 900px;
-            margin: 30px auto;
+            margin: 35px auto;
             padding: 35px;
-            border-radius: 20px;
             background: rgba(255,255,255,0.75);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 6px 25px rgba(70, 100, 70, 0.15);
+            backdrop-filter: blur(14px);
+            border-radius: 20px;
+            box-shadow: 0 8px 26px rgba(60,90,60,0.15);
             font-size: 1.05rem;
-        }
-
-        /* PHOTO GALLERY */
-        .gallery {
-            max-width: 1050px;
-            margin: 35px auto 60px;
-            padding: 0 25px;
-            display: grid;
-            gap: 18px;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        }
-
-        .gallery img {
-            width: 100%;
-            border-radius: 18px;
-            box-shadow: 0 6px 25px rgba(70,100,70,0.2);
-            transition: 0.3s;
-            cursor: pointer;
-        }
-
-        .gallery img:hover {
-            transform: translateY(-6px) scale(1.03);
-        }
-
-        /* LIGHTBOX */
-        #lightbox {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 200;
-        }
-
-        #lightbox img {
-            max-width: 85vw;
-            max-height: 85vh;
-            border-radius: 18px;
-        }
-
-        /* FADE ANIMATION */
-        .fade {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: .8s ease;
-        }
-
-        .fade.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px;
-            color: #587a58;
-            font-size: 0.9rem;
+            line-height: 1.9;
         }
     </style>
 </head>
 
 <body>
 
-<!-- LIGHTBOX -->
-<div id="lightbox" onclick="closeLightbox()">
-    <img id="light-img">
+<!-- ===== LIGHTBOX ===== -->
+<div id="lightbox" onclick="closeLightbox()" style="
+    position: fixed;
+    top:0;left:0;width:100%;height:100%;
+    background: rgba(0,0,0,0.85);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:200;">
+    <img id="light-img" style="max-width:85vw;max-height:85vh;border-radius:18px;">
 </div>
 
-<!-- PASSWORD PAGE -->
+<!-- ===== PASSWORD PAGE ===== -->
 <div id="password-page">
     <h1>專屬瑄柔的入口</h1>
     <p>請輸入妳與無尾熊的小密碼</p>
@@ -241,81 +250,595 @@
     <button onclick="checkPassword()">進入</button>
 </div>
 
-<!-- MAIN CONTENT -->
+<!-- ===== MAIN CONTENT ===== -->
 <div id="content">
 
+<!-- NAVIGATION -->
 <nav>
     <div class="logo">XuanRou × Koala</div>
+
     <div class="links">
+        <a href="#home">首頁</a>
         <a href="#story">故事</a>
         <a href="#photos">照片</a>
+        <a href="#timeline">時間軸</a>
+        <a href="#diary">日記</a>
+        <a href="#messages">留言瓶</a>
+    </div>
+
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+
+    <div id="menu">
+        <a href="#home" onclick="toggleMenu()">首頁</a>
+        <a href="#story" onclick="toggleMenu()">故事</a>
+        <a href="#photos" onclick="toggleMenu()">照片</a>
+        <a href="#timeline" onclick="toggleMenu()">時間軸</a>
+        <a href="#diary" onclick="toggleMenu()">日記</a>
+        <a href="#messages" onclick="toggleMenu()">留言瓶</a>
     </div>
 </nav>
 
-<div class="hero fade">
+<!-- HERO SECTION -->
+<section id="home" class="hero fade">
     <h1>歡迎妳，瑄柔</h1>
-    <p>這裡是為妳保留的小小空間</p>
+    <div class="divider"></div>
+    <p>這裡，是我為妳放在心裡的那個位置。</p>
+</section>
+<!-- ===========================
+      STORY SECTION
+=========================== -->
+<section id="story">
+    <div class="section-title fade">寫給妳的一段話</div>
+
+    <div class="card fade">
+        瑄柔，妳知道嗎？  
+        我原本想把這個網站做得很華麗、很有特效、很厲害的樣子。<br><br>
+
+        可是後來我發現——其實妳不需要那些。  
+        妳需要的從來不是誇張、不是鋪張、不是勉強的浪漫。  
+        妳需要的，是一個乾乾淨淨、安安靜靜、真正為妳留出的地方。<br><br>
+
+        而我想做的，就是把這樣的位置留給妳。  
+        每次想到妳，我都會覺得世界好像慢了下來一點，  
+        然後變得比較溫柔、比較舒服。<br><br>
+
+        我不知道未來會有什麼事情、會遇到什麼問題，  
+        但我可以確定的是——  
+        <b>妳永遠都不是一個人。</b><br><br>
+
+        我會在這裡，陪妳、聽妳、等妳。  
+        不急、不吵、不逼，不管妳怎樣，我都在這裡。
+    </div>
+</section>
+
+<!-- ===========================
+      ABOUT US (Two Column Layout)
+=========================== -->
+<section id="about">
+    <div class="section-title fade">關於我們</div>
+
+    <div class="card fade" style="display:flex;flex-wrap:wrap;gap:30px;align-items:center;">
+        
+        <!-- 左側文字 -->
+        <div style="flex:1;min-width:260px;">
+            <h2 style="color:#355f35;font-size:1.6rem;font-weight:800;margin-bottom:16px;">
+                我 × 妳
+            </h2>
+
+            <p style="font-size:1.05rem;line-height:1.9;">
+                我不知道從什麼時候開始，  
+                妳對我來說變成了一個很特別、很重要的人。<br><br>
+
+                我喜歡妳生氣時的小語氣、  
+                喜歡妳撒嬌的方式、  
+                喜歡妳突然變安靜的樣子、  
+                也喜歡妳不小心露出脆弱的時候。<br><br>
+
+                妳不用很厲害、不用很完美，  
+                妳就是瑄柔，而我喜歡的就是現在的妳。
+            </p>
+        </div>
+
+        <!-- 右側圖片 -->
+        <div style="
+            flex:1;
+            min-width:260px;
+            display:flex;
+            justify-content:center;
+        ">
+            <img src="photo6.jpg" 
+                 style="width:100%;max-width:320px;border-radius:18px;box-shadow:0 6px 25px rgba(60,90,60,0.2);">
+        </div>
+    </div>
+</section>
+
+<!-- ===========================
+      SECOND STORY BLOCK
+=========================== -->
+<section id="story-2">
+    <div class="card fade">
+        我知道我們不一定永遠都會順利，  
+        也不一定每天都剛剛好心情很好。<br><br>
+        但沒關係。  
+        因為喜歡妳，從來不是在妳完美時才喜歡。<br><br>
+
+        是妳全部的樣子——  
+        高興、生氣、累、想哭、需要陪伴、想被理解、  
+        這一些全部加起來的妳，我都想接住。<br><br>
+
+        若世界讓妳覺得太多、太吵、太亂、太累，  
+        那妳回來這裡就好。  
+        我做這裡，就是想讓妳哪一天喘不過氣時，  
+        也能想到——  
+        <b>有一個人永遠是站在妳這邊的。</b>
+    </div>
+</section>
+<!-- ===========================
+      PHOTO GALLERY
+=========================== -->
+<section id="photos">
+    <div class="section-title fade">我們的照片</div>
+
+    <div class="card fade" style="text-align:center;font-size:1rem;color:#587a58;">
+        點擊照片可以放大查看 ❤
+    </div>
+
+    <!-- Masonry Gallery -->
+    <div class="gallery fade" style="
+        column-count: 3;
+        column-gap: 18px;
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 0 20px;
+    ">
+        <img src="photo1.jpg" class="masonry-img" onclick="openLightbox(this.src)" style="width:100%;margin-bottom:18px;border-radius:18px;">
+        <img src="photo2.jpg" class="masonry-img" onclick="openLightbox(this.src)" style="width:100%;margin-bottom:18px;border-radius:18px;">
+        <img src="photo3.jpg" class="masonry-img" onclick="openLightbox(this.src)" style="width:100%;margin-bottom:18px;border-radius:18px;">
+        <img src="photo4.jpg" class="masonry-img" onclick="openLightbox(this.src)" style="width:100%;margin-bottom:18px;border-radius:18px;">
+        <img src="photo5.jpg" class="masonry-img" onclick="openLightbox(this.src)" style="width:100%;margin-bottom:18px;border-radius:18px;">
+        <img src="photo6.jpg" class="masonry-img" onclick="openLightbox(this.src)" style="width:100%;margin-bottom:18px;border-radius:18px;">
+    </div>
+
+</section>
+
+<!-- ===========================
+      LIGHTBOX (Full Screen)
+=========================== -->
+<div id="lightbox" onclick="closeLightbox()" 
+     style="position:fixed;top:0;left:0;width:100%;height:100%;
+            background:rgba(0,0,0,0.85);display:none;
+            justify-content:center;align-items:center;z-index:200;">
+    <img id="light-img" 
+         style="max-width:85vw;max-height:85vh;border-radius:16px;
+                box-shadow:0 6px 25px rgba(255,255,255,0.2);">
 </div>
-
-<div id="story" class="section-title fade">寫給妳的一段話</div>
-
-<div class="card fade">
-    瑄柔，這個網站是我一點一滴做給妳的。<br><br>
-    我希望妳來到這裡時，會覺得舒服、放鬆、安心，  
-    像是一個妳可以短暫休息的地方。<br><br>
-    不浮誇、不多餘，就是我們兩個最自然的樣子。<br><br>
-    謝謝妳願意讓我走進妳的生活，  
-    而我也會在這裡，穩穩的、認真的陪著妳。
-</div>
-<!-- PHOTO SECTION -->
-<div id="photos" class="section-title fade">我們的照片</div>
-
-<div class="gallery fade">
-    <img src="photo1.jpg" onclick="openLightbox(this.src)">
-    <img src="photo2.jpg" onclick="openLightbox(this.src)">
-    <img src="photo3.jpg" onclick="openLightbox(this.src)">
-    <img src="photo4.jpg" onclick="openLightbox(this.src)">
-    <img src="photo5.jpg" onclick="openLightbox(this.src)">
-    <img src="photo6.jpg" onclick="openLightbox(this.src)">
-</div>
-
-<footer class="fade">
-    © 無尾熊為瑄柔製作 · 2025
-</footer>
-
-</div> <!-- END CONTENT -->
 
 <script>
-/* CHECK PASSWORD */
+/* OPEN LIGHTBOX */
+function openLightbox(src) {
+    document.getElementById("light-img").src = src;
+    document.getElementById("lightbox").style.display = "flex";
+}
+
+/* CLOSE LIGHTBOX */
+function closeLightbox() {
+    document.getElementById("lightbox").style.display = "none";
+}
+</script>
+
+<style>
+/* Mobile Masonry Fix */
+@media(max-width: 768px){
+    .gallery {
+        column-count: 2 !important;
+    }
+}
+@media(max-width: 480px){
+    .gallery {
+        column-count: 1 !important;
+    }
+}
+</style>
+<!-- ===========================
+      TIMELINE SECTION
+=========================== -->
+<section id="timeline">
+    <div class="section-title fade">我們的時間軸</div>
+
+    <div style="max-width: 900px; margin: 40px auto; padding: 0 20px;">
+
+        <!-- Timeline Wrapper -->
+        <div class="timeline">
+
+            <!-- 1 -->
+            <div class="timeline-item fade left">
+                <div class="timeline-content">
+                    <h3>第一次聊天</h3>
+                    <p>就是從這一天開始，我開始覺得妳是個特別的人。</p>
+                    <span class="date">某年 · 某月 · 某日</span>
+                </div>
+            </div>
+
+            <!-- 2 -->
+            <div class="timeline-item fade right">
+                <div class="timeline-content">
+                    <h3>第一次見面</h3>
+                    <p>看到妳的那一刻，我心裡其實有點小緊張。</p>
+                    <span class="date">某月 · 某日</span>
+                </div>
+            </div>
+
+            <!-- 3 -->
+            <div class="timeline-item fade left">
+                <div class="timeline-content">
+                    <h3>一起出去的某一天</h3>
+                    <p>那一天我覺得：好像可以一直這樣陪妳。</p>
+                    <span class="date">某日</span>
+                </div>
+            </div>
+
+            <!-- 4 -->
+            <div class="timeline-item fade right">
+                <div class="timeline-content">
+                    <h3>某個很重要的瞬間</h3>
+                    <p>可能是妳笑、可能是妳撒嬌、可能是妳生氣，  
+                       但那一瞬間讓我確定我真的很在意妳。</p>
+                    <span class="date">某日</span>
+                </div>
+            </div>
+
+            <!-- 5 -->
+            <div class="timeline-item fade left">
+                <div class="timeline-content">
+                    <h3>我們現在</h3>
+                    <p>不是最完美、不是最安穩，但是真實、真誠。  
+                       而我想繼續往前走的方向，就是有妳的那邊。</p>
+                    <span class="date">現在</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ===========================
+      TIMELINE CSS
+=========================== -->
+<style>
+.timeline {
+    position: relative;
+    margin: 50px 0;
+}
+
+.timeline:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: 4px;
+    height: 100%;
+    background: #8fb88f;
+    border-radius: 2px;
+}
+
+/* Item */
+.timeline-item {
+    width: 50%;
+    position: relative;
+    padding: 20px 30px;
+}
+
+.timeline-item.left {
+    left: 0;
+    text-align: right;
+}
+
+.timeline-item.right {
+    left: 50%;
+}
+
+.timeline-content {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+    padding: 20px 25px;
+    border-radius: 15px;
+    box-shadow: 0 6px 22px rgba(70,100,70,0.15);
+}
+
+.timeline-item.left .timeline-content {
+    margin-right: 40px;
+}
+
+.timeline-item.right .timeline-content {
+    margin-left: 40px;
+}
+
+.timeline-content h3 {
+    font-size: 1.3rem;
+    color: #355f35;
+    margin-bottom: 8px;
+}
+.timeline-content p {
+    color: #4f6f4f;
+    margin-bottom: 10px;
+}
+.timeline-content .date {
+    font-size: 0.9rem;
+    color: #6f8f6f;
+}
+
+/* Connector circle */
+.timeline-item:before {
+    content: "";
+    position: absolute;
+    top: 20px;
+    width: 16px;
+    height: 16px;
+    background: #4a7c4a;
+    border-radius: 50%;
+    border: 3px solid #e8f3e8;
+}
+
+.timeline-item.left:before {
+    right: -8px;
+}
+.timeline-item.right:before {
+    left: -8px;
+}
+
+/* Mobile RWD */
+@media(max-width: 820px){
+    .timeline:before { left: 10px; }
+    .timeline-item,
+    .timeline-item.left,
+    .timeline-item.right {
+        width: 100%;
+        left: 0;
+        text-align: left;
+        padding-left: 40px;
+    }
+
+    .timeline-item:before {
+        left: 0;
+    }
+
+    .timeline-item.left .timeline-content,
+    .timeline-item.right .timeline-content {
+        margin: 0 0 30px 20px;
+    }
+}
+</style>
+<!-- ===========================
+      DIARY SECTION
+=========================== -->
+<section id="diary" style="margin-top:80px;">
+    <div class="section-title fade">日記 · Diary</div>
+
+    <div class="card fade" style="text-align:center;">
+        <h3 style="color:#355f35;font-size:1.3rem;margin-bottom:16px;">
+            今天想對妳說的一句話
+        </h3>
+
+        <div id="diary-box" style="
+            margin:auto;
+            margin-top:20px;
+            padding:25px;
+            max-width:700px;
+            background:#ffffffcc;
+            border-radius:14px;
+            font-size:1.1rem;
+            line-height:1.9;
+            color:#4f6f4f;
+            box-shadow:0 6px 20px rgba(60,90,60,0.15);
+            transition:0.4s;
+        ">
+            <!-- JS 會自動放進內容 -->
+        </div>
+    </div>
+</section>
+
+<script>
+// ====== Diary Sentences ======
+const diarySentences = [
+    "希望妳今天是被溫柔對待的一天。",
+    "如果妳現在很累，那我就陪妳一下，不講話也可以。",
+    "我喜歡妳的全部，妳不用努力成為什麼樣子。",
+    "妳的世界偶爾很吵沒關係，我在這裡就是希望妳能安靜一下。",
+    "妳是很值得被愛、值得被抱緊的女孩。",
+    "我希望妳每天都知道，有人一直在意妳。",
+    "如果妳想被擁抱，我會比妳願意說出口的還更快抱住妳。",
+    "妳不用很好，也不用假裝沒事，我永遠站在妳這邊。"
+];
+
+// 隨機一句
+function loadDiary(){
+    const pick = diarySentences[Math.floor(Math.random()*diarySentences.length)];
+    document.getElementById("diary-box").innerHTML = pick;
+}
+setTimeout(loadDiary, 800);
+</script>
+
+
+<!-- ===========================
+      MESSAGE BOTTLE SECTION
+=========================== -->
+<section id="messages" style="margin-top:80px;">
+    <div class="section-title fade">留言瓶 · Message Bottle</div>
+
+    <div style="max-width:900px;margin:35px auto;padding:20px;">
+
+        <div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;">
+
+            <!-- Message Card 1 -->
+            <div class="msg fade" style="
+                background:rgba(255,255,255,0.75);
+                backdrop-filter:blur(12px);
+                padding:20px 25px;
+                border-radius:14px;
+                width:260px;
+                box-shadow:0 6px 22px rgba(60,90,60,0.15);
+            ">
+                妳其實比妳想像中的還更值得被愛。
+            </div>
+
+            <!-- Message Card 2 -->
+            <div class="msg fade" style="
+                background:rgba(255,255,255,0.75);
+                backdrop-filter:blur(12px);
+                padding:20px 25px;
+                border-radius:14px;
+                width:260px;
+                box-shadow:0 6px 22px rgba(60,90,60,0.15);
+            ">
+                妳的壞情緒我也願意一起扛。因為妳不是一個人。
+            </div>
+
+            <!-- Message Card 3 -->
+            <div class="msg fade" style="
+                background:rgba(255,255,255,0.75);
+                backdrop-filter:blur(12px);
+                padding:20px 25px;
+                border-radius:14px;
+                width:260px;
+                box-shadow:0 6px 22px rgba(60,90,60,0.15);
+            ">
+                如果世界不溫柔，那我就對妳溫柔一點。
+            </div>
+
+            <!-- Message Card 4 -->
+            <div class="msg fade" style="
+                background:rgba(255,255,255,0.75);
+                backdrop-filter:blur(12px);
+                padding:20px 25px;
+                border-radius:14px;
+                width:260px;
+                box-shadow:0 6px 22px rgba(60,90,60,0.15);
+            ">
+                妳不用表現得堅強，我在妳就不用。
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<style>
+/* Message cards small float effect */
+.msg {
+    animation: floatMsg 6s ease-in-out infinite;
+}
+
+@keyframes floatMsg {
+    0%   { transform: translateY(0px); }
+    50%  { transform: translateY(-12px); }
+    100% { transform: translateY(0px); }
+}
+</style>
+<!-- ===========================
+      MUSIC PLAYER
+=========================== -->
+<section id="music" style="margin-top:80px;">
+    <div class="section-title fade">背景音樂 · Music</div>
+
+    <div class="card fade" style="text-align:center;">
+        <p style="color:#4f6f4f;margin-bottom:20px;">想聽歌時再開就好，不會自動播放。</p>
+
+        <button onclick="toggleMusic()" style="
+            padding:12px 35px;
+            background:#4a7c4a;
+            color:white;
+            border:none;
+            border-radius:12px;
+            font-size:1rem;
+            cursor:pointer;
+            transition:.3s;
+        ">
+            🎵 開 / 關 音樂
+        </button>
+
+        <audio id="bgm" loop style="display:none;">
+            <source src="music.mp3" type="audio/mpeg">
+        </audio>
+
+        <p style="margin-top:15px;font-size:0.9rem;color:#6f8f6f;">
+            （記得上傳一個 music.mp3 到 GitHub）
+        </p>
+    </div>
+</section>
+
+<script>
+/* ===== MUSIC CONTROL ===== */
+let isPlaying = false;
+function toggleMusic(){
+    const bgm = document.getElementById("bgm");
+    if(isPlaying){
+        bgm.pause();
+        isPlaying = false;
+    } else {
+        bgm.play();
+        isPlaying = true;
+    }
+}
+</script>
+
+
+<!-- ===========================
+      FOOTER
+=========================== -->
+<footer class="fade" style="
+    text-align:center;
+    padding:45px;
+    margin-top:80px;
+    color:#587a58;
+    font-size:0.9rem;
+">
+    © 無尾熊為瑄柔製作 · 2025 <br>
+    All Rights Reserved.
+</footer>
+
+
+<!-- ===========================
+      GLOBAL JAVASCRIPT
+=========================== -->
+<script>
+/* ===== PASSWORD CHECK ===== */
 function checkPassword() {
     let pw = document.getElementById("password").value;
     if (pw === "930614") {
         document.getElementById("password-page").style.display = "none";
         document.getElementById("content").style.display = "block";
-        showFade();
+        fadeAll();
     } else {
         let box = document.getElementById("password-page");
         box.classList.add("shake");
-        setTimeout(()=> box.classList.remove("shake"), 400);
+        setTimeout(()=> box.classList.remove("shake"),400);
     }
 }
 
-/* FADE-IN EFFECT */
-function showFade() {
-    document.querySelectorAll(".fade").forEach((el, i)=>{
-        setTimeout(()=> el.classList.add("show"), i * 150);
+/* ===== SHOW ALL FADE ITEMS ===== */
+function fadeAll(){
+    const items = document.querySelectorAll(".fade");
+    items.forEach((el, i)=>{
+        setTimeout(()=> el.classList.add("show"), i * 120);
     });
 }
 
-/* LIGHTBOX */
-function openLightbox(src) {
+/* ===== MOBILE MENU ===== */
+function toggleMenu(){
+    const menu = document.getElementById("menu");
+    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+}
+
+/* ===== LIGHTBOX ===== */
+function openLightbox(src){
     document.getElementById("light-img").src = src;
     document.getElementById("lightbox").style.display = "flex";
 }
-function closeLightbox() {
+function closeLightbox(){
     document.getElementById("lightbox").style.display = "none";
 }
 </script>
+
+</div> <!-- END CONTENT -->
 
 </body>
 </html>
