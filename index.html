@@ -2,90 +2,86 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>瑄柔的綠色戀愛宇宙</title>
+    <title>瑄柔的專屬網站</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Lightbox 用 CSS -->
+    
+    <!-- ====== STYLE ====== -->
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
-            background: linear-gradient(135deg,#e0f5df,#f5fff4,#e3f4df);
-            animation: bgmove 12s infinite alternate;
+            background: linear-gradient(135deg, #e8f3e8, #f4fff4);
+            color: #2f4f2f;
             overflow-x: hidden;
         }
 
-        @keyframes bgmove {
-            0% { background-position: 0 0; }
-            100% { background-position: 100% 100%; }
-        }
-
-        /* 淡入動畫 */
-        .fade-in {
+        /* Smooth Fade-in */
+        .fade {
             opacity: 0;
-            transform: translateY(25px);
+            transform: translateY(20px);
             transition: 1s ease;
         }
-        .fade-in.show {
+        .fade.show {
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* 密碼頁 */
+        /* Password Page */
         #password-page {
             height: 100vh;
             display: flex;
             justify-content: center;
             flex-direction: column;
             align-items: center;
-            text-align: center;
             padding: 20px;
         }
 
         #password-page h1 {
-            font-size: 2.4rem;
-            color: #4caf50;
-            margin-bottom: 10px;
+            font-size: 2rem;
+            letter-spacing: 1px;
+            color: #3a5f3a;
+            font-weight: 700;
         }
 
         #password-page p {
-            color: #6abf69;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
+            color: #587a58;
+            margin-top: 10px;
         }
 
         input {
-            padding: 12px 22px;
+            padding: 12px 18px;
+            width: 260px;
             border-radius: 12px;
-            border: 2px solid #8ed18b;
-            width: 240px;
+            border: 2px solid #96b896;
             text-align: center;
-            transition: 0.3s;
+            margin-top: 18px;
             font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
         }
 
         input:focus {
-            border-color: #4caf50;
+            border-color: #4a7c4a;
         }
 
         button {
-            background: #66bb6a;
-            border: none;
-            color: white;
-            padding: 10px 35px;
-            border-radius: 14px;
-            margin-top: 15px;
-            cursor: pointer;
+            margin-top: 20px;
+            padding: 12px 40px;
             font-size: 1rem;
+            background: #4a7c4a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
             transition: 0.3s;
         }
 
         button:hover {
-            background: #57a85b;
+            background: #3b653b;
         }
 
-        /* 抖動 */
+        /* Shake Error */
         .shake {
             animation: shake 0.4s;
         }
@@ -97,359 +93,181 @@
             100% { transform: translateX(0); }
         }
 
-        /* 整體內容 */
-        #content {
-            display: none;
-            animation: fadeInPage 1s ease;
-        }
+        /* Main Content */
+        #content { display: none; }
 
-        @keyframes fadeInPage {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Header */
         header {
             text-align: center;
             padding: 70px 20px 30px;
         }
 
         header h1 {
-            font-size: 2.75rem;
-            color: #4caf50;
-            font-weight: bold;
+            font-size: 2.4rem;
+            color: #3a5f3a;
+            font-weight: 800;
+            letter-spacing: 1px;
         }
 
         .subtitle {
-            font-size: 1.2rem;
-            color: #6abf69;
-            margin-top: 5px;
+            font-size: 1.1rem;
+            color: #4f6f4f;
+            margin-top: 8px;
         }
 
-        /* 卡片 */
+        /* Section Title */
+        .section-title {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 1.6rem;
+            color: #3a5f3a;
+            font-weight: 700;
+        }
+
+        /* Card */
         .card {
-            max-width: 850px;
-            background: #ffffffdd;
+            max-width: 900px;
             margin: 30px auto;
             padding: 35px;
             border-radius: 22px;
-            box-shadow: 0 4px 25px rgba(100, 150, 100, 0.25);
-            line-height: 1.9;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 25px rgba(60, 90, 60, 0.15);
+            line-height: 1.85;
             font-size: 1.05rem;
         }
 
-        /* 標題 */
-        .section-title {
-            text-align: center;
-            font-size: 2rem;
-            margin-top: 50px;
-            color: #4caf50;
-            font-weight: bold;
-        }
-
-        /* 紀念日時間軸 */
-        .timeline {
-            max-width: 800px;
-            margin: 30px auto;
-            border-left: 3px solid #8ed18d;
-            padding-left: 20px;
-        }
-
-        .timeline-item {
-            margin-bottom: 25px;
-            position: relative;
-        }
-
-        .timeline-item:before {
-            content: "🍃";
-            position: absolute;
-            left: -16px;
-            top: -3px;
-            font-size: 1.3rem;
-        }
-
-        .timeline-item h3 {
-            margin: 0;
-            color: #4caf50;
-        }
-
-        /* 相片集 */
+        /* Gallery */
         .gallery {
             max-width: 1000px;
-            margin: 20px auto 40px;
+            margin: 30px auto 60px;
             padding: 0 20px;
             display: grid;
-            gap: 15px;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         }
 
         .gallery img {
             width: 100%;
-            border-radius: 18px;
-            box-shadow: 0 4px 18px rgba(90,150,90,0.25);
+            border-radius: 16px;
+            box-shadow: 0 6px 22px rgba(60, 90, 60, 0.2);
+            transition: 0.35s;
             cursor: pointer;
-            transition: 0.3s;
         }
 
         .gallery img:hover {
-            transform: scale(1.08);
+            transform: translateY(-6px) scale(1.02);
         }
 
         /* Lightbox */
         #lightbox {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10,10,10,0.85);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
             display: none;
             justify-content: center;
             align-items: center;
         }
 
         #lightbox img {
-            max-width: 90%;
-            max-height: 90%;
+            max-width: 80vw;
+            max-height: 80vh;
             border-radius: 18px;
         }
 
-        /* 愛心飄落 */
-        .heart {
-            position: fixed;
-            top: -10px;
-            color: #8ed18b;
-            animation: fall linear infinite;
-            opacity: 0.75;
-        }
-
-        @keyframes fall {
-            from { transform: translateY(-10vh); }
-            to { transform: translateY(110vh); }
-        }
-
-        /* 爆炸愛心 */
-        .boom-heart {
-            position: fixed;
-            font-size: 24px;
-            color: #4caf50;
-            animation: boom 0.9s ease-out forwards;
-        }
-
-        @keyframes boom {
-            from { transform: scale(0.2); opacity: 1; }
-            to { transform: scale(2.8); opacity: 0; }
-        }
-
-        /* 互動愛心 */
-        #love-btn {
+        footer {
             text-align: center;
-            margin-top: 40px;
+            padding: 40px;
+            color: #4f6f4f;
+            font-size: 0.9rem;
         }
 
-        #love-btn button {
-            background: #4caf50;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            border-radius: 18px;
-            cursor: pointer;
-            transition: 0.4s;
-        }
-
-        #love-btn button:hover {
-            background: #3d9542;
-            transform: scale(1.08);
-        }
-
-        #love-message {
-            margin-top: 20px;
-            font-size: 1.2rem;
-            color: #4caf50;
-            text-align: center;
-            opacity: 0;
-            transition: 0.8s;
-        }
     </style>
 </head>
 
 <body>
 
-<!-- Lightbox 放大圖 -->
+<!-- Lightbox -->
 <div id="lightbox" onclick="closeLightbox()">
-    <img id="lightbox-img">
+    <img id="light-img">
 </div>
 
-<!-- 密碼頁 -->
+<!-- Password Page -->
 <div id="password-page">
-    <h1>瑄柔的小秘密入口</h1>
-    <p>輸入我們的小密碼才能進入 🌿</p>
+    <h1>專屬瑄柔的入口</h1>
+    <p>請輸入妳與無尾熊的小密碼</p>
 
     <input type="password" id="password" placeholder="輸入密碼">
     <button onclick="checkPassword()">進入</button>
 </div>
 
-<!-- 內容頁 -->
+<!-- Main Content -->
 <div id="content">
 
-    <!-- 愛心飄落 -->
-    <script>
-        for (let i = 0; i < 30; i++) {
-            let heart = document.createElement("div");
-            heart.className = "heart";
-            heart.innerHTML = "💚";
-            heart.style.left = Math.random() * 100 + "vw";
-            heart.style.animationDuration = (4 + Math.random() * 4) + "s";
-            heart.style.fontSize = (14 + Math.random() * 20) + "px";
-            document.body.appendChild(heart);
-        }
-    </script>
-
-    <!-- 音樂 -->
-    <audio id="bgm" src="https://www.youtube.com/watch?v=i7IZrHzn8Xo&list=RDCMPkZldgZBw&index=4" autoplay loop hidden></audio>
-
-    <!-- Header -->
-    <header class="fade-in">
+    <header class="fade">
         <h1>歡迎妳，瑄柔</h1>
-        <div class="subtitle">這裡是無尾熊為妳做的綠色戀愛宇宙 💚</div>
+        <div class="subtitle">這是一個只屬於妳的空間</div>
     </header>
 
-    <!-- 告白 -->
-    <div class="section-title fade-in">寫給瑄柔的一段話</div>
-    <div class="card fade-in">
-        瑄柔，我把妳喜歡的綠色加進這個網站裡，  
-        把我對妳的心意藏進每一個動畫、每一段字、每一張照片裡。<br><br>
+    <div class="section-title fade">寫給妳的一段話</div>
+    <div class="card fade">
+        瑄柔，這個網站不是為了要華麗，也不是為了要誇張的浪漫。<br><br>
+        我只是想做一個乾淨、舒服、專門為妳保留的位置，  
+        一個不需要人打擾、妳隨時都能進來看看、  
+        像是屬於妳的小小宇宙。<br><br>
+        若生活有時讓妳覺得複雜，希望這裡可以讓妳喘口氣。  
+        若心情不好，希望這裡能提醒妳有人在乎妳。<br><br>
 
-        妳是我想好好對待的人，是我願意花心思的人，  
-        也是讓我想用最溫柔的方式去守護的人。<br><br>
-
-        謝謝妳讓我走進妳的世界，  
-        <b>我會一直在妳身邊，不管妳心情晴天或雨天。</b>
+        我沒有很多華麗的詞，  
+        但我想讓妳知道：  
+        <b>我一直都在，真誠地在。</b>
     </div>
 
-    <!-- 時間軸 -->
-    <div class="section-title fade-in">我們的故事時間軸</div>
-    <div class="timeline fade-in">
-        <div class="timeline-item">
-            <h3>第一次見面</h3>
-            <p>那天的妳好看得讓我不敢說出口。</p>
-        </div>
-
-        <div class="timeline-item">
-            <h3>開始變熟</h3>
-            <p>聊天變自然，我在等妳的訊息；而我自己也知道。</p>
-        </div>
-
-        <div class="timeline-item">
-            <h3>共享生活</h3>
-            <p>妳說的每一件事，我真的都有放在心上。</p>
-        </div>
-
-        <div class="timeline-item">
-            <h3>現在的我們</h3>
-            <p>沒有完美，但都是認真。我喜歡這樣的我們。</p>
-        </div>
-    </div>
-
-    <!-- 相片集 -->
-    <div class="section-title fade-in">我們的回憶相簿</div>
-    <div class="gallery fade-in">
+    <div class="section-title fade">我們的照片</div>
+    <div class="gallery fade">
         <img src="photo1.jpg" onclick="openLightbox(this.src)">
         <img src="photo2.jpg" onclick="openLightbox(this.src)">
         <img src="photo3.jpg" onclick="openLightbox(this.src)">
         <img src="photo4.jpg" onclick="openLightbox(this.src)">
     </div>
 
-    <!-- 互動愛心 -->
-    <div id="love-btn" class="fade-in">
-        <button onclick="showLove()">點我一下 💚</button>
-        <div id="love-message">（這裡會出現一句話）</div>
-    </div>
-
-    <footer class="fade-in" style="margin-top:60px;">
-        Made with 💚 by 無尾熊 · 給黃瑄柔
+    <footer class="fade">
+        © 無尾熊為瑄柔製作 · 2025
     </footer>
 
 </div>
 
+<!-- JS -->
 <script>
-    /* 密碼 */
     function checkPassword() {
         let input = document.getElementById("password").value;
-        let correct = "930614";
-
-        if (input === correct) {
-            boomHearts();
-
-            setTimeout(() => {
-                document.getElementById("password-page").style.display = "none";
-                document.getElementById("content").style.display = "block";
-                showOnScroll();
-            }, 700);
+        if (input === "930614") {
+            document.getElementById("password-page").style.display = "none";
+            document.getElementById("content").style.display = "block";
+            fadeInElements();
         } else {
-            let pwBox = document.getElementById("password-page");
-            pwBox.classList.add("shake");
-            setTimeout(() => pwBox.classList.remove("shake"), 400);
+            let box = document.getElementById("password-page");
+            box.classList.add("shake");
+            setTimeout(()=> box.classList.remove("shake"),400);
         }
     }
 
-    /* 愛心爆炸 */
-    function boomHearts() {
-        for (let i = 0; i < 18; i++) {
-            let heart = document.createElement("div");
-            heart.className = "boom-heart";
-            heart.innerHTML = "💚";
-
-            heart.style.left = 45 + Math.random() * 10 + "vw";
-            heart.style.top = 45 + Math.random() * 10 + "vh";
-
-            document.body.appendChild(heart);
-
-            setTimeout(() => heart.remove(), 900);
-        }
+    function fadeInElements() {
+        const items = document.querySelectorAll(".fade");
+        setTimeout(()=>{
+            items.forEach(el=>{
+                el.classList.add("show");
+            });
+        },200);
     }
 
-    /* Lightbox */
-    function openLightbox(src) {
-        document.getElementById("lightbox-img").src = src;
+    function openLightbox(src){
+        document.getElementById("light-img").src = src;
         document.getElementById("lightbox").style.display = "flex";
     }
-    function closeLightbox() {
+
+    function closeLightbox(){
         document.getElementById("lightbox").style.display = "none";
-    }
-
-    /* Scroll 出現動畫 */
-    function showOnScroll() {
-        const items = document.querySelectorAll(".fade-in");
-        const show = () => {
-            items.forEach(el => {
-                let rect = el.getBoundingClientRect();
-                if (rect.top < window.innerHeight - 80) {
-                    el.classList.add("show");
-                }
-            });
-        };
-        show();
-        window.addEventListener("scroll", show);
-    }
-
-    /* 互動愛心 */
-    const loveLines = [
-        "妳是我最喜歡的那個人。",
-        "看到妳，我就覺得一切都值得。",
-        "妳的名字，我講一次甜一次。",
-        "我會一直在，不用懷疑。",
-        "有妳，我真的很幸運。"
-    ];
-
-    function showLove() {
-        let msg = loveLines[Math.floor(Math.random()*loveLines.length)];
-        let box = document.getElementById("love-message");
-        box.innerHTML = msg;
-        box.style.opacity = 1;
-
-        setTimeout(()=> box.style.opacity = 0, 2500);
     }
 </script>
 
