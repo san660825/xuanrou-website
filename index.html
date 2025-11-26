@@ -1546,6 +1546,200 @@ document.querySelectorAll("section").forEach(sec=>{
     sec.after(divider);
 });
 </script>
+<!-- ===========================
+     PART 31 — FLOATING HEART BALLOONS
+=========================== -->
+
+<style>
+.heart-balloon {
+    position: fixed;
+    bottom: -40px;
+    font-size: 26px;
+    opacity: 0.8;
+    animation: floatHeart31 8s linear forwards;
+    pointer-events: none;
+    z-index: 998;
+}
+
+@keyframes floatHeart31 {
+    0%   { transform: translateY(0) scale(0.9); opacity: 0.7; }
+    60%  { opacity: 1; }
+    100% { transform: translateY(-120vh) scale(1.2); opacity: 0; }
+}
+</style>
+
+<script>
+function spawnHearts(){
+    const heart = document.createElement("div");
+    heart.className = "heart-balloon";
+    heart.innerText = "❤";
+
+    heart.style.left = Math.random()*90 + "vw";
+    heart.style.animationDuration = (7 + Math.random()*5) + "s";
+    heart.style.fontSize = (22 + Math.random()*14) + "px";
+    heart.style.opacity = 0.5 + Math.random()*0.5;
+
+    document.body.appendChild(heart);
+
+    setTimeout(()=> heart.remove(), 12000);
+}
+
+setInterval(spawnHearts, 6500);   // 每 6.5 秒浮一顆
+</script>
+<!-- ===========================
+     PART 32 — SECTION ICON DECORATION
+=========================== -->
+<style>
+.section-title::before {
+    content: "🌿";
+    font-size: 1.4rem;
+    margin-right: 10px;
+    color: #4a7c4a;
+    opacity: 0.85;
+}
+</style>
+<!-- ===========================
+     PART 33 — PARALLAX BACKGROUND MOTION
+=========================== -->
+<script>
+window.addEventListener("scroll", ()=>{
+    const sc = window.scrollY;
+    const aurora = document.getElementById("aurora");
+    const fog1 = document.querySelectorAll(".fog-layer")[0];
+    const fog2 = document.querySelectorAll(".fog-layer")[1];
+
+    aurora.style.transform = `translateY(${sc * 0.08}px)`;
+    fog1.style.transform = `translateY(${sc * 0.04}px)`;
+    fog2.style.transform = `translateY(${sc * 0.02}px)`;
+});
+</script>
+<!-- ===========================
+     PART 34 — XUANROU BIRTHDAY COUNTDOWN
+=========================== -->
+
+<style>
+#birthday-box {
+    max-width: 650px;
+    margin: 50px auto;
+    padding: 28px 32px;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-radius: 20px;
+    box-shadow:
+        0 8px 28px rgba(120,180,120,0.25),
+        0 0 22px rgba(120,180,120,0.28);
+    text-align: center;
+    color: #355f35;
+    font-family: "PingFang TC","Microsoft JhengHei",sans-serif;
+}
+
+#birthday-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 14px;
+}
+
+#birthday-count {
+    font-size: 1.35rem;
+    line-height: 2.1rem;
+    color: #4a7c4a;
+    font-weight: 600;
+}
+
+.count-highlight {
+    font-size: 1.7rem;
+    font-weight: 900;
+    color: #2f4f2f;
+    padding: 0 6px;
+}
+</style>
+
+
+<section id="birthday">
+    <div class="section-title fade">瑄柔的生日倒數</div>
+
+    <div id="birthday-box" class="fade">
+        <div id="birthday-title">距離瑄柔生日還有</div>
+        <div id="birthday-count">計算中...</div>
+    </div>
+</section>
+
+
+<script>
+/* ===== 瑄柔生日倒數 ===== */
+function updateBirthdayCountdown(){
+
+    const birthday = new Date("2009-05-19");
+    const now = new Date();
+
+    // 今年生日
+    birthday.setFullYear(now.getFullYear());
+
+    // 如果生日已過，算下一年
+    if(birthday.getTime() < now.getTime()){
+        birthday.setFullYear(now.getFullYear() + 1);
+    }
+
+    const diff = birthday.getTime() - now.getTime();
+
+    const day = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hr  = Math.floor(diff / (1000 * 60 * 60)) % 24;
+    const min = Math.floor(diff / (1000 * 60)) % 60;
+    const sec = Math.floor(diff / 1000) % 60;
+
+    document.getElementById("birthday-count").innerHTML =
+        `<span class="count-highlight">${day}</span> 天 
+         <span class="count-highlight">${hr}</span> 時 
+         <span class="count-highlight">${min}</span> 分 
+         <span class="count-highlight">${sec}</span> 秒`;
+}
+
+setInterval(updateBirthdayCountdown, 1000);
+updateBirthdayCountdown();
+</script>
+<!-- ===========================
+     PART 35 — COUPLE CHAT BUBBLES
+=========================== -->
+<style>
+.chat-box {
+    max-width: 780px;
+    margin: 60px auto;
+}
+
+.chat-msg {
+    padding: 12px 18px;
+    border-radius: 18px;
+    margin: 10px 0;
+    max-width: 70%;
+    line-height: 1.65;
+    font-size: 1rem;
+}
+
+.chat-left {
+    background: rgba(255,255,255,0.75);
+    color: #355f35;
+    border-radius: 18px 18px 18px 4px;
+    margin-right: auto;
+}
+
+.chat-right {
+    background: rgba(120,180,120,0.75);
+    color: white;
+    border-radius: 18px 18px 4px 18px;
+    margin-left: auto;
+}
+</style>
+
+<section id="couple-chat">
+    <div class="section-title fade">我們的小對話</div>
+
+    <div class="chat-box fade">
+        <div class="chat-msg chat-left">妳今天還好嗎？</div>
+        <div class="chat-msg chat-right">還好，你呢？</div>
+        <div class="chat-msg chat-left">想妳。</div>
+        <div class="chat-msg chat-right">笨蛋。</div>
+    </div>
+</section>
 
 </body>
 </html>
