@@ -276,29 +276,125 @@ createParticles();
 <!-- ===========================
       HERO SECTION
 =========================== -->
+<!-- ===========================
+     PART 19 — HERO TYPING + SUBTITLE ROTATE
+=========================== -->
+
+<style>
+/* Hero typing animation */
+#hero-typing {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: #355f35;
+    font-family: "PingFang TC","Microsoft JhengHei",sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 3px solid #4a7c4a;
+    width: 0;
+    margin: auto;
+    display: inline-block;
+    animation: typing 2.5s steps(20), blink .75s step-end infinite alternate;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 16ch }
+}
+
+@keyframes blink {
+    from { border-color: transparent }
+    to { border-color: #4a7c4a }
+}
+
+/* Subtitle */
+#hero-sub-rotate {
+    margin-top: 24px;
+    font-size: 1.25rem;
+    color: #4f6f4f;
+    opacity: 0;
+    animation: fadeInSub19 1.8s ease forwards 2.7s;
+}
+
+@keyframes fadeInSub19 {
+    0% { opacity:0; transform:translateY(12px); }
+    100% { opacity:1; transform:translateY(0); }
+}
+
+/* Subtitle rotating text */
+.rotate-text {
+    position: relative;
+    height: 30px;
+    overflow: hidden;
+}
+
+.rotate-text div {
+    position: absolute;
+    width:100%;
+    opacity:0;
+    animation: rotateFade 9s infinite;
+}
+
+.rotate-text div:nth-child(1){ animation-delay: 0s; }
+.rotate-text div:nth-child(2){ animation-delay: 3s; }
+.rotate-text div:nth-child(3){ animation-delay: 6s; }
+
+@keyframes rotateFade {
+    0% { opacity:0; transform:translateY(10px); }
+    10% { opacity:1; transform:translateY(0); }
+    30% { opacity:1; transform:translateY(0); }
+    40% { opacity:0; transform:translateY(-10px); }
+    100% { opacity:0; }
+}
+
+/* Highlight shine effect */
+.highlight-shine {
+    position:relative;
+    display:inline-block;
+    overflow:hidden;
+}
+
+.highlight-shine::after {
+    content:"";
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:100%;
+    height:100%;
+    background: linear-gradient(120deg,
+        transparent,
+        rgba(255,255,255,0.7),
+        transparent);
+    animation: shineMove 2.5s ease-in-out 1.5s forwards;
+}
+
+@keyframes shineMove {
+    from { left:-100%; }
+    to { left:150%; }
+}
+</style>
+
+
 <section id="home" class="hero fade" style="
-    padding-top: 140px;
-    padding-bottom: 80px;
+    padding-top: 150px;
+    padding-bottom: 100px;
     text-align: center;
+    position:relative;
 ">
-    <h1 style="
-        font-size: 2.7rem;
-        font-weight: 800;
-        color: #355f35;
-    ">歡迎妳，瑄柔</h1>
 
-    <div style="
-        width:70px;
-        height:4px;
-        background:#4a7c4a;
-        border-radius:3px;
-        margin:24px auto;
-    "></div>
+    <!-- Main typing title -->
+    <div id="hero-typing" class="highlight-shine">
+        歡迎妳，瑄柔
+    </div>
 
-    <p style="font-size:1.2rem;color:#587a58;">
-        這裡，是我為妳保留的空間。<br>
-        想妳的時候、累的時候、需要人陪的時候，都可以回來。
-    </p>
+    <!-- Subtitle rotating -->
+    <div id="hero-sub-rotate">
+        <div class="rotate-text">
+            <div>這裡，是我專門為妳預留的地方。</div>
+            <div>妳不需要很乖，妳只需要是真實的妳。</div>
+            <div>無論妳怎樣，我都還是在這裡。</div>
+        </div>
+    </div>
+
 </section>
 
 <!-- ===========================
@@ -1040,6 +1136,109 @@ window.onbeforeunload = function(){
 ">
     © 2025 無尾熊為瑄柔製作 · All Rights Reserved
 </footer>
+
+<!-- ===========================
+      PART 16 — FLOATING RIBBONS (UI EFFECT)
+=========================== -->
+<style>
+.ribbon {
+    position: fixed;
+    width: 240px;
+    height: 40px;
+    background: linear-gradient(120deg,
+        rgba(120,200,120,0.25),
+        rgba(255,255,255,0.1)
+    );
+    border-radius: 20px;
+    filter: blur(8px);
+    animation: ribbonFloat 12s ease-in-out infinite;
+    z-index: -1;
+}
+
+/* Animation */
+@keyframes ribbonFloat {
+    0% { transform: translate(-20vw, 20vh) rotate(0deg); opacity:0.45; }
+    40% { opacity:0.6; }
+    100% { transform: translate(100vw, -40vh) rotate(160deg); opacity:0; }
+}
+</style>
+
+<script>
+/* Create floating ribbons */
+function createRibbons(){
+    const count = 6; // ribbon 數量
+    for(let i=0;i<count;i++){
+        let r = document.createElement("div");
+        r.classList.add("ribbon");
+
+        r.style.left = (Math.random()*80)+"vw";
+        r.style.top = (Math.random()*80)+"vh";
+        r.style.animationDuration = (10 + Math.random()*10) + "s";
+        r.style.animationDelay = (Math.random()*6) + "s";
+
+        document.body.appendChild(r);
+    }
+}
+
+createRibbons();
+</script>
+<!-- ===========================
+      PART 17 — MOUSE SPOTLIGHT EFFECT
+=========================== -->
+<style>
+#spotlight {
+    position: fixed;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+        rgba(255,255,255,0.25),
+        rgba(255,255,255,0)
+    );
+    pointer-events: none;
+    mix-blend-mode: soft-light;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+}
+</style>
+
+<div id="spotlight"></div>
+
+<script>
+/* Mouse spotlight */
+document.addEventListener("mousemove", e=>{
+    const s = document.getElementById("spotlight");
+    s.style.left = e.pageX + "px";
+    s.style.top = e.pageY + "px";
+});
+</script>
+<!-- ===========================
+      PART 18 — SCROLL PROGRESS BAR
+=========================== -->
+<style>
+#scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: #4a7c4a;
+    width: 0%;
+    z-index: 99999;
+}
+</style>
+
+<div id="scroll-progress"></div>
+
+<script>
+/* Scroll progress */
+window.addEventListener("scroll", ()=>{
+    let h = document.documentElement;
+    let st = h.scrollTop;
+    let sh = h.scrollHeight - h.clientHeight;
+    let percent = (st / sh) * 100;
+    document.getElementById("scroll-progress").style.width = percent + "%";
+});
+</script>
 
 </body>
 </html>
