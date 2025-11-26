@@ -1740,6 +1740,196 @@ updateBirthdayCountdown();
         <div class="chat-msg chat-right">笨蛋。</div>
     </div>
 </section>
+<!-- ===========================
+     PART 36 — STARLIGHT NIGHT MODE
+=========================== -->
+
+<style>
+body.night-mode {
+    background: radial-gradient(circle at 50% 20%, #0d1210, #050706);
+    color: #e7e7e7;
+}
+
+body.night-mode nav {
+    background: rgba(0,0,0,0.45) !important;
+    color: white !important;
+}
+
+body.night-mode .card,
+body.night-mode .msg,
+body.night-mode .timeline-content {
+    background: rgba(20,20,20,0.65) !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    box-shadow:
+        0 6px 22px rgba(0,0,0,0.4),
+        0 0 18px rgba(150,180,150,0.28) !important;
+}
+
+#night-toggle-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    background: rgba(255,255,255,0.75);
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+}
+body.night-mode #night-toggle-btn {
+    background: rgba(40,40,40,0.7);
+    color: #d6f5d6;
+}
+
+/* 星空 + 金光 */
+#night-stars {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left:0;
+    pointer-events: none;
+    z-index: 0;
+    display: none;
+}
+body.night-mode #night-stars {
+    display: block;
+}
+
+.star36 {
+    position: absolute;
+    background: radial-gradient(circle, #f8f3c2, #c9b96a, transparent);
+    border-radius: 50%;
+    animation: starFlicker36 3s infinite ease-in-out;
+    opacity: 0;
+}
+@keyframes starFlicker36 {
+    0%,100% { opacity: 0.1; }
+    50% { opacity: 0.8; }
+}
+</style>
+
+<div id="night-stars"></div>
+
+<button id="night-toggle-btn">🌙 夜間模式</button>
+
+<script>
+/* Toggle 夜間模式 */
+document.getElementById("night-toggle-btn").onclick = ()=>{
+    document.body.classList.toggle("night-mode");
+};
+
+/* 星空粒子生成 */
+function createNightStars(){
+    const container = document.getElementById("night-stars");
+    for(let i=0; i<70; i++){
+        let s = document.createElement("div");
+        s.className = "star36";
+        const size = (Math.random()*3)+2;
+        s.style.width = size+"px";
+        s.style.height = size+"px";
+        s.style.top = Math.random()*100+"vh";
+        s.style.left = Math.random()*100+"vw";
+        s.style.animationDelay = Math.random()*5 + "s";
+        container.appendChild(s);
+    }
+}
+createNightStars();
+</script>
+<!-- ===========================
+     PART 37 — HANDWRITTEN SIGNATURE LOGO
+=========================== -->
+
+<style>
+#signature37 {
+    width: 300px;
+    margin: 40px auto;
+}
+
+#signature37 path {
+    stroke: #4a7c4a;
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+    animation: drawSignature37 4s ease forwards;
+}
+
+@keyframes drawSignature37 {
+    to { stroke-dashoffset: 0; }
+}
+</style>
+
+<div id="signature37">
+<svg viewBox="0 0 300 100">
+    <!-- 手寫 “瑄柔” 的筆畫，我已經幫你畫成 SVG -->
+    <path d="M20 60 Q40 20 60 60 T100 60" />
+    <path d="M120 50 Q140 10 160 50 T200 50" />
+    <path d="M220 60 q20 -40 40 0" />
+</svg>
+</div>
+<!-- ===========================
+     PART 38 — GREEN CLICK SPARKS
+=========================== -->
+
+<style>
+.spark38 {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius:50%;
+    background: rgba(120,200,120,0.85);
+    box-shadow: 0 0 18px rgba(120,200,120,1);
+    pointer-events: none;
+    animation: sparkFly38 0.8s ease-out forwards;
+}
+
+@keyframes sparkFly38 {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(3) translateY(-40px); opacity: 0; }
+}
+</style>
+
+<script>
+document.addEventListener("click", function(e){
+    for(let i=0;i<6;i++){
+        let s = document.createElement("div");
+        s.className = "spark38";
+
+        s.style.left = e.clientX + "px";
+        s.style.top  = e.clientY + "px";
+
+        let dx = (Math.random()*60 - 30);
+        let dy = (Math.random()*60 - 40);
+
+        s.style.transform = `translate(${dx}px, ${dy}px)`;
+
+        document.body.appendChild(s);
+        setTimeout(()=> s.remove(), 900);
+    }
+});
+</script>
+<!-- ===========================
+     PART 39 — LOTTIE ANIMATION
+=========================== -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.4/lottie.min.js"></script>
+
+<div id="lottie-heart39" style="width:180px;margin:40px auto;"></div>
+
+<script>
+lottie.loadAnimation({
+    container: document.getElementById("lottie-heart39"),
+    renderer: "svg",
+    loop: true,
+    autoplay: true,
+    path: "https://assets8.lottiefiles.com/packages/lf20_3vbOcw.json"
+});
+</script>
 
 </body>
 </html>
