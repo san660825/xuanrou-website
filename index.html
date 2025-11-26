@@ -1239,6 +1239,108 @@ window.addEventListener("scroll", ()=>{
     document.getElementById("scroll-progress").style.width = percent + "%";
 });
 </script>
+<!-- ===========================
+     PART 20 — FULL SITE PREMIUM GLOW FRAME
+=========================== -->
+<style>
+
+/* ===== 1. 全站卡片柔光框 ===== */
+.card,
+.msg,
+.timeline-content,
+#diary-box,
+#tab-content,
+.gallery img,
+#light-img {
+    border: 1.5px solid rgba(255,255,255,0.45);
+    backdrop-filter: blur(12px) saturate(140%);
+    background: rgba(255,255,255,0.60) !important;
+    box-shadow:
+        0 8px 25px rgba(70,90,70,0.18),
+        0 0 22px rgba(120,180,120,0.25); /* 綠色柔光 */
+    transition: 0.45s;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover stronger glow */
+.card:hover,
+.msg:hover,
+.timeline-content:hover,
+.gallery img:hover {
+    box-shadow:
+        0 10px 28px rgba(70,90,70,0.25),
+        0 0 28px rgba(120,180,120,0.35),
+        0 0 8px rgba(200,255,200,0.25) inset;
+}
+
+/* ===== 2. Section 上增加淡綠霧光背景 ===== */
+section {
+    position: relative;
+    padding-top: 60px;
+}
+
+section::before {
+    content:"";
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:120px;
+    background: linear-gradient(to bottom,
+        rgba(200,240,200,0.12),
+        rgba(200,240,200,0)
+    );
+    z-index:-1;
+}
+
+/* ===== 3. 光線滑過邊框 Sweep Shine ===== */
+.glow-sweep::after {
+    content:"";
+    position:absolute;
+    top:0; left:-150%;
+    width:150%; height:100%;
+    background: linear-gradient(120deg,
+        transparent,
+        rgba(255,255,255,0.35),
+        transparent
+    );
+    animation: glowSweep20 3.5s ease-in-out infinite;
+    pointer-events:none;
+}
+
+@keyframes glowSweep20 {
+    0% { left:-150%; }
+    60% { left:150%; }
+    100% { left:150%; }
+}
+
+/* 加到卡片元素 */
+.card,
+.msg,
+.timeline-content,
+#diary-box,
+#tab-content {
+    position:relative;
+}
+
+.card::after,
+.msg::after,
+.timeline-content::after,
+#diary-box::after,
+#tab-content::after {
+    content:"";
+    position:absolute;
+    top:0; left:-150%;
+    width:150%; height:100%;
+    background: linear-gradient(120deg,
+        transparent,
+        rgba(255,255,255,0.35),
+        transparent
+    );
+    animation: glowSweep20 4.8s ease-in-out infinite;
+    pointer-events:none;
+}
+
+</style>
 
 </body>
 </html>
