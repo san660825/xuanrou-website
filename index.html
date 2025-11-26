@@ -1387,6 +1387,165 @@ createFloatingXuanRou();
     <div id="corner-bl" class="corner-glow"></div>
     <div id="corner-br" class="corner-glow"></div>
 </div>
+<!-- ===========================
+     PART 26 — TITLE LETTER BY LETTER ANIMATION
+=========================== -->
+<style>
+.section-title {
+    display: inline-block;
+    font-weight: 800;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.section-title span {
+    opacity: 0;
+    display: inline-block;
+    transform: translateY(18px);
+    animation: titleUp26 0.55s ease forwards;
+}
+
+@keyframes titleUp26 {
+    0% { opacity:0; transform:translateY(18px); }
+    100% { opacity:1; transform:translateY(0); }
+}
+</style>
+
+<script>
+/* 自動把每個 section-title 分割成字 */
+document.querySelectorAll(".section-title").forEach((el)=>{
+    const text = el.innerText;
+    el.innerHTML = "";
+
+    [...text].forEach((ch,i)=>{
+        const span = document.createElement("span");
+        span.style.animationDelay = (i * 0.06)+"s";
+        span.innerText = ch;
+        el.appendChild(span);
+    });
+});
+</script>
+<!-- ===========================
+     PART 27 — PARTICLE INTERACTIVE AVOID
+=========================== -->
+<script>
+document.addEventListener("mousemove", function(e){
+    document.querySelectorAll(".particle").forEach(p=>{
+        const rect = p.getBoundingClientRect();
+        const dx = rect.x - e.clientX;
+        const dy = rect.y - e.clientY;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+
+        if(dist < 120){
+            p.style.transform = `translate(${dx/3}px, ${dy/3}px)`;
+        } else {
+            p.style.transform = "";
+        }
+    });
+});
+</script>
+<!-- ===========================
+     PART 28 — CARD 3D SOFT ROTATE
+=========================== -->
+<style>
+.card, .msg, .timeline-content {
+    transition: transform 0.35s ease, box-shadow 0.4s ease;
+    transform-style: preserve-3d;
+}
+
+.card:hover, .msg:hover, .timeline-content:hover {
+    transform: perspective(600px) rotateX(6deg) rotateY(3deg);
+    box-shadow:
+        0 12px 28px rgba(70,90,70,0.25),
+        0 0 35px rgba(120,180,120,0.35);
+}
+</style>
+<!-- ===========================
+     PART 29 — FLOATING LOVE NOTES
+=========================== -->
+<style>
+.love-note {
+    position: fixed;
+    padding: 12px 18px;
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(120,180,120,0.25);
+    font-size: 0.95rem;
+    color: #355f35;
+    opacity: 0;
+    animation: noteFloat29 6s ease-in-out forwards;
+    pointer-events: none;
+    z-index: 999;
+}
+
+@keyframes noteFloat29 {
+    0%   { opacity:0; transform: translateY(20px) scale(0.9); }
+    20%  { opacity:1; }
+    80%  { opacity:1; transform: translateY(-30px) scale(1); }
+    100% { opacity:0; transform: translateY(-60px) scale(0.95); }
+}
+</style>
+
+<script>
+const loveNotes = [
+    "妳是我每天最柔軟的那個念頭。",
+    "看到妳的名字，我的心會輕一下。",
+    "妳不知道妳有多可愛。",
+    "我一直都在，只想妳開心一點。",
+    "妳值得被抱緊，也值得被珍惜。",
+];
+
+function spawnNote(){
+    let note = document.createElement("div");
+    note.className = "love-note";
+
+    note.innerText = loveNotes[Math.floor(Math.random()*loveNotes.length)];
+
+    note.style.left = Math.random()*70 + "vw";
+    note.style.top = (Math.random()*60 + 20) + "vh";
+
+    document.body.appendChild(note);
+
+    setTimeout(()=> note.remove(), 6000);
+}
+
+setInterval(spawnNote, 9000); // 每 9 秒飄一張
+</script>
+<!-- ===========================
+     PART 30 — GLOW DIVIDERS
+=========================== -->
+<style>
+.glow-divider {
+    width: 85%;
+    height: 3px;
+    margin: 70px auto;
+    background: linear-gradient(
+        90deg,
+        rgba(120,180,120,0),
+        rgba(120,180,120,0.45),
+        rgba(120,180,120,0)
+    );
+    filter: blur(0.5px);
+    animation: glowLine30 7s ease-in-out infinite;
+}
+
+@keyframes glowLine30 {
+    0%   { opacity:0.45; }
+    50%  { opacity:1; }
+    100% { opacity:0.45; }
+}
+</style>
+
+<script>
+/* 自動在每個 section 後面插入光線分隔 */
+document.querySelectorAll("section").forEach(sec=>{
+    const divider = document.createElement("div");
+    divider.className = "glow-divider";
+    sec.after(divider);
+});
+</script>
 
 </body>
 </html>
