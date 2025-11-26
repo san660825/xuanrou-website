@@ -1341,6 +1341,62 @@ section::before {
 }
 
 </style>
+<!-- ===========================
+     PART 21 — FLOATING XUANROU SIGNATURE
+=========================== -->
+
+<style>
+.xuanrou-floating {
+    position: fixed;
+    font-size: 1.1rem;
+    color: rgba(80,120,80,0.85);
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: rgba(255,255,255,0.4);
+    padding: 6px 14px;
+    border-radius: 20px;
+    box-shadow: 0 0 12px rgba(120,180,120,0.35);
+    backdrop-filter: blur(6px);
+    pointer-events: none;
+    user-select: none;
+    animation: floatingXR 14s infinite ease-in-out;
+    z-index: 999;
+    transform: rotate(0deg);
+}
+
+/* 漂浮動畫 */
+@keyframes floatingXR {
+    0%   { transform: translateY(0px) rotate(0deg); opacity: 0.6; }
+    25%  { transform: translateY(-40px) rotate(5deg); opacity: 0.85; }
+    50%  { transform: translateY(0px) rotate(-3deg); opacity: 0.7; }
+    75%  { transform: translateY(-25px) rotate(4deg); opacity: 0.9; }
+    100% { transform: translateY(0px) rotate(0deg); opacity: 0.6; }
+}
+</style>
+
+<script>
+/* 產生漂浮的「瑄柔」 */
+function createFloatingXuanRou(){
+    const count = 6; // 數量可調整，太多會亂
+
+    for(let i = 0; i < count; i++){
+        let x = document.createElement("div");
+        x.className = "xuanrou-floating";
+        x.innerText = "瑄柔";
+
+        // 隨機位置
+        x.style.left = Math.random() * 90 + "vw";
+        x.style.top = Math.random() * 85 + "vh";
+
+        // 不同速度
+        x.style.animationDuration = (10 + Math.random() * 10) + "s";
+
+        document.body.appendChild(x);
+    }
+}
+
+createFloatingXuanRou();
+</script>
 
 </body>
 </html>
