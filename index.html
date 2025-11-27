@@ -1930,294 +1930,7 @@ lottie.loadAnimation({
     path: "https://assets8.lottiefiles.com/packages/lf20_3vbOcw.json"
 });
 </script>
-<!-- ================================
-     TOP ANNOUNCEMENT BAR（開場公告）
-================================ -->
-<style>
-#top-announcement {
-    width: 100%;
-    background: linear-gradient(90deg, #4a7c4a, #2f4f2f);
-    color: white;
-    padding: 12px 18px;
-    text-align: center;
-    font-size: 0.95rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    position: fixed;
-    top: 0; left: 0;
-    z-index: 9999;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.18);
-}
-#top-announcement span {
-    color: #ffe8e8;
-    font-weight: 800;
-}
-</style>
 
-<div id="top-announcement">
-    此網站由 <span>蔡明澔</span> 工程師專為 <span>黃瑄柔</span> 製作 ❤  
-</div>
-
-
-<!-- ================================
-     PERIOD NOTICE（瑄柔月經提醒）
-================================ -->
-<style>
-#period-notice {
-    margin-top: 55px;
-    padding: 12px 20px;
-    background: rgba(255, 230, 230, 0.85);
-    border-left: 6px solid #ff7d7d;
-    text-align: center;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #b75454;
-    backdrop-filter: blur(12px);
-}
-</style>
-
-<div id="period-notice">
-    ❤️ 小提醒：瑄柔這週月經來了，請大家對她好一點、也請她多休息～
-</div>
-
-
-<!-- ================================
-     VISITOR COUNTER（瀏覽人數）
-================================ -->
-<style>
-#visitor-counter-box {
-    margin: 25px auto;
-    padding: 12px 20px;
-    max-width: 300px;
-    background: rgba(255,255,255,0.8);
-    border-radius: 14px;
-    font-size: 1rem;
-    text-align: center;
-    color: #4f6f4f;
-    box-shadow: 0 6px 25px rgba(60,90,60,0.15);
-    backdrop-filter: blur(12px);
-}
-#visitor-counter-number {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: #355f35;
-}
-</style>
-
-<div id="visitor-counter-box">
-    目前共有  
-    <span id="visitor-counter-number">0</span>  
-    人看過這個網站
-</div>
-
-<script>
-/* =====================================
-   VISITOR COUNTER（localStorage 版本）
-   每個裝置紀錄一次，不會亂跳
-===================================== */
-function updateVisitorCount() {
-    let count = localStorage.getItem("visitor_count");
-
-    if(!count){
-        count = 1;
-        localStorage.setItem("visitor_count", count);
-    } else {
-        count = parseInt(count) + 1;
-        localStorage.setItem("visitor_count", count);
-    }
-
-    document.getElementById("visitor-counter-number").innerText = count;
-}
-
-updateVisitorCount();
-</script>
-<!-- =============================
-     PART 41 — Firebase Global Counter
-================================ -->
-
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
-
-<script>
-// ====== Firebase 專案設定（已為你專屬生成） ======
-const firebaseConfig = {
-    apiKey: "AIzaSyC-lMeYhLsxYe3ZtLOCMiAfwgg2eaxdYrs",
-    authDomain: "koala-xuanrou-web.firebaseapp.com",
-    projectId: "koala-xuanrou-web",
-    storageBucket: "koala-xuanrou-web.appspot.com",
-    messagingSenderId: "251002551913",
-    appId: "1:251002551913:web:6b790f4c1f733da9d9e444"
-};
-
-// 初始化 Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// ====== 讀取目前全世界累計瀏覽 ======
-async function loadGlobalVisitors(){
-    const ref = db.collection("global").doc("visitor_count");
-    const snap = await ref.get();
-
-    let count = 0;
-
-    if(snap.exists){
-        count = snap.data().count;
-    }
-
-    // 顯示在 UI
-    const dom = document.getElementById("visitor-counter-number");
-    if(dom) dom.innerText = count.toLocaleString();
-
-    return count;
-}
-
-// ====== 加一筆訪客（每重新整理 +1）======
-async function addVisitor(){
-    const ref = db.collection("global").doc("visitor_count");
-
-    // Firestore 原子遞增
-    await ref.set({
-        count: firebase.firestore.FieldValue.increment(1)
-    }, { merge: true });
-
-    loadGlobalVisitors(); // 更新 UI
-}
-
-// 頁面載入後執行
-window.addEventListener("load", ()=>{
-    addVisitor();
-});
-</script>
-<!-- ===============================
-     PART 42 — 訪客資訊偵測
-================================ -->
-<style>
-#visitor-info-bar {
-    margin-top: 6px;
-    padding: 10px 16px;
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(12px);
-    text-align:center;
-    font-size:0.9rem;
-    color:#4f6f4f;
-    border-bottom: 1px solid rgba(0,0,0,0.06);
-}
-#visitor-info-bar span {
-    font-weight:700;
-    color:#355f35;
-}
-</style>
-
-<div id="visitor-info-bar">
-    正在載入訪客資訊...
-</div>
-
-<script>
-// ====== 設備偵測 ======
-function getDevice(){
-    const ua = navigator.userAgent;
-
-    if(/iPhone/i.test(ua)) return "iPhone";
-    if(/Android/i.test(ua)) return "Android 手機";
-    if(/iPad/i.test(ua)) return "iPad";
-    if(/Windows/i.test(ua)) return "Windows";
-    if(/Macintosh/i.test(ua)) return "MacBook / Mac";
-
-    return "未知裝置";
-}
-
-// ====== 瀏覽器偵測 ======
-function getBrowser(){
-    const ua = navigator.userAgent;
-
-    if(ua.includes("Chrome")) return "Chrome";
-    if(ua.includes("Safari") && !ua.includes("Chrome")) return "Safari";
-    if(ua.includes("Firefox")) return "Firefox";
-    if(ua.includes("Edg")) return "Edge";
-
-    return "不明瀏覽器";
-}
-
-// ====== 城市偵測（免費 API） ======
-async function getLocation(){
-    try{
-        const res = await fetch("https://ipapi.co/json/");
-        const data = await res.json();
-        return data.city || "未知城市";
-    }catch{
-        return "未知城市";
-    }
-}
-
-// ====== 設定 UI ======
-async function setupVisitorInfo(){
-    const device = getDevice();
-    const browser = getBrowser();
-    const city = await getLocation();
-
-    document.getElementById("visitor-info-bar").innerHTML = `
-        📍 你正在使用 <span>${device}</span>
-        ｜瀏覽器：<span>${browser}</span>
-        ｜位置：<span>${city}</span>
-    `;
-}
-
-setupVisitorInfo();
-</script>
-
-// 判斷是不是「瑄柔的 iPhone」
-function isXuanRouDevice(){
-    const ua = navigator.userAgent;
-
-    return (
-        /iPhone/i.test(ua) &&
-        (ua.includes("OS 17") || ua.includes("OS 16")) &&
-        !ua.includes("iPad")
-    );
-}
-
-if(isXuanRouDevice()){
-    document.getElementById("period-xuanrou").style.display = "block";
-}
-</script>
-<!-- ===============================
-     PART 44 — 瑄柔限定小語
-================================ -->
-<style>
-#xuanrou-secret {
-    margin: 25px auto;
-    max-width: 600px;
-    padding: 18px 22px;
-    background: rgba(255,255,255,0.75);
-    backdrop-filter: blur(12px);
-    border-radius: 14px;
-    font-size: 1.05rem;
-    color: #4f6f4f;
-    display:none;
-    box-shadow:0 8px 25px rgba(0,0,0,0.1);
-}
-</style>
-
-<div id="xuanrou-secret">
-</div>
-
-<script>
-const secretMsg = [
-    "我知道你最近累，我有感覺到。你不用講，我也會在。",
-    "不管你心情好不好，我都在你那邊，不會倒戈。",
-    "你不是麻煩，你只是需要被多抱一下。",
-    "你累的時候講我名字，我就會出現那種。",
-    "你不用一直懂事，你在我面前可以鬆一點。"
-];
-
-if(isXuanRouDevice()){
-    const pick = secretMsg[Math.floor(Math.random()*secretMsg.length)];
-    const box = document.getElementById("xuanrou-secret");
-    box.innerText = pick;
-    box.style.display = "block";
-}
-</script>
 <!-- =====================================
    NEW PERIOD NOTICE — 單一不重複提醒
 ===================================== -->
@@ -2278,6 +1991,176 @@ const xuanrouText = `
 =================================================== */
 const box = document.getElementById("period-notice");
 box.innerHTML = isXuanRou() ? xuanrouText : normalText;
+</script>
+<!-- ===============================
+     PART A — 瑄柔小語卡片（取代 iPhone 判斷）
+================================= -->
+<style>
+#xuanrou-message {
+    margin: 25px auto;
+    max-width: 650px;
+    padding: 20px 24px;
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    font-size: 1.08rem;
+    color: #4f6f4f;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+    line-height: 1.9;
+    animation: fadeInUp 1.2s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    0% { opacity:0; transform: translateY(25px); }
+    100% { opacity:1; transform: translateY(0); }
+}
+</style>
+
+<div id="xuanrou-message"></div>
+
+<script>
+const sweetText = [
+    "瑄柔，妳每一天都值得被好好對待，不是因為什麼特別原因，而是因為妳本來就很值得。",
+    "我希望妳今天會笑，也希望如果妳哭了，我會是妳第一個想到的人。",
+    "妳不用很厲害，我會陪妳變厲害；妳累的時候我也會陪妳一起停一下。",
+    "不管妳現在心情多少分，我都願意把我自己的好心情分給妳。",
+    "妳不是在打擾我，妳是在讓我有機會靠近妳。"
+];
+
+document.getElementById("xuanrou-message").innerText =
+    sweetText[Math.floor(Math.random() * sweetText.length)];
+</script>
+<!-- ===============================
+     PART B — 時間情緒色條
+================================= -->
+<style>
+#timeline-color {
+    width: 100%;
+    height: 6px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9000;
+    transition: background 1.2s;
+}
+</style>
+
+<div id="timeline-color"></div>
+
+<script>
+function updateTimelineColor(){
+    const hour = new Date().getHours();
+    const bar = document.getElementById("timeline-color");
+
+    if(hour < 12) bar.style.background = "#9ed69e"; 
+    else if(hour < 17) bar.style.background = "#7bc27b"; 
+    else bar.style.background = "#4c7c4c";
+}
+updateTimelineColor();
+</script>
+<!-- ===============================
+     PART C — 漂浮文字（瑄柔/無尾熊）
+================================= -->
+<style>
+.float-text {
+    position: fixed;
+    font-size: 1.1rem;
+    color: rgba(70,110,70,0.45);
+    pointer-events: none;
+    animation: floatUp 3s ease forwards;
+    user-select: none;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(0); opacity:1; }
+    100% { transform: translateY(-80px); opacity:0; }
+}
+</style>
+
+<script>
+const floatWords = ["瑄柔", "柔柔", "無尾熊", "cute", "baby", "柔柔最漂亮"];
+
+document.addEventListener("click", function(e){
+    const span = document.createElement("span");
+    span.className = "float-text";
+    span.innerText = floatWords[Math.floor(Math.random()*floatWords.length)];
+
+    span.style.left = e.pageX + "px";
+    span.style.top = e.pageY + "px";
+
+    document.body.appendChild(span);
+
+    setTimeout(()=> span.remove(), 3000);
+});
+</script>
+<!-- ===============================
+     PART D — 夜晚星光模式
+================================= -->
+<style>
+.star {
+    position: fixed;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: starTwinkle 2.8s infinite ease-in-out;
+}
+
+@keyframes starTwinkle {
+    0% { opacity:0.3; }
+    50% { opacity:1; }
+    100% { opacity:0.3; }
+}
+</style>
+
+<script>
+function createStars(){
+    const hr = new Date().getHours();
+    if(hr < 18) return; // 白天不顯示
+
+    for(let i=0;i<45;i++){
+        let s = document.createElement("div");
+        s.className = "star";
+        s.style.left = Math.random()*100 + "vw";
+        s.style.top = Math.random()*100 + "vh";
+        s.style.animationDelay = Math.random()*5 + "s";
+        document.body.appendChild(s);
+    }
+}
+createStars();
+</script>
+<!-- ===============================
+     PART E — 每日祝福卡
+================================= -->
+<style>
+#daily-card {
+    max-width: 650px;
+    margin: 25px auto;
+    padding: 22px 26px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 16px;
+    font-size: 1.05rem;
+    color:#4f6f4f;
+    box-shadow:0 8px 28px rgba(0,0,0,0.12);
+    backdrop-filter:blur(12px);
+}
+</style>
+
+<div id="daily-card"></div>
+
+<script>
+const dailyText = [
+    "今天的妳很棒，不是因為做了什麼，而是因為妳有努力活著。",
+    "妳的存在本身就是很值得被珍惜的事情。",
+    "希望妳今天會遇到一件讓妳笑的事。",
+    "如果今天很累，那至少看到我這句話的時候能鬆一口氣。",
+    "我希望妳永遠不會覺得自己是一個人。"
+];
+
+const index = new Date().getDate() % dailyText.length;
+document.getElementById("daily-card").innerText = dailyText[index];
 </script>
 
 </body>
