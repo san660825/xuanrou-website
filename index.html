@@ -2165,54 +2165,7 @@ async function setupVisitorInfo(){
 
 setupVisitorInfo();
 </script>
-<!-- =====================================
-     PART 43 — 月經提醒（一般 + 瑄柔限定）
-===================================== -->
 
-<style>
-#period-main {
-    margin-top: 10px;
-    padding: 12px 20px;
-    background: rgba(255,240,240,0.9);
-    border-left: 6px solid #ff7d7d;
-    text-align:center;
-    font-size:0.95rem;
-    color:#b75454;
-    font-weight:600;
-    backdrop-filter: blur(10px);
-}
-#period-xuanrou {
-    margin-top: 8px;
-    padding: 12px 20px;
-    background: rgba(255,230,240,0.65);
-    border-left: 6px solid #ff91b2;
-    text-align:center;
-    font-size:0.95rem;
-    color:#c94e75;
-    font-weight:700;
-    border-radius:12px;
-    box-shadow:0 5px 16px rgba(255,140,180,0.25);
-    display:none;
-    animation: fadeInXR 1.2s ease forwards;
-}
-
-@keyframes fadeInXR {
-    0% { opacity:0; transform:translateY(10px); }
-    100% { opacity:1; transform:translateY(0); }
-}
-</style>
-
-<div id="period-main">
-    ❤️ 小提醒：瑄柔這週月經來了，請大家對她好一點～
-</div>
-
-<div id="period-xuanrou">
-    瑄柔，你肚子不舒服就不要硬撐，  
-    我知道你很強，可是你累的時候可以停一下，  
-    真的不需要逞強，有我罩著你。
-</div>
-
-<script>
 // 判斷是不是「瑄柔的 iPhone」
 function isXuanRouDevice(){
     const ua = navigator.userAgent;
@@ -2264,6 +2217,67 @@ if(isXuanRouDevice()){
     box.innerText = pick;
     box.style.display = "block";
 }
+</script>
+<!-- =====================================
+   NEW PERIOD NOTICE — 單一不重複提醒
+===================================== -->
+<style>
+#period-notice {
+    margin: 40px auto 20px;
+    max-width: 900px;
+    padding: 18px 26px;
+    background: rgba(255,240,245,0.8);
+    backdrop-filter: blur(18px);
+    border-left: 6px solid #ff8aa5;
+    text-align: center;
+    border-radius: 14px;
+    box-shadow: 0 8px 25px rgba(255,120,150,0.18);
+    color: #b74462;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    animation: fadeInNotice 1.1s ease;
+}
+
+@keyframes fadeInNotice {
+    0% { opacity:0; transform:translateY(12px); }
+    100% { opacity:1; transform:translateY(0); }
+}
+</style>
+
+<div id="period-notice"></div>
+
+<script>
+/* ===================================================
+   自動判斷是不是瑄柔本人
+=================================================== */
+function isXuanRou(){
+    const ua = navigator.userAgent;
+    return (
+        /iPhone/i.test(ua) &&
+        (ua.includes("OS 16") || ua.includes("OS 17")) &&
+        !ua.includes("iPad")
+    );
+}
+
+/* ===================================================
+   新提醒內容（你語氣＋一般訪客版）
+=================================================== */
+const normalText = `
+❤️ 小提醒：瑄柔這週月經來了，最近可能比較累、肚子也容易不舒服。
+拜託大家看到她的時候，多讓一步、講話溫柔一點，讓她可以輕鬆一點過這幾天～
+`;
+
+const xuanrouText = `
+❤️ 瑄柔，我知道妳這週身體比較難受。妳不用逞強、不用硬撐，
+累就休息一下、痛就講一下，我都在這裡。  
+妳的任何不舒服、任何情緒，我都會幫妳扛一點點下來。
+`;
+
+/* ===================================================
+   套用到介面
+=================================================== */
+const box = document.getElementById("period-notice");
+box.innerHTML = isXuanRou() ? xuanrouText : normalText;
 </script>
 
 </body>
