@@ -2089,6 +2089,182 @@ window.addEventListener("load", ()=>{
     addVisitor();
 });
 </script>
+<!-- ===============================
+     PART 42 — 訪客資訊偵測
+================================ -->
+<style>
+#visitor-info-bar {
+    margin-top: 6px;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    text-align:center;
+    font-size:0.9rem;
+    color:#4f6f4f;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+#visitor-info-bar span {
+    font-weight:700;
+    color:#355f35;
+}
+</style>
+
+<div id="visitor-info-bar">
+    正在載入訪客資訊...
+</div>
+
+<script>
+// ====== 設備偵測 ======
+function getDevice(){
+    const ua = navigator.userAgent;
+
+    if(/iPhone/i.test(ua)) return "iPhone";
+    if(/Android/i.test(ua)) return "Android 手機";
+    if(/iPad/i.test(ua)) return "iPad";
+    if(/Windows/i.test(ua)) return "Windows";
+    if(/Macintosh/i.test(ua)) return "MacBook / Mac";
+
+    return "未知裝置";
+}
+
+// ====== 瀏覽器偵測 ======
+function getBrowser(){
+    const ua = navigator.userAgent;
+
+    if(ua.includes("Chrome")) return "Chrome";
+    if(ua.includes("Safari") && !ua.includes("Chrome")) return "Safari";
+    if(ua.includes("Firefox")) return "Firefox";
+    if(ua.includes("Edg")) return "Edge";
+
+    return "不明瀏覽器";
+}
+
+// ====== 城市偵測（免費 API） ======
+async function getLocation(){
+    try{
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+        return data.city || "未知城市";
+    }catch{
+        return "未知城市";
+    }
+}
+
+// ====== 設定 UI ======
+async function setupVisitorInfo(){
+    const device = getDevice();
+    const browser = getBrowser();
+    const city = await getLocation();
+
+    document.getElementById("visitor-info-bar").innerHTML = `
+        📍 你正在使用 <span>${device}</span>
+        ｜瀏覽器：<span>${browser}</span>
+        ｜位置：<span>${city}</span>
+    `;
+}
+
+setupVisitorInfo();
+</script>
+<!-- =====================================
+     PART 43 — 月經提醒（一般 + 瑄柔限定）
+===================================== -->
+
+<style>
+#period-main {
+    margin-top: 10px;
+    padding: 12px 20px;
+    background: rgba(255,240,240,0.9);
+    border-left: 6px solid #ff7d7d;
+    text-align:center;
+    font-size:0.95rem;
+    color:#b75454;
+    font-weight:600;
+    backdrop-filter: blur(10px);
+}
+#period-xuanrou {
+    margin-top: 8px;
+    padding: 12px 20px;
+    background: rgba(255,230,240,0.65);
+    border-left: 6px solid #ff91b2;
+    text-align:center;
+    font-size:0.95rem;
+    color:#c94e75;
+    font-weight:700;
+    border-radius:12px;
+    box-shadow:0 5px 16px rgba(255,140,180,0.25);
+    display:none;
+    animation: fadeInXR 1.2s ease forwards;
+}
+
+@keyframes fadeInXR {
+    0% { opacity:0; transform:translateY(10px); }
+    100% { opacity:1; transform:translateY(0); }
+}
+</style>
+
+<div id="period-main">
+    ❤️ 小提醒：瑄柔這週月經來了，請大家對她好一點～
+</div>
+
+<div id="period-xuanrou">
+    瑄柔，你肚子不舒服就不要硬撐，  
+    我知道你很強，可是你累的時候可以停一下，  
+    真的不需要逞強，有我罩著你。
+</div>
+
+<script>
+// 判斷是不是「瑄柔的 iPhone」
+function isXuanRouDevice(){
+    const ua = navigator.userAgent;
+
+    return (
+        /iPhone/i.test(ua) &&
+        (ua.includes("OS 17") || ua.includes("OS 16")) &&
+        !ua.includes("iPad")
+    );
+}
+
+if(isXuanRouDevice()){
+    document.getElementById("period-xuanrou").style.display = "block";
+}
+</script>
+<!-- ===============================
+     PART 44 — 瑄柔限定小語
+================================ -->
+<style>
+#xuanrou-secret {
+    margin: 25px auto;
+    max-width: 600px;
+    padding: 18px 22px;
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+    border-radius: 14px;
+    font-size: 1.05rem;
+    color: #4f6f4f;
+    display:none;
+    box-shadow:0 8px 25px rgba(0,0,0,0.1);
+}
+</style>
+
+<div id="xuanrou-secret">
+</div>
+
+<script>
+const secretMsg = [
+    "我知道你最近累，我有感覺到。你不用講，我也會在。",
+    "不管你心情好不好，我都在你那邊，不會倒戈。",
+    "你不是麻煩，你只是需要被多抱一下。",
+    "你累的時候講我名字，我就會出現那種。",
+    "你不用一直懂事，你在我面前可以鬆一點。"
+];
+
+if(isXuanRouDevice()){
+    const pick = secretMsg[Math.floor(Math.random()*secretMsg.length)];
+    const box = document.getElementById("xuanrou-secret");
+    box.innerText = pick;
+    box.style.display = "block";
+}
+</script>
 
 </body>
 </html>
