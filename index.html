@@ -1930,6 +1930,107 @@ lottie.loadAnimation({
     path: "https://assets8.lottiefiles.com/packages/lf20_3vbOcw.json"
 });
 </script>
+<!-- ================================
+     TOP ANNOUNCEMENT BAR（開場公告）
+================================ -->
+<style>
+#top-announcement {
+    width: 100%;
+    background: linear-gradient(90deg, #4a7c4a, #2f4f2f);
+    color: white;
+    padding: 12px 18px;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 9999;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.18);
+}
+#top-announcement span {
+    color: #ffe8e8;
+    font-weight: 800;
+}
+</style>
+
+<div id="top-announcement">
+    此網站由 <span>蔡明澔</span> 工程師專為 <span>黃瑄柔</span> 製作 ❤  
+</div>
+
+
+<!-- ================================
+     PERIOD NOTICE（瑄柔月經提醒）
+================================ -->
+<style>
+#period-notice {
+    margin-top: 55px;
+    padding: 12px 20px;
+    background: rgba(255, 230, 230, 0.85);
+    border-left: 6px solid #ff7d7d;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #b75454;
+    backdrop-filter: blur(12px);
+}
+</style>
+
+<div id="period-notice">
+    ❤️ 小提醒：瑄柔這週月經來了，請大家對她好一點、也請她多休息～
+</div>
+
+
+<!-- ================================
+     VISITOR COUNTER（瀏覽人數）
+================================ -->
+<style>
+#visitor-counter-box {
+    margin: 25px auto;
+    padding: 12px 20px;
+    max-width: 300px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 14px;
+    font-size: 1rem;
+    text-align: center;
+    color: #4f6f4f;
+    box-shadow: 0 6px 25px rgba(60,90,60,0.15);
+    backdrop-filter: blur(12px);
+}
+#visitor-counter-number {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #355f35;
+}
+</style>
+
+<div id="visitor-counter-box">
+    目前共有  
+    <span id="visitor-counter-number">0</span>  
+    人看過這個網站
+</div>
+
+<script>
+/* =====================================
+   VISITOR COUNTER（localStorage 版本）
+   每個裝置紀錄一次，不會亂跳
+===================================== */
+function updateVisitorCount() {
+    let count = localStorage.getItem("visitor_count");
+
+    if(!count){
+        count = 1;
+        localStorage.setItem("visitor_count", count);
+    } else {
+        count = parseInt(count) + 1;
+        localStorage.setItem("visitor_count", count);
+    }
+
+    document.getElementById("visitor-counter-number").innerText = count;
+}
+
+updateVisitorCount();
+</script>
 
 </body>
 </html>
