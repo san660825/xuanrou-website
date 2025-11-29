@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>無尾熊拼圖：全球連線版</title>
+    <title>無尾熊的小屋 · Koala Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="theme-color" content="#558b2f">
     
@@ -14,6 +14,7 @@
             --bg-color: #f1f8e9;
             --board-bg: #dcedc8;
             --text-main: #33691e;
+            --accent: #ffb74d;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -23,328 +24,342 @@
             font-family: 'Zen Maru Gothic', sans-serif;
             overflow: hidden;
             height: 100vh;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            display: flex; flex-direction: column;
             color: var(--text-main);
         }
 
-        #game-wrapper {
-            position: relative; width: 100%; max-width: 500px; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            padding: 20px;
+        /* === 底部導航列 === */
+        .nav-bar {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: white; padding: 10px 20px; border-radius: 40px;
+            display: flex; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
+        .nav-item {
+            font-size: 1.5rem; color: #ccc; cursor: pointer; transition: 0.3s;
+            width: 50px; height: 50px; display: flex; justify-content: center; align-items: center;
+            border-radius: 50%;
+        }
+        .nav-item.active { background: #8bc34a; color: white; transform: translateY(-10px); box-shadow: 0 5px 15px rgba(139, 195, 74, 0.4); }
 
-        header {
-            width: 100%; display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px; padding: 0 10px;
+        /* === 頁面容器 === */
+        .page {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.3s, transform 0.3s; opacity: 0; pointer-events: none;
         }
+        .page.active { opacity: 1; pointer-events: all; transform: scale(1); }
+
+        /* === 遊戲頁面 === */
+        #game-wrapper {
+            width: 100%; max-width: 500px; height: 100%; padding: 20px 20px 100px 20px;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        header { width: 100%; display: flex; justify-content: space-between; align-items: center; }
         .score-box {
             background: white; padding: 8px 15px; border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center;
-            min-width: 90px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05); text-align: center; min-width: 80px;
         }
-        .score-label { font-size: 0.7rem; color: #888; font-weight: bold; }
-        .score-val { font-size: 1.2rem; font-weight: 900; color: var(--text-main); font-family: 'Fredoka'; }
-
-        #koala-mascot {
-            width: 70px; height: 70px; transition: transform 0.3s;
-        }
-        .koala-panic { animation: shake 0.5s infinite; }
-        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, -1px); } }
-
+        .score-val { font-size: 1.2rem; font-weight: 900; font-family: 'Fredoka'; }
+        
         #board-container {
-            position: relative; width: 100%; aspect-ratio: 1/1;
-            background: var(--board-bg); border-radius: 16px;
-            box-shadow: inset 0 5px 15px rgba(0,0,0,0.1); padding: 10px;
+            width: 100%; aspect-ratio: 1/1; background: var(--board-bg);
+            border-radius: 16px; padding: 10px; box-shadow: inset 0 5px 15px rgba(0,0,0,0.1);
         }
         canvas#game-canvas { width: 100%; height: 100%; border-radius: 8px; display: block; }
+        #spawn-area { width: 100%; height: 120px; display: flex; justify-content: space-around; align-items: center; }
+        
+        .shape-preview { width: 70px; height: 70px; transition: transform 0.1s; }
+        .shape-preview.dragging { opacity: 0.9; z-index: 2000; position: fixed; transform: scale(1.2); pointer-events: none; }
 
-        #spawn-area {
-            width: 100%; height: 140px; display: flex; justify-content: space-around; align-items: center;
-        }
-        .shape-preview {
-            width: 80px; height: 80px; position: relative; transition: transform 0.1s;
-        }
-        .shape-preview.dragging {
-            opacity: 0.9; z-index: 1000; position: fixed; pointer-events: none;
-            transform: scale(1.1); filter: drop-shadow(0 30px 50px rgba(0,0,0,0.3));
-        }
-
-        /* 按鈕樣式 */
-        .rank-btn {
-            position: absolute; top: 20px; right: 20px;
-            background: #fbc02d; color: white; border: none; padding: 8px 15px;
-            border-radius: 20px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 0 #f57f17; z-index: 100;
+        /* === 小屋頁面 (商店) === */
+        #home-wrapper {
+            width: 100%; max-width: 500px; height: 100%; padding: 60px 20px 100px 20px;
+            display: flex; flex-direction: column; align-items: center;
+            overflow-y: auto;
         }
         
-        #overlay, #rank-overlay, #name-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(85, 139, 47, 0.95); z-index: 2000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.3s;
+        /* 無尾熊展示區 */
+        .koala-room {
+            width: 200px; height: 200px; background: #fff9c4;
+            border-radius: 50%; border: 5px solid white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 30px; position: relative;
         }
-        #rank-overlay { background: rgba(0,0,0,0.85); display: none; }
-        #name-overlay { background: rgba(0,0,0,0.85); display: none; z-index: 3000; }
+        .room-decor { position: absolute; width: 100%; height: 100%; pointer-events: none; }
         
-        .overlay-card {
-            background: white; padding: 30px; border-radius: 30px;
-            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            width: 85%; max-width: 400px;
+        /* 錢包顯示 */
+        .wallet {
+            background: #fff; padding: 10px 25px; border-radius: 30px;
+            font-weight: bold; color: #f57f17; margin-bottom: 20px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px;
         }
 
-        .mode-select {
-            display: flex; flex-direction: column; gap: 15px; margin-top: 20px;
+        /* 商店網格 */
+        .shop-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%;
         }
-        .btn-mode {
-            border: none; padding: 15px; font-size: 1.2rem; border-radius: 50px;
-            cursor: pointer; font-family: 'Zen Maru Gothic'; font-weight: bold;
-            transition: 0.2s; color: white; position: relative; overflow: hidden;
+        .shop-item {
+            background: white; border-radius: 15px; padding: 15px;
+            text-align: center; cursor: pointer; transition: 0.2s;
+            border: 2px solid transparent; position: relative;
         }
-        .btn-easy { background: #8bc34a; box-shadow: 0 5px 0 #558b2f; }
-        .btn-hard { background: #e53935; box-shadow: 0 5px 0 #b71c1c; }
-        .btn-mode:active { transform: translateY(5px); box-shadow: none; }
+        .shop-item.locked { opacity: 0.6; filter: grayscale(1); }
+        .shop-item.owned { border-color: #aed581; background: #f1f8e9; }
+        .shop-item.equipped { border-color: #558b2f; background: #dcedc8; box-shadow: 0 0 0 2px #558b2f; }
         
-        .rank-list { list-style: none; text-align: left; margin: 20px 0; max-height: 300px; overflow-y: auto; }
-        .rank-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
-        .rank-item:nth-child(1) { color: #fbc02d; font-weight: 900; font-size: 1.1em; }
-        .rank-item:nth-child(2) { color: #9e9e9e; font-weight: bold; }
-        .rank-item:nth-child(3) { color: #a1887f; font-weight: bold; }
-        
-        .btn-close { background: #ccc; color: #555; border: none; padding: 10px 30px; border-radius: 20px; margin-top: 10px; }
-        
-        /* 輸入名字 */
-        input.name-input {
-            padding: 10px; border: 2px solid #aed581; border-radius: 10px;
-            font-size: 1.2rem; text-align: center; width: 80%; margin: 15px 0;
-            outline: none; font-family: 'Zen Maru Gothic';
-        }
-        .btn-submit { background: #4db6ac; color: white; border: none; padding: 10px 30px; border-radius: 20px; }
+        .item-icon { font-size: 2rem; margin-bottom: 5px; }
+        .item-price { font-size: 0.8rem; font-weight: bold; color: #f57f17; }
+        .item-name { font-size: 0.8rem; color: #555; margin-bottom: 5px; }
 
+        /* === SVG 樣式 === */
+        #koala-svg { width: 140px; height: 140px; }
+        .svg-accessory { display: none; } /* 預設隱藏飾品 */
+
+        /* 浮動文字 */
         .float-text {
             position: absolute; font-family: 'Fredoka'; font-weight: 900;
-            color: #ff8f00; font-size: 2.5rem; pointer-events: none;
-            text-shadow: 2px 2px 0px white; z-index: 99;
+            color: #ff8f00; font-size: 2rem; pointer-events: none;
+            text-shadow: 2px 2px 0px white; z-index: 3000;
             animation: floatUp 1s forwards;
         }
-        @keyframes floatUp { 0% { transform:translateY(0) scale(0.5); opacity:0; } 50% { transform:translateY(-30px) scale(1.2); opacity:1; } 100% { transform:translateY(-60px) scale(1); opacity:0; } }
+        @keyframes floatUp { 0% { transform:translateY(0) scale(0.5); opacity:0; } 50% { transform:translateY(-50px) scale(1.2); opacity:1; } 100% { transform:translateY(-80px) scale(1); opacity:0; } }
     </style>
 </head>
 <body>
 
-<button class="rank-btn" onclick="Leaderboard.show()">🏆 排行榜</button>
-
-<!-- 遊戲開始/模式選擇 -->
-<div id="overlay">
-    <div class="overlay-card">
-        <h1 style="color: #558b2f; margin-bottom: 5px;">無尾熊拼圖</h1>
-        <p style="color: #888; font-size: 0.9rem;">瑄柔，今天想玩哪一種？</p>
-        
-        <div id="final-score" style="font-size: 1.5rem; font-weight: bold; color: #f57f17; display: none; margin: 15px 0;">
-            0 分
-        </div>
-
-        <div class="mode-select">
-            <button class="btn-mode btn-easy" onclick="game.start('easy')">
-                <i class="fas fa-coffee"></i> 輕鬆模式
-                <div style="font-size: 0.7rem; opacity: 0.8;">無炸彈 · 純放鬆</div>
-            </button>
-            <button class="btn-mode btn-hard" onclick="game.start('hard')">
-                <i class="fas fa-fire"></i> 地獄模式
-                <div style="font-size: 0.7rem; opacity: 0.8;">炸彈倒數 · 全球排名</div>
-            </button>
-        </div>
+<!-- 底部導航 -->
+<div class="nav-bar">
+    <div class="nav-item active" onclick="switchPage('game')">
+        <i class="fas fa-gamepad"></i>
+    </div>
+    <div class="nav-item" onclick="switchPage('home')">
+        <i class="fas fa-home"></i>
     </div>
 </div>
 
-<!-- 排行榜 -->
-<div id="rank-overlay">
-    <div class="overlay-card">
-        <h2>🏆 真實全球榜 (地獄)</h2>
-        <div id="rank-loading" style="color:#888;">載入中...</div>
-        <ul class="rank-list" id="rank-list"></ul>
-        <button class="btn-close" onclick="Leaderboard.close()">關閉</button>
-    </div>
-</div>
+<!-- 1. 遊戲頁面 -->
+<div id="game-page" class="page active">
+    <div id="game-wrapper">
+        <header>
+            <div class="score-box">
+                <div style="font-size:0.7rem; color:#888;">SCORE</div>
+                <div class="score-val" id="score">0</div>
+            </div>
+            <div style="font-weight:bold; color:#558b2f;">賺葉子養無尾熊 🌿</div>
+            <div class="score-box">
+                <div style="font-size:0.7rem; color:#888;">LEAVES</div>
+                <div class="score-val" style="color:#f57f17;" id="game-leaves">0</div>
+            </div>
+        </header>
 
-<!-- 輸入名字 -->
-<div id="name-overlay">
-    <div class="overlay-card">
-        <h2>🎉 新紀錄！</h2>
-        <p>妳太厲害了！請輸入暱稱：</p>
-        <input type="text" id="player-name" class="name-input" placeholder="例如：瑄柔" maxlength="10">
-        <button class="btn-submit" onclick="Leaderboard.submit()">上傳成績</button>
-    </div>
-</div>
-
-<div id="game-wrapper">
-    <header>
-        <div class="score-box">
-            <span class="score-label">SCORE</span>
-            <span class="score-val" id="score">0</span>
+        <div id="board-container">
+            <canvas id="game-canvas" width="800" height="800"></canvas>
         </div>
-        <div id="koala-mascot">
-            <svg viewBox="0 0 80 80">
-                <circle cx="15" cy="25" r="12" fill="#9e9e9e"/>
-                <circle cx="65" cy="25" r="12" fill="#9e9e9e"/>
-                <circle cx="15" cy="25" r="8" fill="#f5f5f5"/>
-                <circle cx="65" cy="25" r="8" fill="#f5f5f5"/>
-                <ellipse cx="40" cy="40" rx="32" ry="28" fill="#9e9e9e"/>
-                <circle cx="28" cy="35" r="3" fill="#333"/>
-                <circle cx="52" cy="35" r="3" fill="#333"/>
-                <ellipse cx="40" cy="42" rx="8" ry="10" fill="#424242"/>
-                <path class="mouth" d="M35 55 Q40 60 45 55" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
-                <circle cx="20" cy="45" r="4" fill="rgba(255,100,100,0.3)"/>
-                <circle cx="60" cy="45" r="4" fill="rgba(255,100,100,0.3)"/>
+        <div id="spawn-area"></div>
+    </div>
+</div>
+
+<!-- 2. 小屋頁面 -->
+<div id="home-page" class="page">
+    <div id="home-wrapper">
+        <div class="wallet">
+            <i class="fas fa-leaf"></i> <span id="total-leaves">0</span>
+        </div>
+
+        <div class="koala-room">
+            <!-- 房間裝飾層 -->
+            <div class="room-decor" id="decor-layer"></div>
+            
+            <!-- 無尾熊本體 -->
+            <svg id="koala-svg" viewBox="0 0 100 100">
+                <!-- 身體 -->
+                <ellipse cx="50" cy="70" rx="35" ry="28" fill="#9e9e9e"/>
+                <ellipse cx="50" cy="70" rx="20" ry="18" fill="#e0e0e0"/>
+                <!-- 頭 -->
+                <circle cx="50" cy="40" r="28" fill="#9e9e9e"/>
+                <!-- 耳朵 -->
+                <circle cx="25" cy="30" r="10" fill="#9e9e9e"/>
+                <circle cx="75" cy="30" r="10" fill="#9e9e9e"/>
+                <circle cx="25" cy="30" r="6" fill="#f5f5f5"/>
+                <circle cx="75" cy="30" r="6" fill="#f5f5f5"/>
+                <!-- 臉 -->
+                <circle cx="42" cy="38" r="3" fill="#333"/>
+                <circle cx="58" cy="38" r="3" fill="#333"/>
+                <ellipse cx="50" cy="45" rx="6" ry="8" fill="#424242"/>
+                <circle cx="35" cy="45" r="4" fill="rgba(255,100,100,0.3)"/>
+                <circle cx="65" cy="45" r="4" fill="rgba(255,100,100,0.3)"/>
+                
+                <!-- === 飾品層 (預設隱藏) === -->
+                <!-- 蝴蝶結 -->
+                <g id="acc-bow" class="svg-accessory">
+                    <path d="M40 70 L30 60 L30 80 Z" fill="#e91e63"/>
+                    <path d="M60 70 L70 60 L70 80 Z" fill="#e91e63"/>
+                    <circle cx="50" cy="70" r="5" fill="#c2185b"/>
+                </g>
+                <!-- 花朵 -->
+                <g id="acc-flower" class="svg-accessory">
+                    <circle cx="25" cy="25" r="8" fill="#ffeb3b"/>
+                    <circle cx="25" cy="25" r="3" fill="#f57f17"/>
+                </g>
+                <!-- 帽子 -->
+                <g id="acc-hat" class="svg-accessory">
+                    <path d="M30 20 L70 20 L60 5 L40 5 Z" fill="#3e2723"/>
+                    <rect x="25" y="20" width="50" height="5" fill="#3e2723"/>
+                </g>
+                <!-- 眼鏡 -->
+                <g id="acc-glasses" class="svg-accessory">
+                    <circle cx="42" cy="38" r="7" stroke="#333" stroke-width="2" fill="none"/>
+                    <circle cx="58" cy="38" r="7" stroke="#333" stroke-width="2" fill="none"/>
+                    <line x1="49" y1="38" x2="51" y2="38" stroke="#333" stroke-width="2"/>
+                </g>
             </svg>
         </div>
-        <div class="score-box">
-            <span class="score-label">BEST</span>
-            <span class="score-val" id="best-score">0</span>
-        </div>
-    </header>
 
-    <div id="board-container">
-        <canvas id="game-canvas" width="800" height="800"></canvas>
+        <h3 style="margin-bottom:15px; color:#558b2f;">無尾熊百貨</h3>
+        <div class="shop-grid" id="shop-container">
+            <!-- JS 生成商品 -->
+        </div>
     </div>
-    <div id="spawn-area"></div>
 </div>
 
 <script>
-    /* =================================================================
-       ⚠️ 設定區：請在此填入 Dreamlo.com 的代碼
-       1. 去 http://dreamlo.com/ 點擊按鈕
-       2. 複製 Private Code 貼到下方 privateKey
-       3. 複製 Public Code 貼到下方 publicKey
-    ================================================================= */
-    const DreamloConfig = {
-        privateKey: "", // 範例: "7s8d6f8s7d6f8s7d6f..." (上傳用)
-        publicKey:  "", // 範例: "5f5e5d5c..." (讀取用)
+    /* =========================================
+       1. 遊戲資料與商店系統
+    ========================================= */
+    const GameData = {
+        leaves: parseInt(localStorage.getItem('xr_leaves') || 0),
+        inventory: JSON.parse(localStorage.getItem('xr_inventory') || '[]'),
+        equipped: JSON.parse(localStorage.getItem('xr_equipped') || '{}')
     };
 
-    /* 1. 排行榜管理器 */
-    const Leaderboard = {
-        show: function() {
-            document.getElementById('rank-overlay').style.display = 'flex';
-            this.fetchScores();
-        },
-        close: function() {
-            document.getElementById('rank-overlay').style.display = 'none';
-        },
-        fetchScores: function() {
-            const list = document.getElementById('rank-list');
-            const loading = document.getElementById('rank-loading');
-            list.innerHTML = '';
-            loading.style.display = 'block';
+    const SHOP_ITEMS = [
+        { id: 'bow', name: '粉紅領結', price: 100, icon: '🎀', type: 'svg' },
+        { id: 'flower', name: '小花朵', price: 250, icon: '🌸', type: 'svg' },
+        { id: 'glasses', name: '文青眼鏡', price: 500, icon: '👓', type: 'svg' },
+        { id: 'hat', name: '紳士帽', price: 800, icon: '🎩', type: 'svg' },
+        { id: 'rug', name: '愛心毯', price: 300, icon: '🧶', type: 'decor', html: '<div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:3rem;">🧶</div>' },
+        { id: 'lamp', name: '小檯燈', price: 600, icon: '💡', type: 'decor', html: '<div style="position:absolute;top:20px;right:20px;font-size:2rem;">💡</div>' }
+    ];
 
-            if(!DreamloConfig.publicKey) {
-                loading.innerText = "尚未設定排行榜金鑰 (請看程式碼說明)";
-                return;
+    function updateWallet() {
+        document.getElementById('total-leaves').innerText = GameData.leaves;
+        document.getElementById('game-leaves').innerText = GameData.leaves;
+        localStorage.setItem('xr_leaves', GameData.leaves);
+    }
+
+    function renderShop() {
+        const container = document.getElementById('shop-container');
+        container.innerHTML = '';
+        
+        SHOP_ITEMS.forEach(item => {
+            const owned = GameData.inventory.includes(item.id);
+            const equipped = GameData.equipped[item.type] === item.id;
+            
+            const div = document.createElement('div');
+            div.className = `shop-item ${owned ? 'owned' : ''} ${equipped ? 'equipped' : ''}`;
+            if (!owned && GameData.leaves < item.price) div.classList.add('locked');
+            
+            div.innerHTML = `
+                <div class="item-icon">${item.icon}</div>
+                <div class="item-name">${item.name}</div>
+                <div class="item-price">${owned ? (equipped ? '使用中' : '已擁有') : item.price + ' 🌿'}</div>
+            `;
+            
+            div.onclick = () => buyOrEquip(item);
+            container.appendChild(div);
+        });
+        
+        updateCharacter();
+    }
+
+    function buyOrEquip(item) {
+        if (GameData.inventory.includes(item.id)) {
+            // 裝備或卸下
+            if (GameData.equipped[item.type] === item.id) {
+                delete GameData.equipped[item.type]; // 卸下
+            } else {
+                GameData.equipped[item.type] = item.id; // 裝備
             }
-
-            // 使用 Dreamlo API
-            const url = `https://www.dreamlo.com/lb/${DreamloConfig.publicKey}/json`;
-            
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    loading.style.display = 'none';
-                    let scores = [];
-                    
-                    if (data.dreamlo && data.dreamlo.leaderboard && data.dreamlo.leaderboard.entry) {
-                        let entries = data.dreamlo.leaderboard.entry;
-                        // 如果只有一筆資料，API 會回傳物件而不是陣列，需轉換
-                        if (!Array.isArray(entries)) entries = [entries];
-                        scores = entries;
-                    }
-
-                    if(scores.length === 0) {
-                        list.innerHTML = '<li style="text-align:center;">目前還沒有人上榜，快來當第一名！</li>';
-                        return;
-                    }
-
-                    scores.forEach((entry, index) => {
-                        const li = document.createElement('li');
-                        li.className = 'rank-item';
-                        // 標記自己 (簡單判斷名字)
-                        const myName = localStorage.getItem('xr_player_name');
-                        if(entry.name === myName) li.style.background = '#f1f8e9';
-
-                        li.innerHTML = `
-                            <span style="width:30px;font-weight:bold;">#${index+1}</span>
-                            <span>${entry.name}</span>
-                            <span>${entry.score}</span>
-                        `;
-                        list.appendChild(li);
-                    });
-                })
-                .catch(err => {
-                    loading.innerText = "連線失敗，請檢查網路";
-                    console.error(err);
-                });
-        },
-        checkNewRecord: function(score) {
-            // 只有地獄模式才上傳
-            if(game.mode !== 'hard') return;
-            if(!DreamloConfig.privateKey) return;
-
-            // 顯示輸入名字視窗
-            this.tempScore = score;
-            document.getElementById('name-overlay').style.display = 'flex';
-            
-            // 預填上次的名字
-            const savedName = localStorage.getItem('xr_player_name');
-            if(savedName) document.getElementById('player-name').value = savedName;
-        },
-        submit: function() {
-            const nameInput = document.getElementById('player-name');
-            const name = nameInput.value.trim() || "無名無尾熊";
-            localStorage.setItem('xr_player_name', name); // 記住名字
-
-            const score = this.tempScore;
-            const url = `https://www.dreamlo.com/lb/${DreamloConfig.privateKey}/add/${encodeURIComponent(name)}/${score}`;
-
-            fetch(url)
-                .then(() => {
-                    alert('上傳成功！');
-                    document.getElementById('name-overlay').style.display = 'none';
-                    this.show(); // 顯示排行榜
-                })
-                .catch(err => alert('上傳失敗，請檢查網路'));
+            localStorage.setItem('xr_equipped', JSON.stringify(GameData.equipped));
+            renderShop();
+        } else {
+            // 購買
+            if (GameData.leaves >= item.price) {
+                if(confirm(`要花 ${item.price} 葉子買 ${item.name} 嗎？`)) {
+                    GameData.leaves -= item.price;
+                    GameData.inventory.push(item.id);
+                    localStorage.setItem('xr_leaves', GameData.leaves);
+                    localStorage.setItem('xr_inventory', JSON.stringify(GameData.inventory));
+                    updateWallet();
+                    renderShop();
+                    Sound.buy();
+                }
+            } else {
+                alert("葉子不夠喔！快去玩遊戲賺錢～");
+            }
         }
-    };
+    }
 
-    /* 2. 音效系統 */
+    function updateCharacter() {
+        // 重置 SVG 飾品
+        document.querySelectorAll('.svg-accessory').forEach(el => el.style.display = 'none');
+        // 重置 房間裝飾
+        document.getElementById('decor-layer').innerHTML = '';
+
+        // 顯示裝備中的物品
+        if (GameData.equipped['svg']) {
+            document.getElementById(`acc-${GameData.equipped['svg']}`).style.display = 'block';
+        }
+        if (GameData.equipped['decor']) {
+            const item = SHOP_ITEMS.find(i => i.id === GameData.equipped['decor']);
+            if(item) document.getElementById('decor-layer').innerHTML = item.html;
+        }
+    }
+
+    /* =========================================
+       2. 頁面切換邏輯
+    ========================================= */
+    function switchPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`${pageId}-page`).classList.add('active');
+        
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+
+        if(pageId === 'home') {
+            updateWallet();
+            renderShop();
+        }
+    }
+
+    /* =========================================
+       3. 遊戲引擎 (Block Puzzle)
+    ========================================= */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const Sound = {
-        play: (freq, type, dur, vol=0.1) => {
+        play: (freq, type, dur) => {
             if(audioCtx.state === 'suspended') audioCtx.resume();
             const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
             o.type = type; o.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            g.gain.setValueAtTime(vol, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.1, audioCtx.currentTime);
             g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
             o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + dur);
         },
         pickup: () => Sound.play(400, 'sine', 0.1),
-        drop: () => Sound.play(200, 'triangle', 0.1, 0.2),
-        clear: (n) => { for(let i=0;i<n;i++) setTimeout(()=>Sound.play(440*(1+i*0.5),'sine',0.3,0.2), i*50); },
-        bomb: () => Sound.play(100, 'sawtooth', 0.8, 0.3)
+        drop: () => Sound.play(200, 'triangle', 0.1),
+        buy: () => Sound.play(600, 'square', 0.2),
+        clear: (n) => { for(let i=0;i<n;i++) setTimeout(()=>Sound.play(440*(1+i*0.5),'sine',0.3), i*50); }
     };
 
-    /* 3. 方塊定義 */
-    const SHAPES_EASY = [
+    const SHAPES = [
         { m: [[1]], color: '#aed581' }, { m: [[1,1]], color: '#8bc34a' }, { m: [[1],[1]], color: '#8bc34a' },
         { m: [[1,1,1]], color: '#689f38' }, { m: [[1],[1],[1]], color: '#689f38' }, { m: [[1,1],[1,1]], color: '#ffb74d' },
         { m: [[1,1,1],[0,1,0]], color: '#4db6ac' }, { m: [[1,0],[1,0],[1,1]], color: '#ff8a65' },
         { m: [[1,1,1,1]], color: '#558b2f' }, { m: [[1],[1],[1],[1]], color: '#558b2f' }
     ];
-    const SHAPES_HARD = [
-        ...SHAPES_EASY,
-        { m: [[1,1,1],[1,0,1]], color: '#ba68c8' }, { m: [[1,0,0],[1,1,1],[0,0,1]], color: '#7986cb' },
-        { m: [[0,1,0],[1,1,1],[0,1,0]], color: '#4dd0e1' }, { m: [[1,1,1],[1,1,1],[1,1,1]], color: '#90a4ae' },
-        { m: [[1,0,0,0,0],[1,1,1,1,1]], color: '#f06292' }
-    ];
 
-    /* 4. 遊戲核心 */
     class BlockPuzzle {
         constructor() {
             this.canvas = document.getElementById('game-canvas');
@@ -353,26 +368,15 @@
             this.cellSize = this.canvas.width / this.gridSize;
             this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
             this.score = 0;
-            this.mode = 'easy';
-            this.particles = [];
+            this.TOUCH_OFFSET = 100;
             this.currentShape = null;
             this.ghostShape = null;
-            this.TOUCH_OFFSET = 100;
+            
             this.loop = this.loop.bind(this);
             requestAnimationFrame(this.loop);
-        }
-
-        start(mode) {
-            this.mode = mode;
-            this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
-            this.score = 0;
-            this.updateScore(0);
-            const savedBest = localStorage.getItem(`xr_puzzle_best_${mode}`) || 0;
-            document.getElementById('best-score').innerText = savedBest;
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('final-score').style.display = 'none';
             this.spawnShapes();
-            this.setKoalaEmotion('normal');
+            updateWallet();
+            updateCharacter(); // 初始化角色外觀
         }
 
         loop() {
@@ -380,13 +384,11 @@
             this.drawGrid();
             if (this.ghostShape) this.drawGhost();
             this.drawPlacedBlocks();
-            this.updateParticles();
             requestAnimationFrame(this.loop);
         }
 
         drawGrid() {
-            this.ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = 'rgba(255,255,255,0.5)'; this.ctx.lineWidth = 2;
             for(let i=0; i<=this.gridSize; i++) {
                 let pos = i * this.cellSize;
                 this.ctx.beginPath(); this.ctx.moveTo(0, pos); this.ctx.lineTo(800, pos); this.ctx.stroke();
@@ -396,8 +398,7 @@
 
         drawGhost() {
             const { x, y, shape } = this.ghostShape;
-            this.ctx.save();
-            this.ctx.globalAlpha = 0.4;
+            this.ctx.save(); this.ctx.globalAlpha = 0.4;
             for(let r=0; r<shape.m.length; r++) {
                 for(let c=0; c<shape.m[0].length; c++) {
                     if(shape.m[r][c]) this.drawCell(x + c, y + r, shape.color); 
@@ -409,127 +410,80 @@
         drawPlacedBlocks() {
             for(let r=0; r<this.gridSize; r++) {
                 for(let c=0; c<this.gridSize; c++) {
-                    if(this.grid[r][c] !== 0) {
-                        this.drawCell(c, r, this.grid[r][c].color, 1, this.grid[r][c].bomb);
-                    }
+                    if(this.grid[r][c] !== 0) this.drawCell(c, r, this.grid[r][c]);
                 }
             }
         }
 
-        drawCell(x, y, color, scale=1, bombTimer=null) {
-            const padding = 4;
-            const size = this.cellSize - padding * 2;
-            const cx = x * this.cellSize + this.cellSize/2;
-            const cy = y * this.cellSize + this.cellSize/2;
-            this.ctx.save();
-            this.ctx.translate(cx, cy);
-            this.ctx.scale(scale, scale);
-            this.ctx.fillStyle = bombTimer !== null ? '#e53935' : color;
-            this.ctx.beginPath();
-            this.ctx.roundRect(-size/2, -size/2, size, size, 10);
-            this.ctx.fill();
+        drawCell(x, y, color) {
+            const padding = 4; const size = this.cellSize - padding * 2;
+            const cx = x * this.cellSize + this.cellSize/2; const cy = y * this.cellSize + this.cellSize/2;
+            this.ctx.save(); this.ctx.translate(cx, cy);
+            this.ctx.fillStyle = color;
+            this.ctx.beginPath(); this.ctx.roundRect(-size/2, -size/2, size, size, 10); this.ctx.fill();
             this.ctx.fillStyle = 'rgba(255,255,255,0.2)';
-            this.ctx.beginPath();
-            this.ctx.arc(-size/4, -size/4, size/6, 0, Math.PI*2);
-            this.ctx.fill();
-            if(bombTimer !== null) {
-                this.ctx.fillStyle = 'white';
-                this.ctx.font = 'bold 40px Arial';
-                this.ctx.textAlign = 'center';
-                this.ctx.textBaseline = 'middle';
-                this.ctx.fillText(bombTimer, 0, 0);
-                if(bombTimer <= 3) {
-                    this.ctx.strokeStyle = `rgba(255,255,0,${Math.abs(Math.sin(Date.now()/100))})`;
-                    this.ctx.lineWidth = 5;
-                    this.ctx.strokeRect(-size/2, -size/2, size, size);
-                }
-            }
+            this.ctx.beginPath(); this.ctx.arc(-size/4, -size/4, size/6, 0, Math.PI*2); this.ctx.fill();
             this.ctx.restore();
         }
 
         spawnShapes() {
             const container = document.getElementById('spawn-area');
             container.innerHTML = '';
-            const pool = this.mode === 'hard' ? SHAPES_HARD : SHAPES_EASY;
             for(let i=0; i<3; i++) {
-                const shapeData = pool[Math.floor(Math.random() * pool.length)];
-                let shapeWithBomb = JSON.parse(JSON.stringify(shapeData));
-                if(this.mode === 'hard' && this.score > 300 && Math.random() < 0.3) {
-                    shapeWithBomb.hasBomb = true;
-                }
-                this.createDraggableShape(shapeWithBomb, container);
+                const shapeData = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+                this.createDraggableShape(shapeData, container);
             }
         }
 
         createDraggableShape(data, container) {
             const el = document.createElement('canvas');
-            el.width = 80; el.height = 80;
-            el.className = 'shape-preview';
+            el.width = 70; el.height = 70; el.className = 'shape-preview';
             const ctx = el.getContext('2d');
-            const rows = data.m.length;
-            const cols = data.m[0].length;
-            const size = 12;
-            const offsetX = (80 - cols*size)/2;
-            const offsetY = (80 - rows*size)/2;
-            ctx.fillStyle = data.hasBomb ? '#e53935' : data.color;
+            const rows = data.m.length; const cols = data.m[0].length;
+            const size = 12; const offsetX = (70 - cols*size)/2; const offsetY = (70 - rows*size)/2;
+            ctx.fillStyle = data.color;
             for(let r=0; r<rows; r++) {
                 for(let c=0; c<cols; c++) {
-                    if(data.m[r][c]) {
-                        ctx.beginPath();
-                        ctx.roundRect(offsetX + c*size, offsetY + r*size, size-2, size-2, 3);
-                        ctx.fill();
-                    }
+                    if(data.m[r][c]) { ctx.beginPath(); ctx.roundRect(offsetX + c*size, offsetY + r*size, size-2, size-2, 3); ctx.fill(); }
                 }
             }
             const handleStart = (e) => {
-                e.preventDefault(); Sound.pickup();
-                el.classList.add('dragging');
+                e.preventDefault(); Sound.pickup(); el.classList.add('dragging');
                 this.currentShape = { el, data, startX: e.clientX || e.touches[0].clientX, startY: e.clientY || e.touches[0].clientY };
                 this.moveShape(e);
             };
-            el.addEventListener('mousedown', handleStart);
-            el.addEventListener('touchstart', handleStart);
+            el.addEventListener('mousedown', handleStart); el.addEventListener('touchstart', handleStart);
             container.appendChild(el);
         }
 
         moveShape(e) {
             const move = (ev) => {
                 if(!this.currentShape) return;
-                const cx = ev.clientX || ev.touches[0].clientX;
-                const cy = ev.clientY || ev.touches[0].clientY;
+                const cx = ev.clientX || ev.touches[0].clientX; const cy = ev.clientY || ev.touches[0].clientY;
                 const el = this.currentShape.el;
-                el.style.left = (cx - 40) + 'px';
-                el.style.top = (cy - 40 - this.TOUCH_OFFSET) + 'px';
+                el.style.left = (cx - 35) + 'px'; el.style.top = (cy - 35 - this.TOUCH_OFFSET) + 'px';
+                
                 const rect = this.canvas.getBoundingClientRect();
                 const x = (cx - rect.left) * (this.canvas.width / rect.width);
                 const y = (cy - this.TOUCH_OFFSET - rect.top) * (this.canvas.height / rect.height);
-                const gx = Math.floor(x / this.cellSize);
-                const gy = Math.floor(y / this.cellSize);
+                const gx = Math.floor(x / this.cellSize); const gy = Math.floor(y / this.cellSize);
                 const shape = this.currentShape.data;
-                const rows = shape.m.length;
-                const cols = shape.m[0].length;
-                const finalX = gx - Math.floor(cols/2);
-                const finalY = gy - Math.floor(rows/2);
+                const finalX = gx - Math.floor(shape.m[0].length/2); const finalY = gy - Math.floor(shape.m.length/2);
+
                 if(this.canPlace(shape.m, finalX, finalY)) {
                     this.ghostShape = { x: finalX, y: finalY, shape: shape };
-                } else {
-                    this.ghostShape = null;
-                }
+                } else { this.ghostShape = null; }
             };
             const end = (ev) => {
-                document.removeEventListener('mousemove', move);
-                document.removeEventListener('touchmove', move);
-                document.removeEventListener('mouseup', end);
-                document.removeEventListener('touchend', end);
+                document.removeEventListener('mousemove', move); document.removeEventListener('touchmove', move);
+                document.removeEventListener('mouseup', end); document.removeEventListener('touchend', end);
                 if(!this.currentShape) return;
                 const cx = ev.clientX || (ev.changedTouches ? ev.changedTouches[0].clientX : 0);
                 const cy = ev.clientY || (ev.changedTouches ? ev.changedTouches[0].clientY : 0);
                 this.tryPlaceShape(cx, cy);
             };
-            document.addEventListener('mousemove', move);
-            document.addEventListener('touchmove', move, {passive: false});
-            document.addEventListener('mouseup', end);
-            document.addEventListener('touchend', end);
+            document.addEventListener('mousemove', move); document.addEventListener('touchmove', move, {passive: false});
+            document.addEventListener('mouseup', end); document.addEventListener('touchend', end);
         }
 
         tryPlaceShape(mx, my) {
@@ -537,24 +491,17 @@
             const rect = this.canvas.getBoundingClientRect();
             const x = (mx - rect.left) * (this.canvas.width / rect.width);
             const y = (my - this.TOUCH_OFFSET - rect.top) * (this.canvas.height / rect.height);
-            const gx = Math.floor(x / this.cellSize);
-            const gy = Math.floor(y / this.cellSize);
+            const gx = Math.floor(x / this.cellSize); const gy = Math.floor(y / this.cellSize);
             const shape = this.currentShape.data;
-            const rows = shape.m.length;
-            const cols = shape.m[0].length;
-            const finalX = gx - Math.floor(cols/2);
-            const finalY = gy - Math.floor(rows/2);
+            const finalX = gx - Math.floor(shape.m[0].length/2); const finalY = gy - Math.floor(shape.m.length/2);
+
             if(this.canPlace(shape.m, finalX, finalY)) {
                 this.place(shape, finalX, finalY);
-                this.currentShape.el.remove();
-                Sound.drop();
+                this.currentShape.el.remove(); Sound.drop();
                 if(document.getElementById('spawn-area').children.length === 0) setTimeout(() => this.spawnShapes(), 500);
             } else {
                 this.currentShape.el.classList.remove('dragging');
-                this.currentShape.el.style.position = '';
-                this.currentShape.el.style.left = '';
-                this.currentShape.el.style.top = '';
-                this.currentShape.el.style.transform = '';
+                this.currentShape.el.style.position = ''; this.currentShape.el.style.left = ''; this.currentShape.el.style.top = '';
             }
             this.currentShape = null;
         }
@@ -572,27 +519,11 @@
         }
 
         place(shape, x, y) {
-            let bombPlaced = false;
             for(let r=0; r<shape.m.length; r++) {
                 for(let c=0; c<shape.m[0].length; c++) {
-                    if(shape.m[r][c]) {
-                        let isBomb = false;
-                        if(shape.hasBomb && !bombPlaced && Math.random() > 0.5) { isBomb = true; bombPlaced = true; }
-                        if(shape.hasBomb && !bombPlaced && r==shape.m.length-1 && c==shape.m[0].length-1) isBomb = true;
-                        this.grid[y+r][x+c] = { color: shape.color, bomb: isBomb ? 9 : null };
-                    }
+                    if(shape.m[r][c]) this.grid[y+r][x+c] = shape.color;
                 }
             }
-            let gameOver = false;
-            for(let r=0; r<this.gridSize; r++) {
-                for(let c=0; c<this.gridSize; c++) {
-                    if(this.grid[r][c] !== 0 && this.grid[r][c].bomb !== null) {
-                        this.grid[r][c].bomb--;
-                        if(this.grid[r][c].bomb < 0) gameOver = true;
-                    }
-                }
-            }
-            if(gameOver) { this.triggerGameOver("炸彈爆炸了！💥"); return; }
             this.updateScore(10);
             this.checkLines();
         }
@@ -604,64 +535,38 @@
                 let full = true; for(let r=0; r<this.gridSize; r++) if(this.grid[r][c] === 0) full = false;
                 if(full) colsToClear.push(c);
             }
-            rowsToClear.forEach(r => { for(let c=0; c<this.gridSize; c++) { this.createParticles(c, r, this.grid[r][c].color); this.grid[r][c] = 0; } });
-            colsToClear.forEach(c => { for(let r=0; r<this.gridSize; r++) { if(!rowsToClear.includes(r)) { this.createParticles(c, r, this.grid[r][c].color); this.grid[r][c] = 0; } } });
             const totalLines = rowsToClear.length + colsToClear.length;
             if(totalLines > 0) {
+                rowsToClear.forEach(r => this.grid[r].fill(0));
+                colsToClear.forEach(c => { for(let r=0; r<this.gridSize; r++) this.grid[r][c] = 0; });
+                
                 Sound.clear(totalLines);
-                let points = totalLines * 100 * totalLines; 
+                let points = totalLines * 100 * totalLines;
                 this.updateScore(points);
-                this.showFloatText(totalLines > 1 ? `COMBO x${totalLines}!` : "Nice!");
-                this.setKoalaEmotion('happy');
-                setTimeout(() => this.setKoalaEmotion('normal'), 2000);
+                
+                // 獎勵葉子
+                let leavesEarned = totalLines * 5; // 每一行給 5 葉子
+                if(totalLines > 1) leavesEarned *= 2; // Combo 加倍
+                this.earnLeaves(leavesEarned);
+                
+                this.showFloatText(`+${leavesEarned} 🌿`);
             }
-        }
-
-        triggerGameOver(reason) {
-            Sound.bomb();
-            this.setKoalaEmotion('panic');
-            document.getElementById('overlay').style.display = 'flex';
-            document.getElementById('final-score').innerText = `最終分數: ${this.score}\n(${reason || '沒地方放了'})`;
-            document.getElementById('final-score').style.display = 'block';
-            // 檢查是否破紀錄並上傳
-            Leaderboard.checkNewRecord(this.score);
         }
 
         updateScore(points) {
             this.score += points;
             document.getElementById('score').innerText = this.score;
-            const key = `xr_puzzle_best_${this.mode}`;
-            const currentBest = parseInt(localStorage.getItem(key) || 0);
-            if(this.score > currentBest) {
-                localStorage.setItem(key, this.score);
-                document.getElementById('best-score').innerText = this.score;
-            }
         }
-
-        createParticles(gx, gy, color) {
-            const cx = gx * this.cellSize + this.cellSize/2;
-            const cy = gy * this.cellSize + this.cellSize/2;
-            for(let i=0; i<5; i++) {
-                this.particles.push({ x: cx, y: cy, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10, life: 1, color: color, size: Math.random() * 10 + 5 });
-            }
-        }
-
-        updateParticles() {
-            for(let i=this.particles.length-1; i>=0; i--) {
-                let p = this.particles[i];
-                p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.life -= 0.05;
-                if(p.life <= 0) { this.particles.splice(i, 1); } else { this.ctx.globalAlpha = p.life; this.ctx.fillStyle = p.color; this.ctx.beginPath(); this.ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); this.ctx.fill(); this.ctx.globalAlpha = 1; }
-            }
+        
+        earnLeaves(amount) {
+            GameData.leaves += amount;
+            updateWallet();
         }
 
         showFloatText(text) {
             const el = document.createElement('div'); el.className = 'float-text'; el.innerText = text;
             el.style.left = '50%'; el.style.top = '40%'; el.style.transform = 'translate(-50%, -50%)';
             document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
-        }
-
-        setKoalaEmotion(state) {
-            const k = document.getElementById('koala-mascot'); k.className = ''; k.classList.add(`koala-${state}`);
         }
     }
 
