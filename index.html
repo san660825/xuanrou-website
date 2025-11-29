@@ -2,646 +2,399 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>瑄柔的專屬網站 · Ultra Max Edition</title>
+    <title>瑄柔的專屬空間 · The One & Only</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="theme-color" content="#355f35">
+    <meta name="theme-color" content="#2c3e50">
+    
+    <!-- 引入 Google 高級襯線字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Outfit:wght@300;600&display=swap" rel="stylesheet">
 
     <style>
         /* ===========================
-           GLOBAL RESET & VARIABLES
+           CORE VARIABLES & RESET
         =========================== */
         :root {
-            --primary: #355f35;
-            --secondary: #4a7c4a;
-            --accent: #8fb88f;
-            --text: #4f6f4f;
-            --bg-glass: rgba(255, 255, 255, 0.75);
-            --shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-            --blur: blur(16px);
+            --primary: #2c3e50;       /* 深邃藍灰 */
+            --accent: #d4a5a5;        /* 柔和乾燥玫瑰粉 */
+            --text-main: #2c3e50;
+            --text-light: #5d6d7e;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 20px 50px rgba(0, 0, 0, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { scroll-behavior: smooth; }
+        
         body {
-            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
-            background-color: #f0f5f0;
+            font-family: 'Outfit', 'Noto Serif TC', sans-serif;
+            background: #fdfbf7;
+            color: var(--text-main);
             overflow-x: hidden;
-            color: var(--text);
-            transition: background 0.5s, color 0.5s;
+            cursor: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="5" fill="%23d4a5a5" opacity="0.8"/></svg>') 10 10, auto;
         }
 
         /* ===========================
-           LOADING SCREEN
+           WELCOME OVERLAY (AUTO-PLAY FIX)
         =========================== */
-        #loading-screen {
+        #welcome-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0f160f; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 10000;
-            transition: opacity 1.2s ease, visibility 1.2s;
+            background: #0f161a; z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 1s ease, transform 1s ease;
         }
-        #loading-title {
-            color: #d6f5d6; font-size: 2rem; letter-spacing: 3px;
-            opacity: 0; animation: fadeInText 2.5s ease forwards;
+        .welcome-text { color: #fff; font-size: 1.5rem; letter-spacing: 4px; margin-bottom: 30px; opacity: 0; animation: fadeInUp 1s ease forwards 0.5s; }
+        .enter-btn {
+            padding: 12px 40px; border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1); color: #fff;
+            font-size: 1rem; letter-spacing: 2px; cursor: pointer;
+            border-radius: 50px; transition: 0.4s; backdrop-filter: blur(5px);
+            opacity: 0; animation: fadeInUp 1s ease forwards 1s;
         }
-        #loading-sub {
-            color: #9fcf9f; margin-top: 16px; font-size: 1rem;
-            opacity: 0; animation: fadeInSub 3s ease forwards;
-        }
-        .fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
-
-        @keyframes fadeInText { 0% { opacity: 0; transform: translateY(20px); } 50%, 100% { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInSub { 0% { opacity: 0; } 100% { opacity: 1; } }
-
-        /* ===========================
-           BACKGROUND EFFECTS
-        =========================== */
-        #dynamic-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
-        .fog-layer {
-            position: absolute; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(190,220,190,0.18) 0%, rgba(120,150,120,0) 70%);
-            animation: fogMove 35s ease-in-out infinite;
-        }
-        @keyframes fogMove { 0%, 100% { transform: translate(-10%, -10%); } 50% { transform: translate(5%, 5%); } }
+        .enter-btn:hover { background: #fff; color: #000; box-shadow: 0 0 20px rgba(255,255,255,0.5); }
         
-        .particle {
-            position: absolute; background: rgba(255,255,255,0.6); border-radius: 50%;
-            pointer-events: none; animation: floatParticle linear infinite;
-        }
-        @keyframes floatParticle { 0% { transform: translateY(0) scale(1); opacity: 0.8; } 100% { transform: translateY(-100vh) scale(0.5); opacity: 0; } }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 
         /* ===========================
-           NAVIGATION
+           DYNAMIC AURORA BACKGROUND
         =========================== */
-        nav {
-            position: fixed; width: 100%; top: 0; left: 0; padding: 16px 32px;
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255, 255, 255, 0.6); backdrop-filter: var(--blur);
-            z-index: 900; box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
+        .aurora-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(125deg, #fdfbf7 0%, #f3e7e9 30%, #e3eeff 70%, #fdfbf7 100%);
+            background-size: 400% 400%;
+            animation: auroraFlow 20s ease infinite;
         }
-        .logo { font-size: 1.25rem; font-weight: 800; color: var(--primary); letter-spacing: 1px; }
-        .links { display: flex; gap: 24px; }
-        .nav-link { text-decoration: none; color: #2f4f2f; font-weight: 600; position: relative; transition: 0.3s; }
-        .nav-link::after {
-            content: ''; position: absolute; width: 0; height: 2px; bottom: -4px; left: 0;
-            background: var(--secondary); transition: width 0.3s;
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* Floating Orbs */
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6;
+            animation: floatOrb 15s infinite ease-in-out;
         }
-        .nav-link:hover::after { width: 100%; }
+        .orb-1 { width: 300px; height: 300px; background: #ffdde1; top: -50px; left: -50px; }
+        .orb-2 { width: 400px; height: 400px; background: #ee9ca7; bottom: -100px; right: -100px; animation-delay: -5s; }
+        @keyframes floatOrb { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(30px, 50px); } }
+
+        /* ===========================
+           UI COMPONENTS (GLASSMORPHISM)
+        =========================== */
+        section { max-width: 1000px; margin: 0 auto; padding: 80px 20px; position: relative; }
         
-        /* Mobile Menu */
-        .hamburger { display: none; font-size: 1.8rem; cursor: pointer; color: var(--primary); }
-        #mobile-menu {
-            position: absolute; top: 70px; right: 20px; background: rgba(255,255,255,0.95);
-            padding: 20px; border-radius: 12px; box-shadow: var(--shadow);
-            display: none; flex-direction: column; gap: 15px; text-align: center;
-            backdrop-filter: blur(20px);
-        }
-        #mobile-menu.active { display: flex; animation: menuPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes menuPop { from { opacity: 0; transform: scale(0.8) translateY(-10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-
-        @media(max-width: 820px) {
-            .links { display: none; }
-            .hamburger { display: block; }
-            nav { padding: 16px 20px; }
-        }
-
-        /* ===========================
-           COMMON COMPONENTS
-        =========================== */
-        section { padding: 60px 20px; position: relative; max-width: 1200px; margin: 0 auto; }
+        .section-header { text-align: center; margin-bottom: 50px; }
         .section-title {
-            text-align: center; font-size: 1.8rem; font-weight: 800; color: var(--primary);
-            margin-bottom: 40px; position: relative; display: inline-block; left: 50%; transform: translateX(-50%);
+            font-family: 'Noto Serif TC', serif; font-size: 2rem; color: var(--primary);
+            position: relative; display: inline-block; padding-bottom: 10px;
         }
-        .section-title::before { content: "🌿"; margin-right: 8px; font-size: 1.4rem; vertical-align: middle; }
+        .section-title::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 40px; height: 2px; background: var(--accent);
+        }
+
+        /* 3D Tilt Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 40px;
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.1s ease, box-shadow 0.3s ease;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
         
-        .card {
-            background: var(--bg-glass); backdrop-filter: var(--blur);
-            border-radius: 20px; padding: 30px; box-shadow: var(--shadow);
-            margin: 0 auto 40px; max-width: 800px; line-height: 1.8;
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: 1px solid rgba(255,255,255,0.3);
+        /* Navigation */
+        nav {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(15px);
+            padding: 12px 30px; border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); z-index: 100;
+            display: flex; gap: 25px; transition: 0.3s;
         }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(50, 90, 50, 0.15); }
+        .nav-item { text-decoration: none; color: var(--text-main); font-weight: 600; font-size: 0.9rem; position: relative; }
+        .nav-item::after {
+            content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
+            background: var(--accent); transition: 0.3s;
+        }
+        .nav-item:hover::after { width: 100%; }
 
-        /* Fade In Animation */
-        .fade { opacity: 0; transform: translateY(30px); transition: all 1s ease; }
-        .fade.show { opacity: 1; transform: translateY(0); }
-
-        /* ===========================
-           HERO SECTION
-        =========================== */
-        #hero { min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding-top: 100px; }
-        #hero-typing {
-            font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; color: var(--primary);
-            border-right: 3px solid var(--secondary); white-space: nowrap; overflow: hidden;
-            width: 0; animation: typing 3s steps(20) forwards, blink .75s infinite;
-        }
-        @keyframes typing { to { width: 100%; } }
-        @keyframes blink { 50% { border-color: transparent; } }
-        
-        .rotate-text-container { height: 30px; overflow: hidden; margin-top: 20px; position: relative; width: 100%; }
-        .rotate-text { animation: rotateText 9s infinite; }
-        .rotate-item { height: 30px; line-height: 30px; color: var(--text); font-size: 1.2rem; }
-        @keyframes rotateText {
-            0%, 30% { transform: translateY(0); }
-            33%, 63% { transform: translateY(-30px); }
-            66%, 96% { transform: translateY(-60px); }
-            100% { transform: translateY(0); }
-        }
-
-        /* ===========================
-           GALLERY (MASONRY)
-        =========================== */
-        .gallery { column-count: 3; column-gap: 20px; }
-        .masonry-img {
-            width: 100%; border-radius: 15px; margin-bottom: 20px; cursor: zoom-in;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: transform 0.3s;
-            break-inside: avoid; display: block;
-        }
-        .masonry-img:hover { transform: scale(1.02); }
-        @media(max-width: 768px) { .gallery { column-count: 2; } }
-        @media(max-width: 480px) { .gallery { column-count: 1; } }
-
-        /* Lightbox */
-        #lightbox {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center;
-            z-index: 2000; opacity: 0; transition: opacity 0.3s;
-        }
-        #lightbox.active { opacity: 1; }
-        #light-img { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 30px rgba(255,255,255,0.2); }
-
-        /* ===========================
-           TIMELINE
-        =========================== */
-        .timeline { position: relative; margin: 40px 0; }
-        .timeline::before {
-            content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 3px;
-            background: var(--accent); transform: translateX(-50%);
-        }
-        .timeline-item { width: 50%; padding: 20px 40px; position: relative; box-sizing: border-box; }
-        .timeline-item.left { left: 0; text-align: right; }
-        .timeline-item.right { left: 50%; text-align: left; }
-        
-        .timeline-dot {
-            position: absolute; width: 16px; height: 16px; background: var(--secondary);
-            border-radius: 50%; top: 25px; z-index: 2; border: 3px solid #fff;
-        }
-        .timeline-item.left .timeline-dot { right: -8px; }
-        .timeline-item.right .timeline-dot { left: -8px; }
-
-        .timeline-content {
-            background: rgba(255,255,255,0.9); padding: 20px; border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08); position: relative;
-        }
-        .timeline-date { font-size: 0.85rem; color: var(--secondary); font-weight: bold; margin-top: 8px; display: block; }
-
+        /* Mobile Nav */
         @media(max-width: 768px) {
-            .timeline::before { left: 20px; }
-            .timeline-item { width: 100%; padding-left: 50px; padding-right: 10px; text-align: left !important; }
-            .timeline-item.left, .timeline-item.right { left: 0; }
-            .timeline-item.left .timeline-dot, .timeline-item.right .timeline-dot { left: 12px; right: auto; }
+            nav { bottom: 20px; top: auto; width: 90%; justify-content: space-around; padding: 15px; }
         }
 
         /* ===========================
            INTERACTIVE ELEMENTS
         =========================== */
-        /* Message Bottle */
-        .msg-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-        .msg-card {
-            background: var(--bg-glass); backdrop-filter: blur(8px); padding: 20px;
-            border-radius: 16px; width: 280px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            animation: floatMsg 6s ease-in-out infinite;
+        .btn-primary {
+            background: var(--primary); color: white; border: none;
+            padding: 12px 28px; border-radius: 12px; font-size: 1rem;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(44, 62, 80, 0.2);
         }
-        @keyframes floatMsg { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        /* Music Player */
-        .player-ui {
-            background: rgba(255,255,255,0.85); padding: 25px; border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(55, 85, 55, 0.15); text-align: center;
-        }
-        input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
-        .control-btn {
-            background: var(--primary); color: white; border: none; padding: 10px 30px;
-            border-radius: 50px; font-size: 1rem; cursor: pointer; margin-top: 15px;
-            transition: transform 0.2s;
-        }
-        .control-btn:active { transform: scale(0.95); }
-
-        /* Night Mode */
-        body.night-mode {
-            background: #0a0f0a; color: #e0e0e0;
-            --bg-glass: rgba(30, 30, 30, 0.8);
-            --text: #cccccc;
-            --primary: #8fb88f;
-        }
-        body.night-mode nav { background: rgba(0,0,0,0.8); }
-        body.night-mode .card, body.night-mode .timeline-content { background: rgba(40,40,40,0.8); color: #ddd; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(44, 62, 80, 0.3); }
         
-        /* Utility */
-        #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--secondary); width: 0%; z-index: 9999; }
-        .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.8); color: white; padding: 12px 24px;
-            border-radius: 30px; font-size: 0.9rem; z-index: 10001; opacity: 0; transition: opacity 0.3s;
+        /* Heart Click Effect */
+        .click-heart {
+            position: fixed; pointer-events: none; animation: flyUp 1s ease-out forwards;
+            color: #e74c3c; font-size: 20px; z-index: 9999;
         }
+        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(1.5); } }
+
+        /* Photo Grid */
+        .photo-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;
+        }
+        .photo-item {
+            border-radius: 16px; overflow: hidden; height: 300px; position: relative; cursor: pointer;
+        }
+        .photo-item img {
+            width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;
+        }
+        .photo-item:hover img { transform: scale(1.1); }
     </style>
 </head>
 <body>
 
-<!-- Loading Screen -->
-<div id="loading-screen">
-    <div id="loading-title">XuanRou × Koala</div>
-    <div id="loading-sub">Loading Sweet Memories...</div>
+<!-- 1. 入場畫面 (確保音樂播放) -->
+<div id="welcome-overlay">
+    <div class="welcome-text">XuanRou × Koala</div>
+    <div style="font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-bottom: 20px;">戴上耳機，體驗最佳效果</div>
+    <button class="enter-btn" onclick="enterSite()">點擊進入屬於妳的世界</button>
 </div>
 
-<!-- Background Layers -->
-<div id="dynamic-bg">
-    <div class="fog-layer"></div>
-    <div class="fog-layer" style="animation-duration: 45s; opacity: 0.5; animation-direction: reverse;"></div>
-    <div id="night-stars"></div>
+<!-- 2. 背景動畫層 -->
+<div class="aurora-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
 </div>
-
-<!-- Scroll Progress -->
-<div id="scroll-progress"></div>
-<!-- Navigation -->
+<!-- 導航列 -->
 <nav>
-    <div class="logo">XuanRou × Koala</div>
-    <div class="links">
-        <a href="#home" class="nav-link">首頁</a>
-        <a href="#story" class="nav-link">故事</a>
-        <a href="#photos" class="nav-link">照片</a>
-        <a href="#timeline" class="nav-link">時間軸</a>
-        <a href="#diary" class="nav-link">日記</a>
-        <a href="#music" class="nav-link">音樂</a>
-    </div>
-    <div class="hamburger" onclick="toggleMenu()">☰</div>
-    <div id="mobile-menu">
-        <a href="#home" class="nav-link" onclick="toggleMenu()">首頁</a>
-        <a href="#story" class="nav-link" onclick="toggleMenu()">故事</a>
-        <a href="#photos" class="nav-link" onclick="toggleMenu()">照片</a>
-        <a href="#timeline" class="nav-link" onclick="toggleMenu()">時間軸</a>
-        <a href="#diary" class="nav-link" onclick="toggleMenu()">日記</a>
-        <a href="#music" class="nav-link" onclick="toggleMenu()">音樂</a>
-    </div>
+    <a href="#home" class="nav-item">首頁</a>
+    <a href="#story" class="nav-item">故事</a>
+    <a href="#moments" class="nav-item">回憶</a>
+    <a href="#fun" class="nav-item">互動</a>
 </nav>
 
-<!-- Hero Section -->
-<section id="home">
-    <div id="hero">
-        <div style="display:inline-block">
-            <div id="hero-typing">歡迎妳，瑄柔</div>
-        </div>
-        <div class="rotate-text-container">
-            <div class="rotate-text">
-                <div class="rotate-item">這裡，是我專門為妳預留的地方。</div>
-                <div class="rotate-item">妳不需要很乖，妳只需要是真實的妳。</div>
-                <div class="rotate-item">無論妳怎樣，我都還是在這裡。</div>
+<!-- 首頁 Hero -->
+<section id="home" style="height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center;">
+    <div class="glass-card" data-tilt style="padding: 60px 40px;">
+        <div style="font-size: 1.2rem; color: var(--accent); letter-spacing: 2px; margin-bottom: 10px;">TO MY DEAREST</div>
+        <h1 style="font-size: 3.5rem; font-family: 'Noto Serif TC'; margin-bottom: 20px; color: var(--primary);">瑄柔</h1>
+        <p style="font-size: 1.1rem; color: var(--text-light); line-height: 1.8;">
+            這世界很吵，<br>但在這裡，只有我和妳。
+        </p>
+        <div style="margin-top: 40px; width: 100%; height: 1px; background: rgba(0,0,0,0.1);"></div>
+        
+        <!-- 戀愛計時器 -->
+        <div style="margin-top: 30px;">
+            <div style="font-size: 0.9rem; color: #888; margin-bottom: 5px;">我們已經相遇</div>
+            <div id="timer" style="font-size: 1.5rem; font-weight: 700; color: var(--primary); font-family: 'Outfit';">
+                00 <span style="font-size:0.8rem">天</span> 00 <span style="font-size:0.8rem">時</span> 00 <span style="font-size:0.8rem">分</span> 00 <span style="font-size:0.8rem">秒</span>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Story Section -->
+<!-- 故事區塊 -->
 <section id="story">
-    <div class="section-title">寫給妳的一段話</div>
-    <div class="card fade">
-        <p>瑄柔，我想把這個地方做得很漂亮、很溫柔、很乾淨，不是為了誰看，而是為了妳。</p>
-        <br>
-        <p>我不知道妳每天經歷了什麼、遇到什麼煩惱、承受了什麼壓力，但我知道——<br>
-        <b>妳值得一個能讓妳放鬆呼吸的地方。</b></p>
-        <br>
-        <p>不管妳心情好或不好、累或不累、想笑或想掉眼淚，我希望妳回到這裡時，都能覺得：「嗯，有人在為我保留位置。」</p>
-        <br>
-        <p>這個網站不是浪漫，是我對妳的在意。是我願意陪妳、願意理解妳、願意花時間在妳身上的證明。</p>
-        <br>
-        <p>無論妳什麼樣子、什麼心情、什麼狀態——<b>我都願意接住。</b></p>
+    <div class="section-header">
+        <div class="section-title">寫給妳的話</div>
+    </div>
+    <div class="glass-card" data-tilt>
+        <p style="font-size: 1.1rem; line-height: 2; text-align: justify;">
+            瑄柔，我常在想，要怎麼讓妳知道我有多在意妳。<br><br>
+            我不是一個很會說甜言蜜語的人，但我會把這份心意寫進代碼裡、藏在每一個細節裡。
+            我知道妳有時候會覺得累、覺得煩，甚至覺得自己不夠好。但在我眼裡，<b>妳真實的樣子就是最可愛的。</b><br><br>
+            這個網站不會過期，就像我對妳的耐心一樣。無論妳什麼時候回來，這裡都亮著燈等妳。
+        </p>
     </div>
 </section>
 
-<!-- About Us Section -->
-<section id="about">
-    <div class="card fade" style="display: flex; flex-wrap: wrap; gap: 30px; align-items: center;">
-        <div style="flex: 1; min-width: 280px;">
-            <h2 style="color:var(--primary); margin-bottom: 15px;">我 × 妳</h2>
-            <p>我喜歡的從來不是完美，而是妳真實的樣子。<br><br>
-            妳生氣的時候、崩潰的時候、想哭的時候、累到不想講話的時候——我都覺得妳很真、很可愛、很值得被心疼。<br>
-            我不會要求妳一直開心、一直懂事；我希望妳做自己，然後知道：<br>
-            <b>不管妳怎樣，我都還是在這裡。</b></p>
-        </div>
-        <div style="flex: 1; min-width: 280px; text-align: center;">
-            <!-- 請確認圖片路徑正確，若無圖片會顯示替代框 -->
-            <img src="photo6.jpg" alt="Our Photo" style="width: 100%; max-width: 350px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.15);" onerror="this.style.display='none'">
-        </div>
+<!-- 照片回憶 (瀑布流) -->
+<section id="moments">
+    <div class="section-header">
+        <div class="section-title">我們的瞬間</div>
+    </div>
+    <div class="photo-grid">
+        <!-- 圖片路徑請確認，若無圖片會顯示色塊 -->
+        <div class="photo-item" onclick="viewPhoto(this)"><img src="photo1.jpg" onerror="this.src='https://placehold.co/600x800/e3eeff/2c3e50?text=Memory+1'"></div>
+        <div class="photo-item" onclick="viewPhoto(this)"><img src="photo2.jpg" onerror="this.src='https://placehold.co/600x800/f3e7e9/2c3e50?text=Memory+2'"></div>
+        <div class="photo-item" onclick="viewPhoto(this)"><img src="photo3.jpg" onerror="this.src='https://placehold.co/600x800/fdfbf7/2c3e50?text=Memory+3'"></div>
+        <div class="photo-item" onclick="viewPhoto(this)"><img src="photo4.jpg" onerror="this.src='https://placehold.co/600x800/e3eeff/2c3e50?text=Memory+4'"></div>
     </div>
 </section>
 
-<!-- Photos Section -->
-<section id="photos">
-    <div class="section-title">我們的照片</div>
-    <div class="gallery fade">
-        <!-- 圖片加入 onerror 處理，防止破圖 -->
-        <img src="photo1.jpg" class="masonry-img" onclick="openLightbox(this.src)" onerror="this.src='https://placehold.co/400x600/e8f5e8/355f35?text=Photo+1'">
-        <img src="photo2.jpg" class="masonry-img" onclick="openLightbox(this.src)" onerror="this.src='https://placehold.co/400x500/e8f5e8/355f35?text=Photo+2'">
-        <img src="photo3.jpg" class="masonry-img" onclick="openLightbox(this.src)" onerror="this.src='https://placehold.co/400x400/e8f5e8/355f35?text=Photo+3'">
-        <img src="photo4.jpg" class="masonry-img" onclick="openLightbox(this.src)" onerror="this.src='https://placehold.co/400x700/e8f5e8/355f35?text=Photo+4'">
-        <img src="photo5.jpg" class="masonry-img" onclick="openLightbox(this.src)" onerror="this.src='https://placehold.co/400x500/e8f5e8/355f35?text=Photo+5'">
-        <img src="photo6.jpg" class="masonry-img" onclick="openLightbox(this.src)" onerror="this.src='https://placehold.co/400x600/e8f5e8/355f35?text=Photo+6'">
+<!-- 互動區塊：喜歡妳的理由 -->
+<section id="fun">
+    <div class="section-header">
+        <div class="section-title">今日份的喜歡</div>
+    </div>
+    <div class="glass-card" style="text-align: center; min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <div id="reason-display" style="font-size: 1.2rem; font-weight: bold; color: var(--primary); margin-bottom: 30px; min-height: 60px;">
+            點擊按鈕，告訴妳一個秘密
+        </div>
+        <button class="btn-primary" onclick="generateReason()">為什麼喜歡瑄柔？</button>
     </div>
 </section>
 
-<!-- Timeline Section -->
-<section id="timeline">
-    <div class="section-title">我們的時間軸</div>
-    <div class="timeline fade">
-        <div class="timeline-item left">
-            <div class="timeline-dot"></div>
-            <div class="timeline-content">
-                <h3>第一次聊天</h3>
-                <p>那天開始，我就覺得妳是一個特別的人。</p>
-                <span class="timeline-date">某年 某月 某日</span>
-            </div>
-        </div>
-        <div class="timeline-item right">
-            <div class="timeline-dot"></div>
-            <div class="timeline-content">
-                <h3>第一次見面</h3>
-                <p>看到妳的那一瞬間，我其實比表面更緊張。</p>
-                <span class="timeline-date">某月 某日</span>
-            </div>
-        </div>
-        <div class="timeline-item left">
-            <div class="timeline-dot"></div>
-            <div class="timeline-content">
-                <h3>第一次一起出去</h3>
-                <p>那時我心裡的感覺是：如果可以，我想一直陪妳。</p>
-                <span class="timeline-date">某日</span>
-            </div>
-        </div>
-        <div class="timeline-item right">
-            <div class="timeline-dot"></div>
-            <div class="timeline-content">
-                <h3>我們現在</h3>
-                <p>不是完美，但真實、坦白。我想要的未來，就是有妳的未來。</p>
-                <span class="timeline-date">現在</span>
-            </div>
-        </div>
-    </div>
-</section>
-<!-- Emotion Tabs -->
-<section>
-    <div class="section-title">情緒急救包</div>
-    <div class="card fade" style="text-align: center;">
-        <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
-            <button class="control-btn" onclick="showTab('angry')" style="background:#d9534f">生氣時</button>
-            <button class="control-btn" onclick="showTab('sad')" style="background:#5bc0de">難過時</button>
-            <button class="control-btn" onclick="showTab('happy')" style="background:#f0ad4e">開心時</button>
-            <button class="control-btn" onclick="showTab('night')" style="background:#292b2c">睡前</button>
-        </div>
-        <div id="tab-content" style="font-size:1.1rem; color:var(--text); min-height: 80px; display:flex; align-items:center; justify-content:center;">
-            （點選一個按鈕，看看我想對妳說什麼 ❤）
-        </div>
-    </div>
-</section>
-
-<!-- Diary & Messages -->
-<section id="diary">
-    <div class="section-title">每日小語</div>
-    <div class="card fade" style="text-align:center;">
-        <h3 style="color:var(--primary); margin-bottom:15px;">今天想對妳說</h3>
-        <div id="diary-box" style="font-size:1.2rem; font-weight:bold; color:var(--text);"></div>
-    </div>
-
-    <div class="msg-grid fade" style="margin-top: 50px;">
-        <div class="msg-card" style="animation-delay: 0s;">妳其實比妳以為的還更值得被愛。</div>
-        <div class="msg-card" style="animation-delay: 1s;">妳的壞情緒我也願意一起扛。</div>
-        <div class="msg-card" style="animation-delay: 2s;">如果世界不溫柔，那我對妳溫柔。</div>
-        <div class="msg-card" style="animation-delay: 3s;">妳不用表現得很好，我在這裡。</div>
-    </div>
-</section>
-
-<!-- Birthday Countdown -->
-<section id="birthday">
-    <div class="section-title">瑄柔生日倒數</div>
-    <div class="card fade" style="text-align: center;">
-        <div id="birthday-count" style="font-size: 1.5rem; font-weight: 800; color: var(--secondary);">計算中...</div>
-    </div>
-</section>
-
-<!-- Period Notice (Smart) -->
-<div id="period-notice" class="fade" style="max-width: 800px; margin: 20px auto; padding: 15px; background: rgba(255,240,245,0.9); border-radius: 12px; text-align: center; color: #b74462; display: none;"></div>
-
-<!-- Music Player -->
-<section id="music">
-    <div class="section-title">專屬音樂</div>
-    <div class="card fade player-ui">
-        <div id="song-name" style="font-weight:bold; margin-bottom:10px;">你知道你比晚霞好看嗎 - Tr33</div>
-        <!-- 請記得將音樂檔案放在同一資料夾 -->
-        <audio id="audio-player" src="你知道你比晚霞好看嗎 - Tr33 (youtube).mp3"></audio>
-        <input type="range" id="progress-bar" value="0" min="0" max="100">
-        <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:5px;">
-            <span id="current-time">0:00</span>
-            <span id="total-time">0:00</span>
-        </div>
-        <button onclick="toggleMusic()" id="play-btn" class="control-btn">播放 ▶</button>
-    </div>
-</section>
-
-<!-- Footer -->
-<footer style="text-align: center; padding: 40px 20px; color: var(--text); font-size: 0.9rem; opacity: 0.8;">
-    © 2025 無尾熊為瑄柔製作 · All Rights Reserved<br>
-    <button onclick="toggleNightMode()" style="margin-top:15px; padding:5px 10px; border:1px solid var(--text); background:transparent; color:var(--text); border-radius:15px; cursor:pointer;">🌙 切換夜間模式</button>
-</footer>
-
-<!-- Lightbox Container -->
-<div id="lightbox" onclick="closeLightbox()">
-    <img id="light-img" src="" alt="Full View">
+<!-- 音樂播放器 (隱藏式，但在底部有控制條) -->
+<div id="music-control" style="position: fixed; bottom: 20px; right: 20px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); padding: 10px 20px; border-radius: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; z-index: 900; transform: translateY(100px); transition: 0.5s;">
+    <div id="music-icon" style="animation: spin 4s linear infinite;">💿</div>
+    <span style="font-size: 0.8rem; font-weight: 600;">Playing For You</span>
+    <button onclick="toggleMusic()" style="background: none; border: none; cursor: pointer; font-size: 1rem;">⏸</button>
 </div>
+<style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
 
-<!-- Toast Notification -->
-<div id="toast-container"></div>
+<!-- 隱藏的音源 -->
+<audio id="bg-music" loop>
+    <source src="你知道你比晚霞好看嗎 - Tr33 (youtube).mp3" type="audio/mpeg">
+</audio>
 
-<!-- ===========================
-     JAVASCRIPT LOGIC
-=========================== -->
+<!-- 圖片燈箱 -->
+<div id="lightbox" onclick="this.style.opacity=0; setTimeout(()=>this.style.display='none', 300)" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;">
+    <img id="lightbox-img" src="" style="max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 50px rgba(255,255,255,0.2);">
+</div>
 <script>
-    // --- 1. Loading Screen ---
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            const loader = document.getElementById('loading-screen');
-            loader.style.opacity = '0';
-            setTimeout(() => { loader.style.display = 'none'; }, 1200);
-            initVisualEffects(); // Start heavy animations after load
-        }, 2000);
-    });
+    /* ===========================
+       1. 音樂自動播放與入場邏輯
+    =========================== */
+    const audio = document.getElementById('bg-music');
+    const overlay = document.getElementById('welcome-overlay');
+    const musicControl = document.getElementById('music-control');
 
-    // --- 2. Scroll Animations (Intersection Observer) ---
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('show');
-            }
+    function enterSite() {
+        // 嘗試播放音樂
+        audio.volume = 0.6; // 音量設為 60% 比較舒服
+        audio.play().then(() => {
+            console.log("Music started successfully");
+        }).catch(err => {
+            console.log("Autoplay blocked, waiting for interaction", err);
         });
-    }, { threshold: 0.1 });
 
-    document.querySelectorAll('.fade').forEach(el => observer.observe(el));
-
-    // --- 3. Navigation & UI ---
-    function toggleMenu() {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('active');
+        // 淡出入場畫面
+        overlay.style.opacity = '0';
+        overlay.style.transform = 'scale(1.1)';
+        
+        // 顯示音樂控制條
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            musicControl.style.transform = 'translateY(0)';
+        }, 1000);
     }
 
-    function toggleNightMode() {
-        document.body.classList.toggle('night-mode');
-    }
-
-    // --- 4. Lightbox ---
-    function openLightbox(src) {
-        const lb = document.getElementById('lightbox');
-        const img = document.getElementById('light-img');
-        img.src = src;
-        lb.style.display = 'flex';
-        setTimeout(() => lb.classList.add('active'), 10);
-    }
-    function closeLightbox() {
-        const lb = document.getElementById('lightbox');
-        lb.classList.remove('active');
-        setTimeout(() => lb.style.display = 'none', 300);
-    }
-
-    // --- 5. Emotion Tabs ---
-    function showTab(type) {
-        const msgs = {
-            angry: "妳生氣的時候，我不會走。我會在妳旁邊等妳冷靜，也等妳願意被抱住。",
-            sad: "妳難過時，我不會叫妳堅強，我會先抱住妳，陪妳把難受慢慢放下。",
-            happy: "妳開心的時候，我會默默記住妳那個表情，因為那是我一天裡最想看的畫面。",
-            night: "睡前我最想跟妳說的是：妳今天辛苦了，妳做得很好。我在這裡，晚安。"
-        };
-        document.getElementById("tab-content").innerText = msgs[type];
-    }
-
-    // --- 6. Diary Randomizer ---
-    const diarySentences = [
-        "希望妳今天是被溫柔對待的一天。",
-        "如果妳現在很累，那我陪妳一下，不講話也可以。",
-        "妳不需要很完美，我喜歡的是妳真實的樣子。",
-        "妳的世界偶爾很吵沒關係，我會在妳靜下來的地方等妳。",
-        "妳值得被愛、值得被抱緊、值得被理解。"
-    ];
-    document.getElementById("diary-box").innerText = diarySentences[Math.floor(Math.random() * diarySentences.length)];
-
-    // --- 7. Music Player ---
-    const audio = document.getElementById("audio-player");
-    const playBtn = document.getElementById("play-btn");
-    const progressBar = document.getElementById("progress-bar");
-    
     function toggleMusic() {
+        const btn = musicControl.querySelector('button');
+        const icon = document.getElementById('music-icon');
+        
         if (audio.paused) {
-            audio.play().then(() => {
-                playBtn.innerHTML = "暫停 ❚❚";
-                showToast("🎵 音樂播放中");
-            }).catch(e => {
-                showToast("⚠️ 找不到音樂檔案，請確認檔案名稱");
-                console.error("Music play error:", e);
-            });
+            audio.play();
+            btn.innerText = '⏸';
+            icon.style.animationPlayState = 'running';
         } else {
             audio.pause();
-            playBtn.innerHTML = "播放 ▶";
+            btn.innerText = '▶';
+            icon.style.animationPlayState = 'paused';
         }
     }
-    
-    audio.addEventListener("timeupdate", () => {
-        if(isNaN(audio.duration)) return;
-        const pct = (audio.currentTime / audio.duration) * 100;
-        progressBar.value = pct;
-        document.getElementById("current-time").innerText = formatTime(audio.currentTime);
-        document.getElementById("total-time").innerText = formatTime(audio.duration);
-    });
 
-    progressBar.addEventListener("input", () => {
-        const time = (progressBar.value / 100) * audio.duration;
-        audio.currentTime = time;
-    });
-
-    function formatTime(s) {
-        const m = Math.floor(s / 60);
-        const sec = Math.floor(s % 60).toString().padStart(2, "0");
-        return `${m}:${sec}`;
-    }
-
-    // --- 8. Birthday Countdown ---
-    function updateBirthday() {
+    /* ===========================
+       2. 戀愛計時器 (Together Timer)
+    =========================== */
+    function updateTimer() {
+        // 設定你們的開始日期 (格式：YYYY-MM-DD)
+        const startDate = new Date("2023-05-20"); // ★ 請修改這裡 ★
         const now = new Date();
-        const currentYear = now.getFullYear();
-        let bday = new Date(`${currentYear}-05-19T00:00:00`); // 假設生日是 5/19
-        
-        if (now > bday) bday.setFullYear(currentYear + 1);
-        
-        const diff = bday - now;
-        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const m = Math.floor((diff / (1000 * 60)) % 60);
-        
-        document.getElementById("birthday-count").innerHTML = `${d}天 ${h}時 ${m}分`;
-    }
-    setInterval(updateBirthday, 60000); // Update every minute to save battery
-    updateBirthday();
+        const diff = now - startDate;
 
-    // --- 9. Period Notice (Logic Optimized) ---
-    function checkPeriod() {
-        // 這裡可以加入簡單的日期邏輯，或是保留原本的 UserAgent 判斷
-        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-        const box = document.getElementById("period-notice");
-        
-        if (isIOS) {
-            box.innerHTML = "❤️ 瑄柔，如果這幾天身體不舒服，記得跟我說，我會幫妳扛著。";
-            box.style.display = "block";
-        }
-    }
-    checkPeriod();
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / (1000 * 60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
 
-    // --- 10. Visual Effects (Particles) ---
-    function initVisualEffects() {
-        const bg = document.getElementById("dynamic-bg");
-        // Limit particles on mobile for performance
-        const count = window.innerWidth < 768 ? 15 : 30; 
+        document.getElementById('timer').innerHTML = 
+            `${days} <span style="font-size:0.8rem">天</span> ${hours} <span style="font-size:0.8rem">時</span> ${minutes} <span style="font-size:0.8rem">分</span> ${seconds} <span style="font-size:0.8rem">秒</span>`;
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    /* ===========================
+       3. 喜歡妳的理由產生器
+    =========================== */
+    const reasons = [
+        "因為妳笑起來的時候，我的世界都亮了。",
+        "因為妳很真實，連生氣的樣子都很可愛。",
+        "因為跟妳在一起，連發呆都覺得有意義。",
+        "因為妳比妳自己想像的還要好一百倍。",
+        "因為妳是我唯一想分享生活瑣事的人。",
+        "因為妳的聲音是我最好的安眠藥。",
+        "沒有原因，就只是因為是妳。"
+    ];
+
+    function generateReason() {
+        const display = document.getElementById('reason-display');
+        display.style.opacity = 0;
         
-        for(let i=0; i<count; i++) {
-            let p = document.createElement("div");
-            p.classList.add("particle");
-            p.style.width = Math.random() * 5 + 2 + "px";
-            p.style.height = p.style.width;
-            p.style.left = Math.random() * 100 + "%";
-            p.style.bottom = "-10px";
-            p.style.animationDuration = (Math.random() * 10 + 10) + "s";
-            p.style.animationDelay = (Math.random() * 5) + "s";
-            bg.appendChild(p);
-        }
+        setTimeout(() => {
+            const random = reasons[Math.floor(Math.random() * reasons.length)];
+            display.innerText = random;
+            display.style.opacity = 1;
+        }, 300);
     }
 
-    // --- 11. Scroll Progress ---
-    window.addEventListener("scroll", () => {
-        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = (winScroll / height) * 100;
-        document.getElementById("scroll-progress").style.width = scrolled + "%";
+    /* ===========================
+       4. 3D Tilt 傾斜特效 (Vanilla JS)
+    =========================== */
+    document.addEventListener('mousemove', (e) => {
+        document.querySelectorAll('.glass-card[data-tilt]').forEach(card => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // 只有滑鼠在卡片附近時才觸發
+            if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -5; // Max 5deg rotation
+                const rotateY = ((x - centerX) / centerX) * 5;
+
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            } else {
+                card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1)`;
+            }
+        });
     });
 
-    // --- Utility: Toast ---
-    function showToast(msg) {
-        const div = document.createElement("div");
-        div.className = "toast";
-        div.innerText = msg;
-        document.body.appendChild(div);
-        // Trigger reflow
-        void div.offsetWidth; 
-        div.style.opacity = 1;
-        setTimeout(() => {
-            div.style.opacity = 0;
-            setTimeout(() => div.remove(), 300);
-        }, 3000);
+    /* ===========================
+       5. 全局點擊愛心特效
+    =========================== */
+    document.addEventListener('click', (e) => {
+        // 避免點擊按鈕時遮擋視線，可選
+        const heart = document.createElement('div');
+        heart.className = 'click-heart';
+        heart.innerText = '❤';
+        heart.style.left = e.clientX + 'px';
+        heart.style.top = e.clientY + 'px';
+        // 隨機大小與旋轉
+        const size = Math.random() * 20 + 10; 
+        heart.style.fontSize = size + 'px';
+        heart.style.transform = `rotate(${Math.random() * 45 - 22.5}deg)`;
+        
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+    });
+
+    /* ===========================
+       6. 圖片燈箱
+    =========================== */
+    function viewPhoto(el) {
+        const src = el.querySelector('img').src;
+        const box = document.getElementById('lightbox');
+        const img = document.getElementById('lightbox-img');
+        img.src = src;
+        box.style.display = 'flex';
+        setTimeout(() => box.style.opacity = 1, 10);
     }
 </script>
 </body>
