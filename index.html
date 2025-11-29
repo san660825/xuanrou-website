@@ -2,590 +2,609 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>瑄柔的無尾熊樂園 · Koala's Green World</title>
+    <title>Koala OS 2025 · 瑄柔專屬宇宙</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="theme-color" content="#558b2f">
+    <meta name="theme-color" content="#2e7d32">
     
-    <!-- 引入圓潤可愛的字體 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <!-- 引入多種高級字體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;600&family=Zen+Maru+Gothic:wght@500;900&family=Nunito:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         /* =========================================
-           1. THEME VARIABLES (EUCALYPTUS GREEN)
+           1. SYSTEM VARIABLES (KOALA PALETTE)
         ========================================= */
         :root {
-            /* 她喜歡的牛油果綠色系 (保留顏色，改意義) */
-            --theme-light: #f1f8e9;   /* 背景淺綠 */
-            --theme-cream: #dcedc8;   /* 裝飾嫩綠 */
-            --theme-green: #aed581;   /* 主色綠 */
-            --theme-deep: #558b2f;    /* 深綠 (尤加利葉) */
-            
-            /* 無尾熊色系 */
-            --koala-grey: #9e9e9e;
-            --koala-dark: #616161;
-            --koala-nose: #424242;
-            
-            /* 功能色 */
-            --white: #ffffff;
-            --glass: rgba(255, 255, 255, 0.7);
-            --shadow: 0 12px 40px rgba(85, 139, 47, 0.15);
+            --primary: #558b2f;       /* 尤加利葉深綠 */
+            --secondary: #aed581;     /* 嫩芽綠 */
+            --accent: #ff8a65;        /* 溫暖橘 (無尾熊鼻子/夕陽) */
+            --bg-dark: #1b5e20;       /* 森林深處 */
+            --bg-light: #f1f8e9;
+            --glass: rgba(255, 255, 255, 0.85);
+            --glass-dark: rgba(0, 0, 0, 0.6);
+            --shadow-lg: 0 20px 50px rgba(0,0,0,0.2);
             --bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+
         body {
-            background-color: var(--theme-light);
-            color: var(--theme-deep);
-            font-family: 'Zen Maru Gothic', 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            font-family: 'Zen Maru Gothic', sans-serif;
             overflow-x: hidden;
+            color: #33691e;
             min-height: 100vh;
-            /* 滑鼠游標改成小樹葉 */
-            cursor: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 0 Q5 5 0 10 Q5 15 10 20 Q15 15 20 10 Q15 5 10 0" fill="%23558b2f" opacity="0.8"/></svg>') 10 10, auto;
         }
 
         /* =========================================
-           2. CANVAS BACKGROUND
+           2. LOADING SYSTEM
         ========================================= */
-        #leaf-canvas {
+        #sys-loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; opacity: 0.5; pointer-events: none;
-        }
-
-        /* =========================================
-           3. LOADING SCREEN (KOALA)
-        ========================================= */
-        #loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--theme-light); z-index: 9999;
+            background: var(--bg-dark); z-index: 10000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: transform 0.8s ease-in-out;
+            transition: transform 1s cubic-bezier(0.7, 0, 0.3, 1);
         }
-        
-        /* CSS 繪製簡單無尾熊頭 */
-        .loader-koala {
-            width: 100px; height: 100px; background: var(--koala-grey);
-            border-radius: 50%; position: relative;
-            box-shadow: 0 10px 0 rgba(0,0,0,0.1);
-            animation: bounceKoala 1s infinite alternate;
+        .loader-circle {
+            width: 80px; height: 80px; border: 5px solid rgba(255,255,255,0.2);
+            border-top: 5px solid var(--secondary); border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
-        /* 耳朵 */
-        .loader-koala::before, .loader-koala::after {
-            content: ''; position: absolute; top: 0; width: 35px; height: 35px;
-            background: var(--koala-grey); border-radius: 50%; z-index: -1;
-        }
-        .loader-koala::before { left: -10px; }
-        .loader-koala::after { right: -10px; }
-        
-        /* 鼻子 */
-        .loader-nose {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 30px; height: 40px; background: var(--koala-nose); border-radius: 40%;
-        }
-        
         .loader-text {
-            margin-top: 30px; font-size: 1.2rem; font-weight: bold; color: var(--theme-deep);
-            letter-spacing: 2px; animation: pulse 1.5s infinite;
+            margin-top: 20px; color: white; font-family: 'Fredoka'; letter-spacing: 2px;
+            animation: pulse 1s infinite;
         }
-
-        @keyframes bounceKoala { from { transform: translateY(0); } to { transform: translateY(-15px); } }
-        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
 
         /* =========================================
-           4. UI COMPONENTS
+           3. UI ARCHITECTURE (APP DOCK)
         ========================================= */
-        .container { max-width: 1000px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
-
-        .glass-card {
-            background: var(--glass); backdrop-filter: blur(12px);
-            border: 2px solid var(--white); border-radius: 30px;
-            padding: 40px; margin-bottom: 40px;
-            box-shadow: var(--shadow);
-            transition: transform 0.4s var(--bounce);
-        }
-        .glass-card:hover { transform: translateY(-8px); }
-
-        .section-title {
-            text-align: center; font-size: 2rem; color: var(--theme-deep);
-            margin-bottom: 30px; position: relative; font-weight: 900;
-        }
-        .section-title::before { content: '🐨'; margin-right: 10px; }
-        .section-title::after {
-            content: ''; display: block; width: 60px; height: 6px;
-            background: var(--theme-green); border-radius: 10px; margin: 10px auto 0;
+        .app-container {
+            max-width: 1200px; margin: 0 auto; padding: 20px 20px 120px 20px;
+            position: relative; z-index: 5;
         }
 
-        .btn {
-            display: inline-block; padding: 12px 35px;
-            background: var(--theme-deep); color: var(--white);
-            border-radius: 50px; border: none; cursor: pointer; font-size: 1rem;
-            transition: 0.3s var(--bounce);
+        /* 底部懸浮 Dock */
+        .dock-wrapper {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,255,255,0.4); backdrop-filter: blur(20px);
+            padding: 15px 25px; border-radius: 30px;
+            display: flex; gap: 20px; z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
         }
-        .btn:hover { background: var(--theme-green); transform: scale(1.05); }
+        .dock-item {
+            width: 50px; height: 50px; border-radius: 15px;
+            background: white; display: flex; justify-content: center; align-items: center;
+            font-size: 1.5rem; color: var(--primary); cursor: pointer;
+            transition: 0.3s var(--bounce); position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .dock-item:hover { transform: translateY(-15px) scale(1.2); }
+        .dock-item.active { background: var(--primary); color: white; }
+        .dock-tooltip {
+            position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 5px 10px;
+            border-radius: 10px; font-size: 0.8rem; opacity: 0; pointer-events: none;
+            transition: 0.2s; white-space: nowrap;
+        }
+        .dock-item:hover .dock-tooltip { opacity: 1; top: -50px; }
 
         /* =========================================
-           5. HERO & PET
+           4. TAMAGOTCHI ENGINE (電子雞)
         ========================================= */
-        .hero {
-            min-height: 80vh; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; text-align: center;
-            padding-top: 60px;
+        .pet-card {
+            background: var(--glass); border-radius: 40px; padding: 30px;
+            text-align: center; position: relative; overflow: hidden;
+            box-shadow: var(--shadow-lg); border: 3px solid white;
+            margin-bottom: 40px;
         }
-        .hero h1 { font-size: 3.5rem; color: var(--theme-deep); margin-bottom: 10px; }
-        .hero p { font-size: 1.2rem; color: #666; max-width: 600px; line-height: 1.8; }
-
-        /* 無尾熊互動區 */
-        #pet-container {
-            width: 180px; height: 160px; margin: 0 auto 20px;
-            cursor: pointer; transition: 0.3s; position: relative;
+        .pet-stats {
+            display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;
         }
-        #pet-svg { width: 100%; height: 100%; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1)); }
-        .pet-bubble {
-            position: absolute; top: -30px; right: -50px;
-            background: var(--white); padding: 10px 15px; border-radius: 20px 20px 20px 0;
-            font-size: 0.9rem; color: var(--theme-deep); box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            opacity: 0; transform: scale(0); transition: 0.3s var(--bounce); pointer-events: none;
+        .stat-bar {
+            width: 100px; height: 10px; background: #ddd; border-radius: 10px; overflow: hidden;
+            position: relative;
         }
-        .pet-bubble.show { opacity: 1; transform: scale(1); }
-
-        /* =========================================
-           6. TIMERS
-        ========================================= */
-        .timer-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;
-            margin-top: 30px; width: 100%; max-width: 600px;
-        }
-        .timer-box {
-            background: var(--white); border-radius: 20px; padding: 15px;
-            text-align: center; border: 2px solid var(--theme-cream);
-        }
-        .timer-val { font-size: 2rem; font-weight: 900; color: var(--theme-deep); display: block; }
-        .timer-label { font-size: 0.8rem; color: #888; font-weight: bold; }
-
-        /* =========================================
-           7. GALLERY & MUSIC & WISHES
-        ========================================= */
-        .gallery-scroll {
-            display: flex; overflow-x: auto; gap: 20px; padding: 20px 5px;
-            scroll-behavior: smooth;
-        }
-        .polaroid {
-            min-width: 220px; background: var(--white); padding: 10px 10px 40px 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); transform: rotate(var(--rot));
-            transition: 0.3s; border-radius: 4px; cursor: zoom-in;
-        }
-        .polaroid:hover { transform: rotate(0) scale(1.05); z-index: 10; }
-        .polaroid img { width: 100%; height: 250px; object-fit: cover; background: #eee; }
+        .stat-fill { height: 100%; width: 100%; transition: width 0.5s; }
+        .fill-hunger { background: #ffca28; }
+        .fill-happy { background: #ec407a; }
         
-        .music-player {
-            display: flex; align-items: center; gap: 20px; background: var(--white);
-            padding: 15px 25px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            max-width: 500px; margin: 0 auto;
-        }
-        .play-btn {
-            width: 50px; height: 50px; background: var(--theme-deep); border-radius: 50%;
-            color: white; display: flex; justify-content: center; align-items: center;
-            cursor: pointer;
-        }
-        .progress-bar {
-            width: 100%; height: 6px; background: #eee; border-radius: 10px;
-            margin-top: 8px; overflow: hidden;
-        }
-        .progress-fill { height: 100%; background: var(--theme-green); width: 0%; }
+        /* 無尾熊 SVG 動畫類別 */
+        .koala-svg { width: 200px; height: 200px; transition: 0.3s; cursor: pointer; }
+        .koala-svg.eating { animation: eatAnim 0.5s infinite; }
+        .koala-svg.happy { animation: jumpAnim 0.5s infinite; }
+        .koala-svg.sleeping { filter: brightness(0.8); }
 
-        .wish-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
-        .wish-note {
-            background: #fff9c4; padding: 15px; border-radius: 2px 2px 15px 2px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.1); font-size: 0.9rem;
-            animation: popIn 0.5s var(--bounce);
-        }
-        @keyframes popIn { from { opacity:0; transform: scale(0.5); } to { opacity:1; transform: scale(1); } }
+        @keyframes eatAnim { 0% { transform: scale(1); } 50% { transform: scale(1.05) rotate(5deg); } }
+        @keyframes jumpAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
 
-        @media(max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
-            .timer-grid { grid-template-columns: repeat(2, 1fr); }
+        .pet-actions {
+            display: flex; justify-content: center; gap: 15px; margin-top: 20px;
         }
+        .action-btn {
+            padding: 10px 20px; border-radius: 20px; border: none;
+            background: var(--primary); color: white; font-weight: bold;
+            cursor: pointer; transition: 0.2s; box-shadow: 0 5px 0 #33691e;
+        }
+        .action-btn:active { transform: translateY(5px); box-shadow: none; }
+
+        /* =========================================
+           5. 3D CUBE ENGINE
+        ========================================= */
+        .cube-scene {
+            width: 200px; height: 200px; perspective: 600px; margin: 60px auto;
+        }
+        .cube {
+            width: 100%; height: 100%; position: relative;
+            transform-style: preserve-3d; transform: translateZ(-100px);
+            animation: rotateCube 15s infinite linear;
+        }
+        .cube-face {
+            position: absolute; width: 200px; height: 200px;
+            border: 2px solid white; opacity: 0.9;
+            background: rgba(255,255,255,0.9);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; overflow: hidden;
+        }
+        .cube-face img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .face-front  { transform: rotateY(  0deg) translateZ(100px); }
+        .face-right  { transform: rotateY( 90deg) translateZ(100px); }
+        .face-back   { transform: rotateY(180deg) translateZ(100px); }
+        .face-left   { transform: rotateY(-90deg) translateZ(100px); }
+        .face-top    { transform: rotateX( 90deg) translateZ(100px); }
+        .face-bottom { transform: rotateX(-90deg) translateZ(100px); }
+
+        @keyframes rotateCube {
+            0% { transform: translateZ(-100px) rotateX(0deg) rotateY(0deg); }
+            100% { transform: translateZ(-100px) rotateX(360deg) rotateY(360deg); }
+        }
+
+        /* =========================================
+           6. GAME CANVAS & DRAWING BOARD
+        ========================================= */
+        .app-card {
+            background: white; border-radius: 30px; padding: 20px;
+            box-shadow: var(--shadow-lg); margin-bottom: 40px;
+            display: none; /* 預設隱藏，點擊 Dock 切換 */
+            animation: slideUp 0.5s var(--bounce);
+        }
+        .app-card.active { display: block; }
+
+        canvas {
+            background: #f0f0f0; border-radius: 20px; width: 100%;
+            touch-action: none; cursor: crosshair;
+        }
+
+        @keyframes slideUp { from { opacity:0; transform:translateY(50px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-<!-- 1. 載入畫面 (無尾熊版) -->
-<div id="loader">
-    <div class="loader-koala">
-        <div class="loader-nose"></div>
-    </div>
-    <div class="loader-text">KOALA HUGGING...</div>
+<!-- 1. 系統載入 -->
+<div id="sys-loader">
+    <div class="loader-circle"></div>
+    <div class="loader-text">KOALA OS STARTING...</div>
 </div>
 
-<!-- 2. 背景 Canvas (尤加利葉) -->
-<canvas id="leaf-canvas"></canvas>
+<!-- 2. 背景流星雨 Canvas -->
+<canvas id="star-canvas" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none;"></canvas>
 
-<!-- 3. 主內容 -->
-<div class="container">
-    
-    <!-- Hero Section -->
-    <section class="hero">
-        <div id="pet-container" onclick="petInteraction()">
-            <div class="pet-bubble" id="pet-msg">抱抱！</div>
-            <!-- SVG Koala Character -->
-            <svg id="pet-svg" viewBox="0 0 120 120">
-                <!-- Ears -->
-                <circle cx="20" cy="40" r="18" fill="#9e9e9e"/>
-                <circle cx="100" cy="40" r="18" fill="#9e9e9e"/>
-                <circle cx="20" cy="40" r="10" fill="#f5f5f5"/>
-                <circle cx="100" cy="40" r="10" fill="#f5f5f5"/>
-                
-                <!-- Head -->
-                <ellipse cx="60" cy="60" rx="45" ry="40" fill="#9e9e9e"/>
-                
-                <!-- Eyes -->
-                <circle cx="45" cy="55" r="4" fill="#333"/>
-                <circle cx="75" cy="55" r="4" fill="#333"/>
-                
-                <!-- Nose (Big Koala Nose) -->
-                <ellipse cx="60" cy="65" rx="12" ry="16" fill="#424242"/>
-                <ellipse cx="58" cy="62" rx="3" ry="4" fill="rgba(255,255,255,0.2)"/>
-                
-                <!-- Cheeks -->
-                <circle cx="30" cy="65" r="5" fill="rgba(255,182,193,0.4)"/>
-                <circle cx="90" cy="65" r="5" fill="rgba(255,182,193,0.4)"/>
-                
-                <!-- Paws (Holding invisible tree) -->
-                <circle cx="40" cy="95" r="10" fill="#9e9e9e"/>
-                <circle cx="80" cy="95" r="10" fill="#9e9e9e"/>
-            </svg>
-        </div>
+<!-- 3. 主應用容器 -->
+<div class="app-container">
 
-        <h1>Hi, 瑄柔</h1>
-        <p>歡迎來到無尾熊的秘密森林。<br>這裡有妳最愛的綠色，還有隨時準備抱住妳的我。</p>
+    <!-- Header -->
+    <header style="text-align: center; margin-bottom: 40px; padding-top: 40px;">
+        <div style="font-size: 1rem; color: var(--primary); font-weight: bold; letter-spacing: 2px;">WELCOME BACK</div>
+        <h1 style="font-size: 3rem; color: var(--bg-dark); text-shadow: 2px 2px 0px white;">瑄柔的專屬宇宙</h1>
         
-        <!-- 智慧計時器 -->
-        <div class="glass-card" style="margin-top: 40px; width: 100%;">
-            <div id="timer-title" style="color: var(--theme-deep); font-weight: bold; letter-spacing: 1px;">
-                距離我們的約定 (2025.10.07) 還有
-            </div>
-            <div class="timer-grid">
-                <div class="timer-box"><span class="timer-val" id="d">0</span><span class="timer-label">DAYS</span></div>
-                <div class="timer-box"><span class="timer-val" id="h">0</span><span class="timer-label">HOURS</span></div>
-                <div class="timer-box"><span class="timer-val" id="m">0</span><span class="timer-label">MINS</span></div>
-                <div class="timer-box"><span class="timer-val" id="s">0</span><span class="timer-label">SECS</span></div>
-            </div>
+        <!-- 智慧計時器 (2025-10-07) -->
+        <div style="background: rgba(255,255,255,0.6); display: inline-block; padding: 10px 30px; border-radius: 50px; margin-top: 15px; font-weight: bold; color: #e91e63;">
+            <i class="fas fa-heart"></i> <span id="main-timer">系統計算中...</span>
         </div>
-    </section>
+    </header>
 
-    <!-- 金牛座生日模組 -->
-    <section>
-        <div class="glass-card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
-            <div>
-                <h2 style="color: var(--theme-deep); margin-bottom: 5px;">♉ 金牛座女孩</h2>
-                <div style="color: #666;">生日：2009.05.19</div>
-            </div>
-            <div style="text-align: right;">
-                <div style="font-size: 0.9rem; color: #888;">距離下次生日還有</div>
-                <div id="bday-count" style="font-size: 1.8rem; font-weight: 900; color: var(--theme-green);">計算中...</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 照片回憶 -->
-    <section>
-        <div class="section-title">尤加利葉花園</div>
-        <div class="gallery-scroll">
-            <!-- 替換為真實照片 -->
-            <div class="polaroid" style="--rot: -3deg;" onclick="openLightBox(this)">
-                <img src="photo1.jpg" onerror="this.src='https://placehold.co/400x500/dcedc8/558b2f?text=Memory'">
-                <div class="polaroid-caption">初次相遇</div>
-            </div>
-            <div class="polaroid" style="--rot: 2deg;" onclick="openLightBox(this)">
-                <img src="photo2.jpg" onerror="this.src='https://placehold.co/400x500/f1f8e9/558b2f?text=Cute'">
-                <div class="polaroid-caption">可愛的妳</div>
-            </div>
-            <div class="polaroid" style="--rot: -1deg;" onclick="openLightBox(this)">
-                <img src="photo3.jpg" onerror="this.src='https://placehold.co/400x500/aed581/558b2f?text=Love'">
-                <div class="polaroid-caption">美好時光</div>
-            </div>
-            <div class="polaroid" style="--rot: 4deg;" onclick="openLightBox(this)">
-                <img src="photo4.jpg" onerror="this.src='https://placehold.co/400x500/dcedc8/558b2f?text=Future'">
-                <div class="polaroid-caption">未來可期</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 音樂播放器 -->
-    <section>
-        <div class="section-title">森林點播</div>
-        <div class="music-player">
-            <div class="play-btn" onclick="toggleAudio()">
-                <i class="fas fa-play" id="play-icon"></i>
-            </div>
-            <div class="music-info">
-                <div style="font-weight: bold; color: var(--theme-deep);">你知道你比晚霞好看嗎</div>
-                <div style="font-size: 0.8rem; color: #888;">Tr33</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="audio-progress"></div>
+    <!-- APP 1: KOALA TAMAGOTCHI (電子雞) -->
+    <div id="app-pet" class="app-card active">
+        <h2 style="text-align:center; color:var(--primary); margin-bottom:20px;">🐨 妳的專屬無尾熊</h2>
+        
+        <div class="pet-card">
+            <!-- 狀態條 -->
+            <div class="pet-stats">
+                <div>
+                    <i class="fas fa-utensils" style="color:#ffca28"></i> 飽食度
+                    <div class="stat-bar"><div class="stat-fill fill-hunger" id="bar-hunger" style="width: 80%;"></div></div>
+                </div>
+                <div>
+                    <i class="fas fa-smile" style="color:#ec407a"></i> 心情值
+                    <div class="stat-bar"><div class="stat-fill fill-happy" id="bar-happy" style="width: 80%;"></div></div>
                 </div>
             </div>
-        </div>
-        <audio id="bg-audio" loop>
-            <source src="你知道你比晚霞好看嗎 - Tr33 (youtube).mp3" type="audio/mpeg">
-        </audio>
-    </section>
 
-    <!-- 許願瓶 -->
-    <section>
-        <div class="section-title">無尾熊的許願樹洞</div>
-        <div class="glass-card">
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <input type="text" id="wish-input" placeholder="寫下一個小願望..." style="flex: 1; padding: 12px; border-radius: 20px; border: 2px solid var(--theme-cream); outline: none;">
-                <button class="btn" onclick="addWish()">貼上</button>
+            <!-- 無尾熊 SVG -->
+            <div id="koala-pet" class="koala-svg">
+                <svg viewBox="0 0 200 200">
+                    <!-- Body -->
+                    <ellipse cx="100" cy="140" rx="60" ry="50" fill="#9e9e9e"/>
+                    <ellipse cx="100" cy="140" rx="30" ry="25" fill="#e0e0e0"/> <!-- Belly -->
+                    
+                    <!-- Head -->
+                    <circle cx="100" cy="80" r="50" fill="#9e9e9e"/>
+                    
+                    <!-- Ears -->
+                    <circle cx="55" cy="60" r="20" fill="#9e9e9e"/>
+                    <circle cx="145" cy="60" r="20" fill="#9e9e9e"/>
+                    <circle cx="55" cy="60" r="12" fill="#f5f5f5"/>
+                    <circle cx="145" cy="60" r="12" fill="#f5f5f5"/>
+                    
+                    <!-- Face -->
+                    <circle cx="85" cy="75" r="5" fill="#333" class="eye-left"/>
+                    <circle cx="115" cy="75" r="5" fill="#333" class="eye-right"/>
+                    <ellipse cx="100" cy="85" rx="12" ry="16" fill="#424242"/> <!-- Nose -->
+                    <path d="M90 105 Q100 115 110 105" stroke="#333" stroke-width="3" fill="none" id="pet-mouth"/>
+                    
+                    <!-- Blush -->
+                    <circle cx="70" cy="85" r="6" fill="rgba(255,100,100,0.3)"/>
+                    <circle cx="130" cy="85" r="6" fill="rgba(255,100,100,0.3)"/>
+                </svg>
             </div>
-            <div class="wish-grid" id="wish-container"></div>
+
+            <!-- 對話框 -->
+            <div id="pet-dialog" style="min-height: 30px; color: var(--primary); font-weight: bold; margin: 15px 0;">
+                "瑄柔～快來陪我玩！"
+            </div>
+
+            <!-- 操作按鈕 -->
+            <div class="pet-actions">
+                <button class="action-btn" onclick="feedPet()"><i class="fas fa-leaf"></i> 餵食</button>
+                <button class="action-btn" onclick="playPet()"><i class="fas fa-hand-sparkles"></i> 摸摸</button>
+                <button class="action-btn" onclick="sleepPet()"><i class="fas fa-bed"></i> 睡覺</button>
+            </div>
         </div>
-    </section>
+    </div>
+    <!-- APP 2: KOALA RUSH (遊戲) -->
+    <div id="app-game" class="app-card">
+        <h2 style="text-align:center; color:var(--primary); margin-bottom:10px;">🎮 Koala Catch</h2>
+        <p style="text-align:center; color:#666; margin-bottom:20px;">點擊畫面左右移動，幫無尾熊接住愛心！</p>
+        
+        <div style="position:relative; max-width:400px; margin:0 auto;">
+            <canvas id="game-canvas" width="400" height="500" style="border:4px solid var(--primary);"></canvas>
+            <div id="game-score" style="position:absolute; top:10px; left:10px; font-size:1.5rem; font-weight:bold; color:var(--primary);">Score: 0</div>
+            <button id="start-game-btn" onclick="startGame()" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); padding:15px 30px; background:var(--accent); color:white; border:none; border-radius:50px; font-size:1.2rem; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.2);">開始遊戲</button>
+        </div>
+    </div>
 
-    <!-- Footer -->
-    <footer style="text-align: center; padding: 40px; color: #888; font-size: 0.9rem;">
-        Made with 🐨 & ❤ for XuanRou<br>
-        <span style="font-size: 0.8rem; opacity: 0.6;">Koala's Love Factory 2025</span>
-    </footer>
+    <!-- APP 3: 3D MEMORY CUBE (相簿) -->
+    <div id="app-cube" class="app-card">
+        <h2 style="text-align:center; color:var(--primary);">🧊 回憶魔方</h2>
+        <p style="text-align:center; color:#888;">這是我們多面的回憶 (會自動旋轉)</p>
+        
+        <div class="cube-scene">
+            <div class="cube">
+                <!-- 請替換為真實照片 -->
+                <div class="cube-face face-front"><img src="photo1.jpg" onerror="this.src='https://placehold.co/200x200/aed581/fff?text=Love'"></div>
+                <div class="cube-face face-back"><img src="photo2.jpg" onerror="this.src='https://placehold.co/200x200/ffcc80/fff?text=You'"></div>
+                <div class="cube-face face-right"><img src="photo3.jpg" onerror="this.src='https://placehold.co/200x200/81d4fa/fff?text=Cute'"></div>
+                <div class="cube-face face-left"><img src="photo4.jpg" onerror="this.src='https://placehold.co/200x200/f48fb1/fff?text=Sweet'"></div>
+                <div class="cube-face face-top"><img src="photo6.jpg" onerror="this.src='https://placehold.co/200x200/ce93d8/fff?text=Us'"></div>
+                <div class="cube-face face-bottom" style="background:var(--primary); color:white;">Koala<br>Love</div>
+            </div>
+        </div>
+    </div>
 
+    <!-- APP 4: CLOUD CANVAS (畫布) -->
+    <div id="app-draw" class="app-card">
+        <h2 style="text-align:center; color:var(--primary);">🎨 雲端塗鴉牆</h2>
+        <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
+            <button onclick="setColor('#000')" style="width:30px; height:30px; background:#000; border-radius:50%; border:none;"></button>
+            <button onclick="setColor('#e91e63')" style="width:30px; height:30px; background:#e91e63; border-radius:50%; border:none;"></button>
+            <button onclick="setColor('#558b2f')" style="width:30px; height:30px; background:#558b2f; border-radius:50%; border:none;"></button>
+            <button onclick="clearCanvas()" style="padding:5px 15px; border-radius:20px; border:1px solid #ccc; background:white;">清除</button>
+        </div>
+        <canvas id="draw-canvas" width="600" height="400" style="border:2px dashed #ccc; background:white; cursor: url('data:image/svg+xml;utf8,<svg width=\'10\' height=\'10\' viewBox=\'0 0 10 10\' xmlns=\'http://www.w3.org/2000/svg\'><circle cx=\'5\' cy=\'5\' r=\'4\' fill=\'%23333\'/></svg>') 5 5, auto;"></canvas>
+    </div>
+
+</div> <!-- End App Container -->
+
+<!-- 底部 Dock 選單 -->
+<div class="dock-wrapper">
+    <div class="dock-item active" onclick="switchApp('app-pet')">
+        <i class="fas fa-paw"></i>
+        <div class="dock-tooltip">電子雞</div>
+    </div>
+    <div class="dock-item" onclick="switchApp('app-game')">
+        <i class="fas fa-gamepad"></i>
+        <div class="dock-tooltip">小遊戲</div>
+    </div>
+    <div class="dock-item" onclick="switchApp('app-cube')">
+        <i class="fas fa-cube"></i>
+        <div class="dock-tooltip">回憶魔方</div>
+    </div>
+    <div class="dock-item" onclick="switchApp('app-draw')">
+        <i class="fas fa-palette"></i>
+        <div class="dock-tooltip">塗鴉牆</div>
+    </div>
 </div>
 
-<!-- 燈箱 -->
-<div id="lightbox" onclick="this.style.display='none'" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 10000; display: none; justify-content: center; align-items: center;">
-    <img id="lb-img" src="" style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 0 30px rgba(255,255,255,0.2);">
-</div>
+<!-- 音樂播放 (隱藏) -->
+<audio id="bg-music" loop>
+    <source src="你知道你比晚霞好看嗎 - Tr33 (youtube).mp3" type="audio/mpeg">
+</audio>
 <script>
     /* =========================================
-       1. SYSTEM INITIALIZATION
+       1. SYSTEM BOOT
     ========================================= */
     window.addEventListener('load', () => {
-        const loader = document.getElementById('loader');
+        const loader = document.getElementById('sys-loader');
         setTimeout(() => {
             loader.style.transform = 'translateY(-100%)';
-            initCanvas(); // 啟動森林背景
-            loadWishes(); // 載入願望
+            initStarBg(); // 啟動背景
+            // 嘗試播放音樂
+            document.getElementById('bg-music').volume = 0.5;
+            document.body.addEventListener('click', () => {
+                document.getElementById('bg-music').play().catch(()=>{});
+            }, {once:true});
         }, 1500);
     });
 
     /* =========================================
-       2. SMART TIMER (2025-10-07)
+       2. APP SWITCHER (DOCK)
+    ========================================= */
+    function switchApp(appId) {
+        // 隱藏所有 App
+        document.querySelectorAll('.app-card').forEach(el => {
+            el.classList.remove('active');
+        });
+        // 顯示目標 App
+        document.getElementById(appId).classList.add('active');
+        
+        // 更新 Dock 狀態
+        document.querySelectorAll('.dock-item').forEach(el => {
+            el.classList.remove('active');
+        });
+        event.currentTarget.classList.add('active');
+    }
+
+    /* =========================================
+       3. SMART TIMER (2025-10-07)
     ========================================= */
     function updateTimer() {
-        const targetDate = new Date(2025, 9, 7, 0, 53, 0); 
+        const target = new Date(2025, 9, 7, 0, 53, 0);
         const now = new Date();
-        let diff = targetDate - now;
-        const title = document.getElementById('timer-title');
-        
+        let diff = target - now;
+        const label = document.getElementById('main-timer');
+
         if (diff > 0) {
-            title.innerHTML = '<i class="fas fa-hourglass-half"></i> 距離我們的約定 (2025.10.07) 還有';
-            title.style.color = "var(--theme-deep)";
+            // 倒數
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const m = Math.floor((diff / (1000 * 60)) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+            label.innerText = `距離約定還有 ${d}天 ${h}時 ${m}分 ${s}秒`;
         } else {
-            title.innerHTML = '<i class="fas fa-heart"></i> 我們已經在一起';
-            title.style.color = "#e91e63"; 
+            // 累計
             diff = Math.abs(diff);
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            label.innerText = `我們已經在一起 ${d} 天了`;
         }
-
-        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const m = Math.floor((diff / (1000 * 60)) % 60);
-        const s = Math.floor((diff / 1000) % 60);
-
-        document.getElementById('d').innerText = d;
-        document.getElementById('h').innerText = h;
-        document.getElementById('m').innerText = m;
-        document.getElementById('s').innerText = s;
     }
     setInterval(updateTimer, 1000);
     updateTimer();
 
     /* =========================================
-       3. BIRTHDAY LOGIC (05-19)
+       4. TAMAGOTCHI LOGIC (電子雞)
     ========================================= */
-    function updateBirthday() {
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        let nextBday = new Date(currentYear, 4, 19); 
-        
-        if (now > nextBday) {
-            nextBday.setFullYear(currentYear + 1);
-        }
-        
-        const diff = nextBday - now;
-        const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-        document.getElementById('bday-count').innerText = `${days} 天`;
-    }
-    updateBirthday();
-
-    /* =========================================
-       4. INTERACTIVE KOALA
-    ========================================= */
-    const petMsgs = [
-        "像無尾熊一樣抱緊妳！", "妳今天好漂亮～", "要記得喝水喔！", 
-        "最喜歡瑄柔了！", "我要掛在妳身上～", "不要太累喔！", "無尾熊愛妳！"
-    ];
+    let hunger = 80;
+    let happy = 80;
     
-    function petInteraction() {
-        const pet = document.getElementById('pet-svg');
-        const bubble = document.getElementById('pet-msg');
+    function updatePetUI() {
+        document.getElementById('bar-hunger').style.width = hunger + '%';
+        document.getElementById('bar-happy').style.width = happy + '%';
         
-        // 搖晃動畫
-        pet.style.transform = `scale(1.1) rotate(${Math.random()*10 - 5}deg)`;
-        setTimeout(() => pet.style.transform = 'scale(1) rotate(0deg)', 200);
-        
-        // 隨機訊息
-        bubble.innerText = petMsgs[Math.floor(Math.random() * petMsgs.length)];
-        bubble.classList.add('show');
-        setTimeout(() => bubble.classList.remove('show'), 3000);
-        
-        createHeart();
+        // 狀態顏色變化
+        document.getElementById('bar-hunger').style.background = hunger < 30 ? '#ef5350' : '#ffca28';
+        document.getElementById('bar-happy').style.background = happy < 30 ? '#ef5350' : '#ec407a';
     }
 
-    function createHeart() {
-        const heart = document.createElement('div');
-        heart.innerHTML = '🐨'; // 噴出無尾熊或愛心
-        heart.style.position = 'fixed';
-        heart.style.left = (event.clientX) + 'px';
-        heart.style.top = (event.clientY) + 'px';
-        heart.style.fontSize = '20px';
-        heart.style.pointerEvents = 'none';
-        heart.style.animation = 'floatUp 1s ease-out forwards';
-        document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 1000);
-    }
-    
-    const styleSheet = document.createElement("style");
-    styleSheet.innerText = `@keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity:1; } 100% { transform: translateY(-50px) scale(1.5); opacity:0; } }`;
-    document.head.appendChild(styleSheet);
-
-    /* =========================================
-       5. WISH JAR
-    ========================================= */
-    function loadWishes() {
-        const wishes = JSON.parse(localStorage.getItem('xr_koala_wishes')) || ["希望瑄柔天天開心", "一起去動物園"];
-        const container = document.getElementById('wish-container');
-        container.innerHTML = '';
-        wishes.forEach(renderWish);
+    function petSay(msg) {
+        const dialog = document.getElementById('pet-dialog');
+        dialog.innerText = msg;
+        dialog.style.animation = 'pulse 0.5s';
+        setTimeout(() => dialog.style.animation = '', 500);
     }
 
-    function renderWish(text) {
-        const div = document.createElement('div');
-        div.className = 'wish-note';
-        div.innerText = text;
-        div.style.transform = `rotate(${Math.random()*4 - 2}deg)`;
-        document.getElementById('wish-container').prepend(div);
+    function feedPet() {
+        hunger = Math.min(100, hunger + 15);
+        updatePetUI();
+        petSay("嚼嚼嚼... 尤加利葉真好吃！🌿");
+        const pet = document.getElementById('koala-pet');
+        pet.classList.add('eating');
+        setTimeout(() => pet.classList.remove('eating'), 1000);
     }
 
-    function addWish() {
-        const input = document.getElementById('wish-input');
-        const text = input.value.trim();
-        if (text) {
-            const wishes = JSON.parse(localStorage.getItem('xr_koala_wishes')) || ["希望瑄柔天天開心", "一起去動物園"];
-            wishes.push(text);
-            localStorage.setItem('xr_koala_wishes', JSON.stringify(wishes));
-            renderWish(text);
-            input.value = '';
-        }
+    function playPet() {
+        happy = Math.min(100, happy + 15);
+        hunger = Math.max(0, hunger - 5); // 玩耍會餓
+        updatePetUI();
+        petSay("好開心！最喜歡瑄柔了！❤");
+        const pet = document.getElementById('koala-pet');
+        pet.classList.add('happy');
+        setTimeout(() => pet.classList.remove('happy'), 1000);
     }
 
-    /* =========================================
-       6. AUDIO & LIGHTBOX
-    ========================================= */
-    const audio = document.getElementById('bg-audio');
-    const playIcon = document.getElementById('play-icon');
-    const progress = document.getElementById('audio-progress');
-
-    function toggleAudio() {
-        if (audio.paused) {
-            audio.play();
-            playIcon.className = 'fas fa-pause';
-        } else {
-            audio.pause();
-            playIcon.className = 'fas fa-play';
-        }
+    function sleepPet() {
+        petSay("呼... 呼... 晚安... 💤");
+        const pet = document.getElementById('koala-pet');
+        pet.classList.add('sleeping');
+        setTimeout(() => pet.classList.remove('sleeping'), 3000);
     }
 
-    audio.addEventListener('timeupdate', () => {
-        const pct = (audio.currentTime / audio.duration) * 100;
-        progress.style.width = pct + '%';
-    });
-
-    function openLightBox(el) {
-        const src = el.querySelector('img').src;
-        document.getElementById('lb-img').src = src;
-        document.getElementById('lightbox').style.display = 'flex';
-    }
+    // 隨機自然消耗
+    setInterval(() => {
+        hunger = Math.max(0, hunger - 1);
+        happy = Math.max(0, happy - 1);
+        updatePetUI();
+        if(hunger < 20) petSay("我肚子餓了...");
+    }, 5000);
 </script>
 <script>
     /* =========================================
-       7. EUCALYPTUS LEAF BACKGROUND
+       5. GAME ENGINE (KOALA CATCH)
     ========================================= */
-    function initCanvas() {
-        const canvas = document.getElementById('leaf-canvas');
+    const gCanvas = document.getElementById('game-canvas');
+    const gCtx = gCanvas.getContext('2d');
+    let gameRunning = false;
+    let score = 0;
+    let playerX = 175; // 400/2 - 25
+    let items = [];
+    let gameLoopId;
+
+    // 玩家控制
+    gCanvas.addEventListener('mousemove', (e) => {
+        const rect = gCanvas.getBoundingClientRect();
+        playerX = e.clientX - rect.left - 25;
+    });
+    // 手機觸控
+    gCanvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const rect = gCanvas.getBoundingClientRect();
+        playerX = e.touches[0].clientX - rect.left - 25;
+    });
+
+    function startGame() {
+        if(gameRunning) return;
+        gameRunning = true;
+        score = 0;
+        items = [];
+        document.getElementById('start-game-btn').style.display = 'none';
+        gameLoop();
+    }
+
+    function gameLoop() {
+        if(!gameRunning) return;
+        
+        // 清空畫布
+        gCtx.clearRect(0, 0, 400, 500);
+        
+        // 產生掉落物 (愛心)
+        if(Math.random() < 0.03) {
+            items.push({x: Math.random() * 380, y: 0, speed: Math.random() * 2 + 2});
+        }
+
+        // 繪製玩家 (簡單無尾熊方塊)
+        gCtx.fillStyle = '#9e9e9e';
+        gCtx.beginPath();
+        gCtx.arc(playerX + 25, 460, 25, 0, Math.PI*2); // 頭
+        gCtx.fill();
+        gCtx.fillStyle = '#333'; // 眼
+        gCtx.beginPath(); gCtx.arc(playerX + 15, 455, 3, 0, Math.PI*2); gCtx.fill();
+        gCtx.beginPath(); gCtx.arc(playerX + 35, 455, 3, 0, Math.PI*2); gCtx.fill();
+        gCtx.fillStyle = '#424242'; // 鼻
+        gCtx.beginPath(); gCtx.ellipse(playerX + 25, 465, 6, 4, 0, 0, Math.PI*2); gCtx.fill();
+
+        // 更新掉落物
+        for(let i=0; i<items.length; i++) {
+            let item = items[i];
+            item.y += item.speed;
+            
+            // 繪製愛心
+            gCtx.fillStyle = '#e91e63';
+            gCtx.font = '20px Arial';
+            gCtx.fillText('❤', item.x, item.y);
+
+            // 碰撞檢測
+            if(item.y > 440 && item.y < 480 && item.x > playerX && item.x < playerX + 50) {
+                score++;
+                document.getElementById('game-score').innerText = 'Score: ' + score;
+                items.splice(i, 1);
+                i--;
+            } else if (item.y > 500) {
+                items.splice(i, 1);
+                i--;
+            }
+        }
+
+        gameLoopId = requestAnimationFrame(gameLoop);
+    }
+
+    /* =========================================
+       6. DRAWING BOARD (CANVAS)
+    ========================================= */
+    const dCanvas = document.getElementById('draw-canvas');
+    const dCtx = dCanvas.getContext('2d');
+    let painting = false;
+    let drawColor = '#000';
+
+    function startPosition(e) {
+        painting = true;
+        draw(e);
+    }
+    function endPosition() {
+        painting = false;
+        dCtx.beginPath();
+    }
+    function draw(e) {
+        if (!painting) return;
+        const rect = dCanvas.getBoundingClientRect();
+        // 支援滑鼠與觸控
+        const clientX = e.clientX || e.touches[0].clientX;
+        const clientY = e.clientY || e.touches[0].clientY;
+        
+        dCtx.lineWidth = 5;
+        dCtx.lineCap = 'round';
+        dCtx.strokeStyle = drawColor;
+
+        dCtx.lineTo(clientX - rect.left, clientY - rect.top);
+        dCtx.stroke();
+        dCtx.beginPath();
+        dCtx.moveTo(clientX - rect.left, clientY - rect.top);
+    }
+
+    dCanvas.addEventListener('mousedown', startPosition);
+    dCanvas.addEventListener('mouseup', endPosition);
+    dCanvas.addEventListener('mousemove', draw);
+    
+    dCanvas.addEventListener('touchstart', (e)=>{e.preventDefault(); startPosition(e)});
+    dCanvas.addEventListener('touchend', endPosition);
+    dCanvas.addEventListener('touchmove', (e)=>{e.preventDefault(); draw(e)});
+
+    function setColor(c) { drawColor = c; }
+    function clearCanvas() { dCtx.clearRect(0, 0, dCanvas.width, dCanvas.height); }
+
+    /* =========================================
+       7. BACKGROUND ANIMATION (STARS)
+    ========================================= */
+    function initStarBg() {
+        const canvas = document.getElementById('star-canvas');
         const ctx = canvas.getContext('2d');
-        let width, height;
-        let particles = [];
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        class Leaf {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.size = Math.random() * 10 + 5; // 葉子大小
-                this.speedX = Math.random() * 1 - 0.5;
-                this.speedY = Math.random() * 1 + 0.5;
-                this.rotation = Math.random() * 360;
-                this.rotSpeed = Math.random() * 2 - 1;
-                // 尤加利葉色系
-                const colors = ['#aed581', '#dcedc8', '#81c784', '#66bb6a'];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-            }
-
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                this.rotation += this.rotSpeed;
-
-                if (this.y > height) this.y = -20;
-                if (this.x > width) this.x = -20;
-                if (this.x < -20) this.x = width;
-            }
-
-            draw() {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.rotation * Math.PI / 180);
-                ctx.fillStyle = this.color;
-                
-                // 繪製尤加利葉形狀 (細長橢圓)
-                ctx.beginPath();
-                ctx.ellipse(0, 0, this.size, this.size / 3, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            }
-        }
-
-        // 建立 50 片葉子
-        for (let i = 0; i < 50; i++) {
-            particles.push(new Leaf());
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const stars = [];
+        for(let i=0; i<100; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speed: Math.random() * 0.5
             });
-            requestAnimationFrame(animate);
         }
-        animate();
+
+        function animateBg() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            
+            stars.forEach(star => {
+                star.y += star.speed;
+                if(star.y > canvas.height) star.y = 0;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI*2);
+                ctx.fill();
+            });
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
     }
 </script>
 </body>
