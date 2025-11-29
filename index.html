@@ -2,32 +2,19 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>瑄柔的無尾熊拼圖森林 · Koala Puzzle</title>
+    <title>無尾熊拼圖：地獄挑戰版</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="theme-color" content="#558b2f">
     
-    <!-- 引入圓潤字體與圖標 -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Zen+Maru+Gothic:wght@500;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* =========================================
-           1. 森林系配色 (Forest Palette)
-        ========================================= */
         :root {
-            --bg-color: #f1f8e9;      /* 背景淺綠 */
-            --board-bg: #dcedc8;      /* 棋盤底色 */
-            
-            /* 方塊顏色 (牛油果色階) */
-            --block-1: #aed581;       /* 淺綠 */
-            --block-2: #8bc34a;       /* 中綠 */
-            --block-3: #689f38;       /* 深綠 */
-            --block-4: #ffb74d;       /* 點綴橘 (無尾熊色) */
-            --block-5: #4db6ac;       /* 清新藍綠 */
-            
-            --text-main: #33691e;     /* 深綠文字 */
-            --shadow: 0 8px 20px rgba(51, 105, 30, 0.15);
-            --radius: 16px;
+            --bg-color: #f1f8e9;
+            --board-bg: #dcedc8;
+            --text-main: #33691e;
+            --bomb-color: #e53935; /* 炸彈紅 */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -35,162 +22,143 @@
         body {
             background-color: var(--bg-color);
             font-family: 'Zen Maru Gothic', sans-serif;
-            overflow: hidden; /* 禁止捲動，專注遊戲 */
+            overflow: hidden;
             height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             color: var(--text-main);
         }
 
-        /* =========================================
-           2. 遊戲容器 (Game Container)
-        ========================================= */
         #game-wrapper {
             position: relative; width: 100%; max-width: 500px; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: space-between;
             padding: 20px;
         }
 
-        /* 頂部資訊列 */
         header {
             width: 100%; display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 10px; padding: 0 10px;
         }
         .score-box {
-            background: white; padding: 10px 20px; border-radius: 30px;
-            box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center;
-            min-width: 100px;
+            background: white; padding: 8px 15px; border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center;
+            min-width: 90px;
         }
-        .score-label { font-size: 0.8rem; color: #888; font-weight: bold; }
-        .score-val { font-size: 1.5rem; font-weight: 900; color: var(--text-main); font-family: 'Fredoka'; }
+        .score-label { font-size: 0.7rem; color: #888; font-weight: bold; }
+        .score-val { font-size: 1.2rem; font-weight: 900; color: var(--text-main); font-family: 'Fredoka'; }
 
-        /* 無尾熊反應區 */
         #koala-mascot {
-            width: 80px; height: 80px; position: relative;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 70px; height: 70px; transition: transform 0.3s;
         }
-        #koala-mascot svg { width: 100%; height: 100%; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1)); }
-        
-        /* 無尾熊表情動畫 */
-        .koala-normal .mouth { d: path("M35 45 Q40 50 45 45"); }
-        .koala-happy { transform: scale(1.2) rotate(-10deg); }
-        .koala-happy .mouth { d: path("M35 45 Q40 55 45 45"); } /* 笑嘴 */
-        .koala-sad { transform: translateY(5px); }
-        .koala-sad .mouth { d: path("M35 50 Q40 45 45 50"); } /* 哭嘴 */
+        .koala-panic { animation: shake 0.5s infinite; }
+        @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 10% { transform: translate(-1px, -2px) rotate(-1deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 30% { transform: translate(3px, 2px) rotate(0deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 50% { transform: translate(-1px, 2px) rotate(-1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 70% { transform: translate(3px, 1px) rotate(-1deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 90% { transform: translate(1px, 2px) rotate(0deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
 
-        /* =========================================
-           3. 棋盤區域 (Canvas)
-        ========================================= */
         #board-container {
-            position: relative;
-            width: 100%; aspect-ratio: 1/1; /* 正方形 */
-            background: var(--board-bg);
-            border-radius: var(--radius);
-            box-shadow: inset 0 5px 15px rgba(0,0,0,0.1), var(--shadow);
-            padding: 10px;
-            touch-action: none; /* 防止觸控捲動 */
+            position: relative; width: 100%; aspect-ratio: 1/1;
+            background: var(--board-bg); border-radius: 16px;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.1); padding: 10px;
         }
-        canvas#game-canvas {
-            width: 100%; height: 100%;
-            border-radius: 8px;
-            display: block;
-        }
+        canvas#game-canvas { width: 100%; height: 100%; border-radius: 8px; display: block; }
 
-        /* =========================================
-           4. 待選方塊區 (Spawn Area)
-        ========================================= */
         #spawn-area {
-            width: 100%; height: 140px;
-            display: flex; justify-content: space-around; align-items: center;
-            padding: 10px; margin-bottom: 20px;
+            width: 100%; height: 140px; display: flex; justify-content: space-around; align-items: center;
         }
         .shape-preview {
-            width: 80px; height: 80px;
-            position: relative;
-            transform-origin: center center;
-            transition: transform 0.1s;
+            width: 80px; height: 80px; position: relative; transition: transform 0.1s;
         }
-        /* 拖曳時的樣式 */
         .shape-preview.dragging {
-            opacity: 0.8; z-index: 1000; position: fixed; pointer-events: none;
-            transform: scale(1.2); /* 拖曳時放大 */
-            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.3));
+            opacity: 0.9; z-index: 1000; position: fixed; pointer-events: none;
+            transform: scale(1.1); filter: drop-shadow(0 20px 40px rgba(0,0,0,0.4));
         }
 
-        /* =========================================
-           5. 浮動文字特效 (Combo)
-        ========================================= */
-        .float-text {
-            position: absolute; font-family: 'Fredoka'; font-weight: 900;
-            color: #ff8f00; font-size: 2rem; pointer-events: none;
-            text-shadow: 2px 2px 0px white; z-index: 99;
-            animation: floatUp 1s forwards;
+        /* 排行榜按鈕 */
+        .rank-btn {
+            position: absolute; top: 20px; right: 20px;
+            background: #fbc02d; color: white; border: none; padding: 8px 15px;
+            border-radius: 20px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 0 #f57f17; z-index: 100;
         }
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(0.5); opacity: 0; }
-            50% { transform: translateY(-30px) scale(1.2); opacity: 1; }
-            100% { transform: translateY(-60px) scale(1); opacity: 0; }
-        }
+        .rank-btn:active { transform: translateY(4px); box-shadow: none; }
 
-        /* =========================================
-           6. 遊戲結束/開始 遮罩
-        ========================================= */
-        #overlay {
+        /* 遮罩與彈窗 */
+        #overlay, #rank-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(85, 139, 47, 0.95); z-index: 2000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.5s;
+            transition: opacity 0.3s;
         }
-        .overlay-card {
-            background: white; padding: 40px; border-radius: 30px;
-            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            max-width: 85%; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        #rank-overlay { background: rgba(0,0,0,0.85); display: none; }
         
+        .overlay-card {
+            background: white; padding: 30px; border-radius: 30px;
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            width: 85%; max-width: 400px;
+        }
+        
+        .rank-list {
+            list-style: none; text-align: left; margin: 20px 0; max-height: 300px; overflow-y: auto;
+        }
+        .rank-item {
+            display: flex; justify-content: space-between; padding: 10px;
+            border-bottom: 1px solid #eee; font-family: 'Fredoka';
+        }
+        .rank-item.me { background: #f1f8e9; color: #558b2f; font-weight: bold; border-radius: 10px; }
+        .rank-num { width: 30px; font-weight: bold; color: #888; }
+
         .btn-start {
             background: #8bc34a; color: white; border: none;
             padding: 15px 40px; font-size: 1.5rem; border-radius: 50px;
-            margin-top: 20px; cursor: pointer; font-family: 'Zen Maru Gothic'; font-weight: bold;
-            box-shadow: 0 5px 0 #558b2f; transition: 0.2s;
+            cursor: pointer; font-family: 'Zen Maru Gothic'; font-weight: bold;
+            box-shadow: 0 5px 0 #558b2f;
         }
-        .btn-start:active { transform: translateY(5px); box-shadow: none; }
+        .btn-close {
+            background: #ccc; color: #555; border: none; padding: 10px 30px;
+            border-radius: 20px; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
 
-        /* 背景裝飾 */
-        .bg-leaf {
-            position: fixed; z-index: -1; opacity: 0.3;
-            animation: floatBg 10s infinite ease-in-out;
+        .float-text {
+            position: absolute; font-family: 'Fredoka'; font-weight: 900;
+            color: #ff8f00; font-size: 2.5rem; pointer-events: none;
+            text-shadow: 2px 2px 0px white; z-index: 99;
+            animation: floatUp 1s forwards;
         }
-        @keyframes floatBg { 0%,100% { transform:translate(0,0) rotate(0deg); } 50% { transform:translate(20px, 20px) rotate(10deg); } }
+        @keyframes floatUp { 0% { transform:translateY(0) scale(0.5); opacity:0; } 50% { transform:translateY(-30px) scale(1.2); opacity:1; } 100% { transform:translateY(-60px) scale(1); opacity:0; } }
     </style>
 </head>
 <body>
 
-<!-- 背景裝飾 -->
-<i class="fas fa-leaf bg-leaf" style="top:10%; left:10%; font-size: 50px; color: #aed581; animation-delay: 0s;"></i>
-<i class="fas fa-leaf bg-leaf" style="top:80%; right:10%; font-size: 80px; color: #dcedc8; animation-delay: 2s;"></i>
-<i class="fas fa-paw bg-leaf" style="top:20%; right:20%; font-size: 40px; color: #dcedc8; animation-delay: 4s;"></i>
+<!-- 排行榜按鈕 -->
+<button class="rank-btn" onclick="showRank()">🏆 排行榜</button>
 
-<!-- 遊戲結束/開始遮罩 -->
+<!-- 遊戲開始/結束遮罩 -->
 <div id="overlay">
     <div class="overlay-card">
-        <h1 style="color: #558b2f; margin-bottom: 10px;">無尾熊拼圖森林</h1>
-        <p style="color: #666; margin-bottom: 20px;">瑄柔，準備好來場腦力激盪了嗎？</p>
-        <div id="final-score" style="font-size: 2rem; font-weight: bold; color: #f57f17; display: none; margin-bottom: 20px;">0 分</div>
-        <button class="btn-start" id="start-btn">開始遊戲</button>
+        <h1 style="color: #558b2f;">無尾熊拼圖<br><span style="font-size:0.6em; color:#e53935;">🔥 地獄挑戰版</span></h1>
+        <p style="color: #666; margin: 15px 0;">小心！炸彈方塊即將出現。<br>倒數歸零前必須消除它！</p>
+        <div id="final-score" style="font-size: 2rem; font-weight: bold; color: #f57f17; display: none; margin-bottom: 20px;">0</div>
+        <button class="btn-start" id="start-btn">開始挑戰</button>
+    </div>
+</div>
+
+<!-- 排行榜遮罩 -->
+<div id="rank-overlay">
+    <div class="overlay-card">
+        <h2>🏆 全球高手榜</h2>
+        <ul class="rank-list" id="rank-list">
+            <!-- JS 生成 -->
+        </ul>
+        <button class="btn-close" onclick="closeRank()">關閉</button>
     </div>
 </div>
 
 <div id="game-wrapper">
-    
-    <!-- 頂部資訊 -->
     <header>
         <div class="score-box">
             <span class="score-label">SCORE</span>
             <span class="score-val" id="score">0</span>
         </div>
         
-        <!-- 無尾熊吉祥物 (SVG) -->
-        <div id="koala-mascot" class="koala-normal">
+        <!-- 無尾熊 SVG -->
+        <div id="koala-mascot">
             <svg viewBox="0 0 80 80">
                 <circle cx="15" cy="25" r="12" fill="#9e9e9e"/>
                 <circle cx="65" cy="25" r="12" fill="#9e9e9e"/>
@@ -212,70 +180,95 @@
         </div>
     </header>
 
-    <!-- 棋盤容器 -->
     <div id="board-container">
         <canvas id="game-canvas" width="800" height="800"></canvas>
     </div>
 
-    <!-- 待選方塊區 -->
     <div id="spawn-area"></div>
-
 </div>
+
 <script>
     /* =========================================
-       1. AUDIO SYNTHESIZER (音效合成)
+       1. AUDIO SYNTHESIZER
     ========================================= */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
     const Sound = {
-        playTone: (freq, type, duration, vol=0.1) => {
+        play: (freq, type, dur, vol=0.1) => {
             if(audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = type; o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            g.gain.setValueAtTime(vol, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(); o.stop(audioCtx.currentTime + dur);
         },
-        pickup: () => Sound.playTone(400, 'sine', 0.1),
-        drop: () => Sound.playTone(200, 'triangle', 0.1, 0.2),
-        clear: (count) => {
-            const base = 440;
-            for(let i=0; i<count; i++) {
-                setTimeout(() => {
-                    Sound.playTone(base * (1 + i*0.5), 'sine', 0.3, 0.2);
-                }, i * 50);
-            }
-        },
-        gameover: () => {
-            Sound.playTone(150, 'sawtooth', 0.5, 0.2);
-        }
+        pickup: () => Sound.play(400, 'sine', 0.1),
+        drop: () => Sound.play(200, 'triangle', 0.1, 0.2),
+        clear: (n) => { for(let i=0;i<n;i++) setTimeout(()=>Sound.play(440*(1+i*0.5),'sine',0.3,0.2), i*50); },
+        bomb: () => Sound.play(100, 'sawtooth', 0.8, 0.3), // 炸彈爆炸聲
+        tick: () => Sound.play(800, 'square', 0.05, 0.05)  // 倒數聲
     };
 
     /* =========================================
-       2. SHAPE DEFINITIONS (方塊形狀)
+       2. EXPANDED SHAPES (更多變態形狀)
     ========================================= */
     const SHAPES = [
+        // 基礎
         { m: [[1]], color: '#aed581' },
         { m: [[1,1]], color: '#8bc34a' },
         { m: [[1],[1]], color: '#8bc34a' },
-        { m: [[1,1,1]], color: '#689f38' },
-        { m: [[1],[1],[1]], color: '#689f38' },
-        { m: [[1,1],[1,1]], color: '#ffb74d' },
-        { m: [[1,1,1],[0,1,0]], color: '#4db6ac' },
-        { m: [[0,1,0],[1,1,1]], color: '#4db6ac' },
-        { m: [[1,0],[1,0],[1,1]], color: '#ff8a65' },
-        { m: [[1,1,1,1]], color: '#558b2f' },
-        { m: [[1],[1],[1],[1]], color: '#558b2f' },
-        { m: [[1,1,0],[0,1,1]], color: '#ba68c8' }
+        { m: [[1,1],[1,1]], color: '#ffb74d' }, // 田
+        { m: [[1,1,1],[0,1,0]], color: '#4db6ac' }, // T
+        { m: [[1,0],[1,0],[1,1]], color: '#ff8a65' }, // L
+        { m: [[1,1,1,1]], color: '#558b2f' }, // 4長條
+        // 進階 (難度UP)
+        { m: [[1,1,1],[1,0,1]], color: '#ba68c8' }, // U型
+        { m: [[1,0,0],[1,1,1],[0,0,1]], color: '#7986cb' }, // 閃電加長
+        { m: [[1,0,1],[1,1,1],[1,0,1]], color: '#e57373' }, // H型
+        { m: [[0,1,0],[1,1,1],[0,1,0]], color: '#4dd0e1' }, // 十字
+        { m: [[1,1,1],[1,1,1],[1,1,1]], color: '#90a4ae' }, // 3x3 巨型方塊 (惡夢)
+        { m: [[1,0,0,0,0],[1,1,1,1,1]], color: '#f06292' }, // 5格L
+        { m: [[1],[1],[1],[1],[1]], color: '#558b2f' } // 5格長條
     ];
 
     /* =========================================
-       3. GAME ENGINE CLASS (遊戲核心)
+       3. FAKE GLOBAL RANKING
+    ========================================= */
+    const FAKE_PLAYERS = [
+        {name: "KoalaMaster", score: 12500},
+        {name: "ForestKing", score: 9800},
+        {name: "Eucalyptus", score: 8540},
+        {name: "LazyBear", score: 7200},
+        {name: "BambooLover", score: 5600},
+        {name: "SleepyHead", score: 4300},
+        {name: "GreenLeaf", score: 3100}
+    ];
+
+    function showRank() {
+        const list = document.getElementById('rank-list');
+        list.innerHTML = '';
+        
+        // 插入玩家當前分數
+        const myScore = parseInt(document.getElementById('score').innerText);
+        let allPlayers = [...FAKE_PLAYERS, {name: "瑄柔 (妳)", score: myScore, isMe: true}];
+        
+        // 排序
+        allPlayers.sort((a,b) => b.score - a.score);
+        
+        allPlayers.forEach((p, i) => {
+            const li = document.createElement('li');
+            li.className = `rank-item ${p.isMe ? 'me' : ''}`;
+            li.innerHTML = `<span class="rank-num">#${i+1}</span><span>${p.name}</span><span>${p.score}</span>`;
+            list.appendChild(li);
+        });
+        
+        document.getElementById('rank-overlay').style.display = 'flex';
+    }
+    function closeRank() { document.getElementById('rank-overlay').style.display = 'none'; }
+
+    /* =========================================
+       4. GAME ENGINE
     ========================================= */
     class BlockPuzzle {
         constructor() {
@@ -283,19 +276,18 @@
             this.ctx = this.canvas.getContext('2d');
             this.gridSize = 8;
             this.cellSize = this.canvas.width / this.gridSize;
+            // Grid now stores objects: { color: string, bomb: number|null } or 0
             this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
+            
             this.score = 0;
             this.bestScore = localStorage.getItem('xr_puzzle_best') || 0;
             this.particles = [];
             this.currentShape = null;
             this.ghostShape = null;
-            
-            // ★ 關鍵設定：手指偏移量 (像素)
-            // 這會讓方塊浮在手指上方約 100px 的位置
-            this.TOUCH_OFFSET = 100; 
-            
+            this.TOUCH_OFFSET = 100; // 手機手指偏移量
+            this.bombsActive = false; // 分數高於 500 開啟炸彈
+
             document.getElementById('best-score').innerText = this.bestScore;
-            
             this.loop = this.loop.bind(this);
             requestAnimationFrame(this.loop);
         }
@@ -303,12 +295,12 @@
         start() {
             this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
             this.score = 0;
+            this.bombsActive = false;
             this.updateScore(0);
-            document.getElementById('overlay').style.opacity = 0;
-            setTimeout(() => document.getElementById('overlay').style.display = 'none', 500);
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('final-score').style.display = 'none';
             this.spawnShapes();
             this.setKoalaEmotion('normal');
-            Sound.pickup();
         }
 
         loop() {
@@ -336,9 +328,7 @@
             this.ctx.globalAlpha = 0.4;
             for(let r=0; r<shape.m.length; r++) {
                 for(let c=0; c<shape.m[0].length; c++) {
-                    if(shape.m[r][c]) {
-                        this.drawCell(x + c, y + r, shape.color); 
-                    }
+                    if(shape.m[r][c]) this.drawCell(x + c, y + r, shape.color); 
                 }
             }
             this.ctx.restore();
@@ -348,13 +338,14 @@
             for(let r=0; r<this.gridSize; r++) {
                 for(let c=0; c<this.gridSize; c++) {
                     if(this.grid[r][c] !== 0) {
-                        this.drawCell(c, r, this.grid[r][c]);
+                        // 繪製方塊與炸彈
+                        this.drawCell(c, r, this.grid[r][c].color, 1, this.grid[r][c].bomb);
                     }
                 }
             }
         }
 
-        drawCell(x, y, color, scale=1) {
+        drawCell(x, y, color, scale=1, bombTimer=null) {
             const padding = 4;
             const size = this.cellSize - padding * 2;
             const cx = x * this.cellSize + this.cellSize/2;
@@ -363,14 +354,36 @@
             this.ctx.save();
             this.ctx.translate(cx, cy);
             this.ctx.scale(scale, scale);
-            this.ctx.fillStyle = color;
+            
+            // 炸彈方塊變紅色
+            this.ctx.fillStyle = bombTimer !== null ? '#e53935' : color;
+            
             this.ctx.beginPath();
             this.ctx.roundRect(-size/2, -size/2, size, size, 10);
             this.ctx.fill();
+            
+            // 高光
             this.ctx.fillStyle = 'rgba(255,255,255,0.2)';
             this.ctx.beginPath();
             this.ctx.arc(-size/4, -size/4, size/6, 0, Math.PI*2);
             this.ctx.fill();
+
+            // 繪製炸彈數字
+            if(bombTimer !== null) {
+                this.ctx.fillStyle = 'white';
+                this.ctx.font = 'bold 40px Arial';
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                this.ctx.fillText(bombTimer, 0, 0);
+                
+                // 炸彈外圈閃爍
+                if(bombTimer <= 3) {
+                    this.ctx.strokeStyle = `rgba(255,255,0,${Math.abs(Math.sin(Date.now()/100))})`;
+                    this.ctx.lineWidth = 5;
+                    this.ctx.strokeRect(-size/2, -size/2, size, size);
+                }
+            }
+
             this.ctx.restore();
         }
 
@@ -379,7 +392,12 @@
             container.innerHTML = '';
             for(let i=0; i<3; i++) {
                 const shapeData = SHAPES[Math.floor(Math.random() * SHAPES.length)];
-                this.createDraggableShape(shapeData, container);
+                // 隨機賦予炸彈屬性 (如果分數夠高)
+                let shapeWithBomb = JSON.parse(JSON.stringify(shapeData));
+                if(this.score > 500 && Math.random() < 0.3) {
+                    shapeWithBomb.hasBomb = true;
+                }
+                this.createDraggableShape(shapeWithBomb, container);
             }
         }
 
@@ -390,16 +408,16 @@
             const ctx = el.getContext('2d');
             const rows = data.m.length;
             const cols = data.m[0].length;
-            const size = 15;
+            const size = 12; // 預覽稍微縮小以適應複雜形狀
             const offsetX = (80 - cols*size)/2;
             const offsetY = (80 - rows*size)/2;
             
-            ctx.fillStyle = data.color;
+            ctx.fillStyle = data.hasBomb ? '#e53935' : data.color;
             for(let r=0; r<rows; r++) {
                 for(let c=0; c<cols; c++) {
                     if(data.m[r][c]) {
                         ctx.beginPath();
-                        ctx.roundRect(offsetX + c*size, offsetY + r*size, size-2, size-2, 4);
+                        ctx.roundRect(offsetX + c*size, offsetY + r*size, size-2, size-2, 3);
                         ctx.fill();
                     }
                 }
@@ -425,16 +443,11 @@
                 const cy = ev.clientY || ev.touches[0].clientY;
                 const el = this.currentShape.el;
                 
-                // ★ 視覺更新：方塊位置 = 手指位置 - 偏移量
-                // 這樣方塊就會浮在手指上面，不會被擋住
                 el.style.left = (cx - 40) + 'px';
                 el.style.top = (cy - 40 - this.TOUCH_OFFSET) + 'px';
 
-                // ★ 邏輯計算：落點判斷也要跟著往上移
-                // 我們判斷的是「方塊看起來在哪裡」，而不是「手指在哪裡」
                 const rect = this.canvas.getBoundingClientRect();
                 const x = (cx - rect.left) * (this.canvas.width / rect.width);
-                // 這裡減去 TOUCH_OFFSET，讓落點判定與視覺位置一致
                 const y = (cy - this.TOUCH_OFFSET - rect.top) * (this.canvas.height / rect.height);
                 
                 const gx = Math.floor(x / this.cellSize);
@@ -474,11 +487,8 @@
         tryPlaceShape(mx, my) {
             this.ghostShape = null;
             const rect = this.canvas.getBoundingClientRect();
-            
-            // ★ 放置判定：同樣要考慮偏移量
             const x = (mx - rect.left) * (this.canvas.width / rect.width);
             const y = (my - this.TOUCH_OFFSET - rect.top) * (this.canvas.height / rect.height);
-            
             const gx = Math.floor(x / this.cellSize);
             const gy = Math.floor(y / this.cellSize);
             
@@ -492,9 +502,14 @@
                 this.place(shape, finalX, finalY);
                 this.currentShape.el.remove();
                 Sound.drop();
+                
+                // 檢查是否需要生成新方塊
                 if(document.getElementById('spawn-area').children.length === 0) {
                     setTimeout(() => this.spawnShapes(), 500);
                 }
+                
+                // 檢查是否遊戲結束 (沒地方放)
+                // 這裡簡化處理：如果炸彈爆炸會觸發 GameOver
             } else {
                 this.currentShape.el.classList.remove('dragging');
                 this.currentShape.el.style.position = '';
@@ -521,13 +536,46 @@
         }
 
         place(shape, x, y) {
+            // 1. 放置新方塊
+            let bombPlaced = false;
             for(let r=0; r<shape.m.length; r++) {
                 for(let c=0; c<shape.m[0].length; c++) {
                     if(shape.m[r][c]) {
-                        this.grid[y+r][x+c] = shape.color;
+                        // 如果這個形狀帶有炸彈，隨機選一個格子變成炸彈
+                        let isBomb = false;
+                        if(shape.hasBomb && !bombPlaced && Math.random() > 0.5) {
+                            isBomb = true;
+                            bombPlaced = true;
+                        }
+                        // 確保至少有一個炸彈如果 flag 是 true
+                        if(shape.hasBomb && !bombPlaced && r==shape.m.length-1 && c==shape.m[0].length-1) {
+                            isBomb = true;
+                        }
+
+                        this.grid[y+r][x+c] = {
+                            color: shape.color,
+                            bomb: isBomb ? 9 : null // 炸彈倒數 9 回合
+                        };
                     }
                 }
             }
+
+            // 2. 更新所有現存炸彈的倒數
+            let gameOver = false;
+            for(let r=0; r<this.gridSize; r++) {
+                for(let c=0; c<this.gridSize; c++) {
+                    if(this.grid[r][c] !== 0 && this.grid[r][c].bomb !== null) {
+                        this.grid[r][c].bomb--;
+                        if(this.grid[r][c].bomb < 0) gameOver = true;
+                    }
+                }
+            }
+
+            if(gameOver) {
+                this.triggerGameOver("炸彈爆炸了！💥");
+                return;
+            }
+
             this.updateScore(10);
             this.checkLines();
         }
@@ -547,16 +595,17 @@
                 if(full) colsToClear.push(c);
             }
 
+            // 執行消除
             rowsToClear.forEach(r => {
                 for(let c=0; c<this.gridSize; c++) {
-                    this.createParticles(c, r, this.grid[r][c]);
+                    this.createParticles(c, r, this.grid[r][c].color);
                     this.grid[r][c] = 0;
                 }
             });
             colsToClear.forEach(c => {
                 for(let r=0; r<this.gridSize; r++) {
                     if(!rowsToClear.includes(r)) {
-                        this.createParticles(c, r, this.grid[r][c]);
+                        this.createParticles(c, r, this.grid[r][c].color);
                         this.grid[r][c] = 0;
                     }
                 }
@@ -571,6 +620,15 @@
                 this.setKoalaEmotion('happy');
                 setTimeout(() => this.setKoalaEmotion('normal'), 2000);
             }
+        }
+
+        triggerGameOver(reason) {
+            Sound.bomb();
+            this.setKoalaEmotion('panic');
+            document.getElementById('overlay').style.display = 'flex';
+            document.getElementById('final-score').innerText = `最終分數: ${this.score}\n(${reason})`;
+            document.getElementById('final-score').style.display = 'block';
+            document.getElementById('start-btn').innerText = "再挑戰一次";
         }
 
         updateScore(points) {
@@ -630,14 +688,9 @@
         }
     }
 
-    // 初始化遊戲
     const game = new BlockPuzzle();
-    
-    // 綁定開始按鈕
-    document.getElementById('start-btn').addEventListener('click', () => {
-        game.start();
-    });
-
-    // 防止手機下拉刷新
+    document.getElementById('start-btn').addEventListener('click', () => game.start());
     document.body.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
 </script>
+</body>
+</html>
