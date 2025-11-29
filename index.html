@@ -288,7 +288,11 @@
             this.bestScore = localStorage.getItem('xr_puzzle_best') || 0;
             this.particles = [];
             this.currentShape = null;
-            this.ghostShape = null; // 新增：預覽影子的狀態
+            this.ghostShape = null;
+            
+            // ★ 關鍵設定：手指偏移量 (像素)
+            // 這會讓方塊浮在手指上方約 100px 的位置
+            this.TOUCH_OFFSET = 100; 
             
             document.getElementById('best-score').innerText = this.bestScore;
             
@@ -310,18 +314,9 @@
         loop() {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.drawGrid();
-            
-            // 1. 畫預覽影子 (Ghost) - 在方塊下方
-            if (this.ghostShape) {
-                this.drawGhost();
-            }
-
-            // 2. 畫已放置的方塊
+            if (this.ghostShape) this.drawGhost();
             this.drawPlacedBlocks();
-            
-            // 3. 畫特效
             this.updateParticles();
-            
             requestAnimationFrame(this.loop);
         }
 
@@ -335,16 +330,13 @@
             }
         }
 
-        // 新增：繪製半透明預覽
         drawGhost() {
             const { x, y, shape } = this.ghostShape;
             this.ctx.save();
-            this.ctx.globalAlpha = 0.4; // 半透明
-            
+            this.ctx.globalAlpha = 0.4;
             for(let r=0; r<shape.m.length; r++) {
                 for(let c=0; c<shape.m[0].length; c++) {
                     if(shape.m[r][c]) {
-                        // 使用灰色或方塊原本的顏色
                         this.drawCell(x + c, y + r, shape.color); 
                     }
                 }
@@ -375,8 +367,6 @@
             this.ctx.beginPath();
             this.ctx.roundRect(-size/2, -size/2, size, size, 10);
             this.ctx.fill();
-            
-            // 高光
             this.ctx.fillStyle = 'rgba(255,255,255,0.2)';
             this.ctx.beginPath();
             this.ctx.arc(-size/4, -size/4, size/6, 0, Math.PI*2);
@@ -435,16 +425,17 @@
                 const cy = ev.clientY || ev.touches[0].clientY;
                 const el = this.currentShape.el;
                 
-                // 手機優化：讓方塊跟隨在手指上方 50px，避免手指擋住
-                const visualOffsetY = 50; 
+                // ★ 視覺更新：方塊位置 = 手指位置 - 偏移量
+                // 這樣方塊就會浮在手指上面，不會被擋住
                 el.style.left = (cx - 40) + 'px';
-                el.style.top = (cy - 40 - visualOffsetY) + 'px';
+                el.style.top = (cy - 40 - this.TOUCH_OFFSET) + 'px';
 
-                // 計算預覽位置 (Ghost Calculation)
+                // ★ 邏輯計算：落點判斷也要跟著往上移
+                // 我們判斷的是「方塊看起來在哪裡」，而不是「手指在哪裡」
                 const rect = this.canvas.getBoundingClientRect();
-                // 這裡使用 cx, cy (手指實際位置) 來計算落點，而不是視覺位置，這樣手感比較直覺
                 const x = (cx - rect.left) * (this.canvas.width / rect.width);
-                const y = (cy - rect.top) * (this.canvas.height / rect.height);
+                // 這裡減去 TOUCH_OFFSET，讓落點判定與視覺位置一致
+                const y = (cy - this.TOUCH_OFFSET - rect.top) * (this.canvas.height / rect.height);
                 
                 const gx = Math.floor(x / this.cellSize);
                 const gy = Math.floor(y / this.cellSize);
@@ -455,7 +446,6 @@
                 const finalX = gx - Math.floor(cols/2);
                 const finalY = gy - Math.floor(rows/2);
 
-                // 如果位置合法，更新影子
                 if(this.canPlace(shape.m, finalX, finalY)) {
                     this.ghostShape = { x: finalX, y: finalY, shape: shape };
                 } else {
@@ -482,12 +472,13 @@
         }
 
         tryPlaceShape(mx, my) {
-            // 清除影子
             this.ghostShape = null;
-
             const rect = this.canvas.getBoundingClientRect();
+            
+            // ★ 放置判定：同樣要考慮偏移量
             const x = (mx - rect.left) * (this.canvas.width / rect.width);
-            const y = (my - rect.top) * (this.canvas.height / rect.height);
+            const y = (my - this.TOUCH_OFFSET - rect.top) * (this.canvas.height / rect.height);
+            
             const gx = Math.floor(x / this.cellSize);
             const gy = Math.floor(y / this.cellSize);
             
@@ -505,7 +496,6 @@
                     setTimeout(() => this.spawnShapes(), 500);
                 }
             } else {
-                // 放回原處
                 this.currentShape.el.classList.remove('dragging');
                 this.currentShape.el.style.position = '';
                 this.currentShape.el.style.left = '';
