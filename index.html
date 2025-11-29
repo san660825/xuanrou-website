@@ -2,400 +2,360 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>瑄柔的專屬空間 · The One & Only</title>
+    <title>瑄柔的專屬星球 · My Universe</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="theme-color" content="#2c3e50">
+    <meta name="theme-color" content="#1a1a2e">
     
-    <!-- 引入 Google 高級襯線字體 -->
+    <!-- 高級字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Outfit:wght@300;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Cinzel:wght@400;700&family=Outfit:wght@300;600&display=swap" rel="stylesheet">
 
     <style>
         /* ===========================
-           CORE VARIABLES & RESET
+           CORE VARIABLES
         =========================== */
         :root {
-            --primary: #2c3e50;       /* 深邃藍灰 */
-            --accent: #d4a5a5;        /* 柔和乾燥玫瑰粉 */
-            --text-main: #2c3e50;
-            --text-light: #5d6d7e;
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 20px 50px rgba(0, 0, 0, 0.15);
+            --bg-deep: #0f0c29;
+            --bg-gradient: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-main: #ffffff;
+            --text-sub: #dcdcdc;
+            --accent: #ffd700; /* 金色，象徵金牛座與星光 */
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
             font-family: 'Outfit', 'Noto Serif TC', sans-serif;
-            background: #fdfbf7;
+            background: var(--bg-deep);
             color: var(--text-main);
             overflow-x: hidden;
-            cursor: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="5" fill="%23d4a5a5" opacity="0.8"/></svg>') 10 10, auto;
+            min-height: 100vh;
         }
 
         /* ===========================
-           WELCOME OVERLAY (AUTO-PLAY FIX)
+           BACKGROUND: STARRY NIGHT
+        =========================== */
+        #star-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-gradient); z-index: -2;
+        }
+        .star {
+            position: absolute; background: white; border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            opacity: var(--opacity);
+        }
+        @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+
+        /* ===========================
+           WELCOME OVERLAY (MUSIC TRIGGER)
         =========================== */
         #welcome-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0f161a; z-index: 99999;
+            background: #000; z-index: 99999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 1s ease, transform 1s ease;
+            transition: opacity 1.2s ease;
         }
-        .welcome-text { color: #fff; font-size: 1.5rem; letter-spacing: 4px; margin-bottom: 30px; opacity: 0; animation: fadeInUp 1s ease forwards 0.5s; }
         .enter-btn {
-            padding: 12px 40px; border: 1px solid rgba(255,255,255,0.3);
-            background: rgba(255,255,255,0.1); color: #fff;
-            font-size: 1rem; letter-spacing: 2px; cursor: pointer;
-            border-radius: 50px; transition: 0.4s; backdrop-filter: blur(5px);
-            opacity: 0; animation: fadeInUp 1s ease forwards 1s;
+            margin-top: 30px; padding: 12px 40px;
+            background: transparent; border: 1px solid rgba(255,255,255,0.5);
+            color: white; letter-spacing: 3px; border-radius: 30px;
+            cursor: pointer; transition: 0.4s; font-family: 'Cinzel', serif;
         }
-        .enter-btn:hover { background: #fff; color: #000; box-shadow: 0 0 20px rgba(255,255,255,0.5); }
-        
-        @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        .enter-btn:hover { background: white; color: black; box-shadow: 0 0 25px rgba(255,255,255,0.6); }
 
         /* ===========================
-           DYNAMIC AURORA BACKGROUND
+           GLASSMORPHISM CARD
         =========================== */
-        .aurora-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: linear-gradient(125deg, #fdfbf7 0%, #f3e7e9 30%, #e3eeff 70%, #fdfbf7 100%);
-            background-size: 400% 400%;
-            animation: auroraFlow 20s ease infinite;
+        section { max-width: 900px; margin: 0 auto; padding: 60px 20px; }
+        
+        .glass-card {
+            background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: var(--shadow); text-align: center; position: relative; overflow: hidden;
+            transition: transform 0.3s ease;
         }
-        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        /* Floating Orbs */
-        .orb {
-            position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6;
-            animation: floatOrb 15s infinite ease-in-out;
+        .glass-card:hover { transform: translateY(-5px); }
+        
+        /* 金牛座裝飾 */
+        .taurus-icon {
+            font-size: 4rem; color: var(--accent); margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            animation: floatIcon 6s ease-in-out infinite;
         }
-        .orb-1 { width: 300px; height: 300px; background: #ffdde1; top: -50px; left: -50px; }
-        .orb-2 { width: 400px; height: 400px; background: #ee9ca7; bottom: -100px; right: -100px; animation-delay: -5s; }
-        @keyframes floatOrb { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(30px, 50px); } }
+        @keyframes floatIcon { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
         /* ===========================
-           UI COMPONENTS (GLASSMORPHISM)
+           TIMERS & TEXT
         =========================== */
-        section { max-width: 1000px; margin: 0 auto; padding: 80px 20px; position: relative; }
+        .timer-display {
+            font-family: 'Cinzel', sans-serif; font-size: 1.8rem;
+            margin: 20px 0; color: var(--accent); letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .timer-label { font-size: 0.9rem; color: var(--text-sub); letter-spacing: 1px; text-transform: uppercase; }
         
-        .section-header { text-align: center; margin-bottom: 50px; }
         .section-title {
-            font-family: 'Noto Serif TC', serif; font-size: 2rem; color: var(--primary);
-            position: relative; display: inline-block; padding-bottom: 10px;
+            font-family: 'Noto Serif TC', serif; font-size: 1.8rem; margin-bottom: 30px;
+            position: relative; display: inline-block;
         }
         .section-title::after {
-            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 40px; height: 2px; background: var(--accent);
-        }
-
-        /* 3D Tilt Card */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px; padding: 40px;
-            box-shadow: var(--shadow-soft);
-            transition: transform 0.1s ease, box-shadow 0.3s ease;
-            transform-style: preserve-3d;
-            will-change: transform;
-        }
-        
-        /* Navigation */
-        nav {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(15px);
-            padding: 12px 30px; border-radius: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); z-index: 100;
-            display: flex; gap: 25px; transition: 0.3s;
-        }
-        .nav-item { text-decoration: none; color: var(--text-main); font-weight: 600; font-size: 0.9rem; position: relative; }
-        .nav-item::after {
-            content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
-            background: var(--accent); transition: 0.3s;
-        }
-        .nav-item:hover::after { width: 100%; }
-
-        /* Mobile Nav */
-        @media(max-width: 768px) {
-            nav { bottom: 20px; top: auto; width: 90%; justify-content: space-around; padding: 15px; }
+            content: ''; display: block; width: 40px; height: 2px;
+            background: var(--accent); margin: 10px auto 0;
         }
 
         /* ===========================
-           INTERACTIVE ELEMENTS
+           PHOTO GRID
         =========================== */
-        .btn-primary {
-            background: var(--primary); color: white; border: none;
-            padding: 12px 28px; border-radius: 12px; font-size: 1rem;
-            cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(44, 62, 80, 0.2);
-        }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(44, 62, 80, 0.3); }
-        
-        /* Heart Click Effect */
-        .click-heart {
-            position: fixed; pointer-events: none; animation: flyUp 1s ease-out forwards;
-            color: #e74c3c; font-size: 20px; z-index: 9999;
-        }
-        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(1.5); } }
-
-        /* Photo Grid */
-        .photo-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;
-        }
+        .photo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
         .photo-item {
-            border-radius: 16px; overflow: hidden; height: 300px; position: relative; cursor: pointer;
+            border-radius: 12px; overflow: hidden; aspect-ratio: 3/4; position: relative; cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        .photo-item img {
-            width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;
-        }
+        .photo-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .photo-item:hover img { transform: scale(1.1); }
+
+        /* Music Control */
+        #music-control {
+            position: fixed; bottom: 20px; right: 20px; z-index: 100;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);
+            padding: 10px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3);
+            cursor: pointer; animation: spin 8s linear infinite;
+            animation-play-state: paused;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<!-- 1. 入場畫面 (確保音樂播放) -->
-<div id="welcome-overlay">
-    <div class="welcome-text">XuanRou × Koala</div>
-    <div style="font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-bottom: 20px;">戴上耳機，體驗最佳效果</div>
-    <button class="enter-btn" onclick="enterSite()">點擊進入屬於妳的世界</button>
-</div>
+<!-- 1. 背景星空 -->
+<div id="star-bg"></div>
 
-<!-- 2. 背景動畫層 -->
-<div class="aurora-bg">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
+<!-- 2. 入場畫面 -->
+<div id="welcome-overlay">
+    <div style="font-family: 'Cinzel'; font-size: 2rem; letter-spacing: 5px; color: white; text-shadow: 0 0 20px rgba(255,255,255,0.5);">XuanRou</div>
+    <div style="color: #aaa; margin-top: 10px; font-size: 0.9rem;">2025.10.07 · 00:53 AM</div>
+    <button class="enter-btn" onclick="enterUniverse()">ENTER</button>
 </div>
-<!-- 導航列 -->
-<nav>
-    <a href="#home" class="nav-item">首頁</a>
-    <a href="#story" class="nav-item">故事</a>
-    <a href="#moments" class="nav-item">回憶</a>
-    <a href="#fun" class="nav-item">互動</a>
+<!-- 導航 -->
+<nav style="position: fixed; top: 0; width: 100%; padding: 20px; text-align: center; z-index: 50; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);">
+    <span style="font-family:'Cinzel'; font-weight:bold; letter-spacing:2px;">XR × KL</span>
 </nav>
 
-<!-- 首頁 Hero -->
-<section id="home" style="height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center;">
-    <div class="glass-card" data-tilt style="padding: 60px 40px;">
-        <div style="font-size: 1.2rem; color: var(--accent); letter-spacing: 2px; margin-bottom: 10px;">TO MY DEAREST</div>
-        <h1 style="font-size: 3.5rem; font-family: 'Noto Serif TC'; margin-bottom: 20px; color: var(--primary);">瑄柔</h1>
-        <p style="font-size: 1.1rem; color: var(--text-light); line-height: 1.8;">
-            這世界很吵，<br>但在這裡，只有我和妳。
+<!-- Hero: 在一起計時器 -->
+<section style="margin-top: 80px;">
+    <div class="glass-card">
+        <div class="timer-label">WE HAVE BEEN TOGETHER FOR</div>
+        <div id="love-timer" class="timer-display">計算中...</div>
+        <div style="font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-top: 10px;">
+            起始於 2025年10月7日 凌晨 00:53
+        </div>
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 25px 0;">
+        <p style="line-height: 1.8; font-size: 1.05rem;">
+            瑄柔，從那個凌晨開始，時間對我來說有了新的意義。<br>
+            每一秒鐘，都是屬於我們的。
         </p>
-        <div style="margin-top: 40px; width: 100%; height: 1px; background: rgba(0,0,0,0.1);"></div>
+    </div>
+</section>
+
+<!-- Birthday: 金牛座生日倒數 -->
+<section>
+    <div class="glass-card" style="border-color: var(--accent);">
+        <div class="taurus-icon">♉</div>
+        <div class="section-title" style="color: var(--accent);">瑄柔生日倒數</div>
         
-        <!-- 戀愛計時器 -->
-        <div style="margin-top: 30px;">
-            <div style="font-size: 0.9rem; color: #888; margin-bottom: 5px;">我們已經相遇</div>
-            <div id="timer" style="font-size: 1.5rem; font-weight: 700; color: var(--primary); font-family: 'Outfit';">
-                00 <span style="font-size:0.8rem">天</span> 00 <span style="font-size:0.8rem">時</span> 00 <span style="font-size:0.8rem">分</span> 00 <span style="font-size:0.8rem">秒</span>
-            </div>
+        <div style="margin-bottom: 20px;">
+            <span style="background: rgba(255,215,0,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; color: var(--accent); border: 1px solid var(--accent);">
+                2009.05.19 · 金牛座
+            </span>
         </div>
-    </div>
-</section>
 
-<!-- 故事區塊 -->
-<section id="story">
-    <div class="section-header">
-        <div class="section-title">寫給妳的話</div>
-    </div>
-    <div class="glass-card" data-tilt>
-        <p style="font-size: 1.1rem; line-height: 2; text-align: justify;">
-            瑄柔，我常在想，要怎麼讓妳知道我有多在意妳。<br><br>
-            我不是一個很會說甜言蜜語的人，但我會把這份心意寫進代碼裡、藏在每一個細節裡。
-            我知道妳有時候會覺得累、覺得煩，甚至覺得自己不夠好。但在我眼裡，<b>妳真實的樣子就是最可愛的。</b><br><br>
-            這個網站不會過期，就像我對妳的耐心一樣。無論妳什麼時候回來，這裡都亮著燈等妳。
+        <div id="bday-timer" class="timer-display" style="font-size: 1.5rem;">
+            000 天 00 時 00 分 00 秒
+        </div>
+        <p style="font-size: 0.9rem; color: #ccc;">
+            這一天，是全宇宙最可愛的日子。
         </p>
     </div>
 </section>
 
-<!-- 照片回憶 (瀑布流) -->
-<section id="moments">
-    <div class="section-header">
-        <div class="section-title">我們的瞬間</div>
-    </div>
+<!-- Photos: 回憶 -->
+<section>
+    <div class="section-title">我們的瞬間</div>
     <div class="photo-grid">
-        <!-- 圖片路徑請確認，若無圖片會顯示色塊 -->
-        <div class="photo-item" onclick="viewPhoto(this)"><img src="photo1.jpg" onerror="this.src='https://placehold.co/600x800/e3eeff/2c3e50?text=Memory+1'"></div>
-        <div class="photo-item" onclick="viewPhoto(this)"><img src="photo2.jpg" onerror="this.src='https://placehold.co/600x800/f3e7e9/2c3e50?text=Memory+2'"></div>
-        <div class="photo-item" onclick="viewPhoto(this)"><img src="photo3.jpg" onerror="this.src='https://placehold.co/600x800/fdfbf7/2c3e50?text=Memory+3'"></div>
-        <div class="photo-item" onclick="viewPhoto(this)"><img src="photo4.jpg" onerror="this.src='https://placehold.co/600x800/e3eeff/2c3e50?text=Memory+4'"></div>
+        <!-- 替換圖片路徑，onerror 防止破圖 -->
+        <div class="photo-item"><img src="photo1.jpg" onerror="this.src='https://placehold.co/400x500/24243e/FFF?text=Love'"></div>
+        <div class="photo-item"><img src="photo2.jpg" onerror="this.src='https://placehold.co/400x500/24243e/FFF?text=Story'"></div>
+        <div class="photo-item"><img src="photo3.jpg" onerror="this.src='https://placehold.co/400x500/24243e/FFF?text=Memory'"></div>
+        <div class="photo-item"><img src="photo4.jpg" onerror="this.src='https://placehold.co/400x500/24243e/FFF?text=Future'"></div>
     </div>
 </section>
 
-<!-- 互動區塊：喜歡妳的理由 -->
-<section id="fun">
-    <div class="section-header">
-        <div class="section-title">今日份的喜歡</div>
-    </div>
-    <div class="glass-card" style="text-align: center; min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <div id="reason-display" style="font-size: 1.2rem; font-weight: bold; color: var(--primary); margin-bottom: 30px; min-height: 60px;">
-            點擊按鈕，告訴妳一個秘密
+<!-- Interaction: 每日情話 -->
+<section style="margin-bottom: 80px;">
+    <div class="glass-card">
+        <div class="section-title">想對妳說</div>
+        <div id="daily-msg" style="font-size: 1.2rem; line-height: 1.6; min-height: 60px;">
+            點擊下方按鈕，聽聽我的心裡話。
         </div>
-        <button class="btn-primary" onclick="generateReason()">為什麼喜歡瑄柔？</button>
+        <button onclick="newMsg()" style="margin-top: 20px; padding: 10px 25px; background: rgba(255,255,255,0.1); border: 1px solid white; color: white; border-radius: 20px; cursor: pointer; transition: 0.3s;">
+            換一句
+        </button>
     </div>
 </section>
 
-<!-- 音樂播放器 (隱藏式，但在底部有控制條) -->
-<div id="music-control" style="position: fixed; bottom: 20px; right: 20px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); padding: 10px 20px; border-radius: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; z-index: 900; transform: translateY(100px); transition: 0.5s;">
-    <div id="music-icon" style="animation: spin 4s linear infinite;">💿</div>
-    <span style="font-size: 0.8rem; font-weight: 600;">Playing For You</span>
-    <button onclick="toggleMusic()" style="background: none; border: none; cursor: pointer; font-size: 1rem;">⏸</button>
+<!-- 音樂控制鈕 -->
+<div id="music-control" onclick="toggleMusic()">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
 </div>
-<style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
 
-<!-- 隱藏的音源 -->
+<!-- 隱藏音源 -->
 <audio id="bg-music" loop>
     <source src="你知道你比晚霞好看嗎 - Tr33 (youtube).mp3" type="audio/mpeg">
 </audio>
-
-<!-- 圖片燈箱 -->
-<div id="lightbox" onclick="this.style.opacity=0; setTimeout(()=>this.style.display='none', 300)" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;">
-    <img id="lightbox-img" src="" style="max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 50px rgba(255,255,255,0.2);">
-</div>
 <script>
     /* ===========================
-       1. 音樂自動播放與入場邏輯
+       1. 星空背景生成
+    =========================== */
+    function createStars() {
+        const bg = document.getElementById('star-bg');
+        const count = 100; // 星星數量
+        for(let i=0; i<count; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            const size = Math.random() * 2 + 1;
+            const duration = Math.random() * 3 + 2;
+            
+            star.style.left = x + '%';
+            star.style.top = y + '%';
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.setProperty('--duration', duration + 's');
+            star.style.setProperty('--opacity', Math.random());
+            
+            bg.appendChild(star);
+        }
+    }
+    createStars();
+
+    /* ===========================
+       2. 音樂與入場控制
     =========================== */
     const audio = document.getElementById('bg-music');
-    const overlay = document.getElementById('welcome-overlay');
-    const musicControl = document.getElementById('music-control');
+    const musicBtn = document.getElementById('music-control');
 
-    function enterSite() {
-        // 嘗試播放音樂
-        audio.volume = 0.6; // 音量設為 60% 比較舒服
-        audio.play().then(() => {
-            console.log("Music started successfully");
-        }).catch(err => {
-            console.log("Autoplay blocked, waiting for interaction", err);
-        });
-
-        // 淡出入場畫面
-        overlay.style.opacity = '0';
-        overlay.style.transform = 'scale(1.1)';
+    function enterUniverse() {
+        const overlay = document.getElementById('welcome-overlay');
         
-        // 顯示音樂控制條
+        // 播放音樂
+        audio.volume = 0.5;
+        audio.play().then(() => {
+            musicBtn.style.animationPlayState = 'running';
+        }).catch(e => console.log("Audio play failed", e));
+
+        // 淡出特效
+        overlay.style.opacity = 0;
         setTimeout(() => {
             overlay.style.display = 'none';
-            musicControl.style.transform = 'translateY(0)';
-        }, 1000);
+        }, 1200);
     }
 
     function toggleMusic() {
-        const btn = musicControl.querySelector('button');
-        const icon = document.getElementById('music-icon');
-        
-        if (audio.paused) {
+        if(audio.paused) {
             audio.play();
-            btn.innerText = '⏸';
-            icon.style.animationPlayState = 'running';
+            musicBtn.style.animationPlayState = 'running';
+            musicBtn.style.opacity = 1;
         } else {
             audio.pause();
-            btn.innerText = '▶';
-            icon.style.animationPlayState = 'paused';
+            musicBtn.style.animationPlayState = 'paused';
+            musicBtn.style.opacity = 0.5;
         }
     }
 
     /* ===========================
-       2. 戀愛計時器 (Together Timer)
+       3. 在一起計時器 (2025/10/07 00:53)
     =========================== */
-    function updateTimer() {
-        // 設定你們的開始日期 (格式：YYYY-MM-DD)
-        const startDate = new Date("2023-05-20"); // ★ 請修改這裡 ★
+    function updateLoveTimer() {
+        // 設定精確時間：月份是 0-based (10月是 9)
+        const startDate = new Date(2025, 9, 7, 0, 53, 0); 
         const now = new Date();
-        const diff = now - startDate;
+        
+        let diff = now - startDate;
+
+        // 如果現在時間還沒到 2025/10/07 (測試用，或未來網站)
+        // 為了顯示效果，如果 diff 是負數，我們顯示 "倒數計時中" 或取絕對值
+        // 這裡假設現在已經是未來，或者我們顯示 "距離那一天還有..."
+        let prefix = "";
+        if (diff < 0) {
+            diff = Math.abs(diff);
+            prefix = "距離在一起還有 ";
+        }
 
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
         const minutes = Math.floor((diff / (1000 * 60)) % 60);
         const seconds = Math.floor((diff / 1000) % 60);
 
-        document.getElementById('timer').innerHTML = 
-            `${days} <span style="font-size:0.8rem">天</span> ${hours} <span style="font-size:0.8rem">時</span> ${minutes} <span style="font-size:0.8rem">分</span> ${seconds} <span style="font-size:0.8rem">秒</span>`;
+        document.getElementById('love-timer').innerHTML = 
+            `<div style="font-size:0.6em; margin-bottom:5px;">${prefix}</div>` +
+            `${days}天 ${hours}時 ${minutes}分 ${seconds}秒`;
     }
-    setInterval(updateTimer, 1000);
-    updateTimer();
+    setInterval(updateLoveTimer, 1000);
+    updateLoveTimer();
 
     /* ===========================
-       3. 喜歡妳的理由產生器
+       4. 生日倒數 (2009/05/19)
     =========================== */
-    const reasons = [
-        "因為妳笑起來的時候，我的世界都亮了。",
-        "因為妳很真實，連生氣的樣子都很可愛。",
-        "因為跟妳在一起，連發呆都覺得有意義。",
-        "因為妳比妳自己想像的還要好一百倍。",
-        "因為妳是我唯一想分享生活瑣事的人。",
-        "因為妳的聲音是我最好的安眠藥。",
-        "沒有原因，就只是因為是妳。"
-    ];
-
-    function generateReason() {
-        const display = document.getElementById('reason-display');
-        display.style.opacity = 0;
+    function updateBirthdayTimer() {
+        const now = new Date();
+        const currentYear = now.getFullYear();
         
+        // 設定今年生日 5月19日 (月份是 4)
+        let nextBday = new Date(currentYear, 4, 19, 0, 0, 0);
+        
+        // 如果今年生日已經過了，就算明年的
+        if (now > nextBday) {
+            nextBday.setFullYear(currentYear + 1);
+        }
+        
+        const diff = nextBday - now;
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / (1000 * 60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+        
+        document.getElementById('bday-timer').innerText = 
+            `${days}天 ${hours}時 ${minutes}分 ${seconds}秒`;
+    }
+    setInterval(updateBirthdayTimer, 1000);
+    updateBirthdayTimer();
+
+    /* ===========================
+       5. 隨機情話
+    =========================== */
+    const messages = [
+        "妳是我的凌晨 12:53，也是我的一生。",
+        "金牛座的妳或許固執，但我願意用一輩子去包容。",
+        "不管未來怎樣，2025/10/07 那一刻永遠暫停在我心裡。",
+        "妳不需要改變什麼，妳現在的樣子就是我最喜歡的樣子。",
+        "想牽著妳的手，從 2025 走到很久很久以後。"
+    ];
+    function newMsg() {
+        const el = document.getElementById('daily-msg');
+        el.style.opacity = 0;
         setTimeout(() => {
-            const random = reasons[Math.floor(Math.random() * reasons.length)];
-            display.innerText = random;
-            display.style.opacity = 1;
+            el.innerText = messages[Math.floor(Math.random() * messages.length)];
+            el.style.opacity = 1;
         }, 300);
     }
+    // 初始化一句
+    newMsg();
 
-    /* ===========================
-       4. 3D Tilt 傾斜特效 (Vanilla JS)
-    =========================== */
-    document.addEventListener('mousemove', (e) => {
-        document.querySelectorAll('.glass-card[data-tilt]').forEach(card => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            // 只有滑鼠在卡片附近時才觸發
-            if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                const rotateX = ((y - centerY) / centerY) * -5; // Max 5deg rotation
-                const rotateY = ((x - centerX) / centerX) * 5;
-
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
-            } else {
-                card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1)`;
-            }
-        });
-    });
-
-    /* ===========================
-       5. 全局點擊愛心特效
-    =========================== */
-    document.addEventListener('click', (e) => {
-        // 避免點擊按鈕時遮擋視線，可選
-        const heart = document.createElement('div');
-        heart.className = 'click-heart';
-        heart.innerText = '❤';
-        heart.style.left = e.clientX + 'px';
-        heart.style.top = e.clientY + 'px';
-        // 隨機大小與旋轉
-        const size = Math.random() * 20 + 10; 
-        heart.style.fontSize = size + 'px';
-        heart.style.transform = `rotate(${Math.random() * 45 - 22.5}deg)`;
-        
-        document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 1000);
-    });
-
-    /* ===========================
-       6. 圖片燈箱
-    =========================== */
-    function viewPhoto(el) {
-        const src = el.querySelector('img').src;
-        const box = document.getElementById('lightbox');
-        const img = document.getElementById('lightbox-img');
-        img.src = src;
-        box.style.display = 'flex';
-        setTimeout(() => box.style.opacity = 1, 10);
-    }
 </script>
 </body>
 </html>
