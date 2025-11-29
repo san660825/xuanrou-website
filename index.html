@@ -2,19 +2,19 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>無尾熊的小屋 · Koala Home</title>
+    <title>無尾熊許願池 🐨✨</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="theme-color" content="#558b2f">
+    <meta name="theme-color" content="#f8bbd0">
     
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Zen+Maru+Gothic:wght@500;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --bg-color: #f1f8e9;
-            --board-bg: #dcedc8;
-            --text-main: #33691e;
-            --accent: #ffb74d;
+            --bg-color: #fff0f5; /* 淺粉紅背景 */
+            --board-bg: #fce4ec;
+            --text-main: #880e4f;
+            --accent: #ec407a;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -31,16 +31,16 @@
         /* === 底部導航列 === */
         .nav-bar {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: white; padding: 10px 20px; border-radius: 40px;
-            display: flex; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: white; padding: 10px 30px; border-radius: 40px;
+            display: flex; gap: 40px; box-shadow: 0 10px 30px rgba(233, 30, 99, 0.15);
             z-index: 1000;
         }
         .nav-item {
-            font-size: 1.5rem; color: #ccc; cursor: pointer; transition: 0.3s;
+            font-size: 1.5rem; color: #f8bbd0; cursor: pointer; transition: 0.3s;
             width: 50px; height: 50px; display: flex; justify-content: center; align-items: center;
             border-radius: 50%;
         }
-        .nav-item.active { background: #8bc34a; color: white; transform: translateY(-10px); box-shadow: 0 5px 15px rgba(139, 195, 74, 0.4); }
+        .nav-item.active { background: var(--accent); color: white; transform: translateY(-10px); box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3); }
 
         /* === 頁面容器 === */
         .page {
@@ -58,13 +58,13 @@
         header { width: 100%; display: flex; justify-content: space-between; align-items: center; }
         .score-box {
             background: white; padding: 8px 15px; border-radius: 20px;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.05); text-align: center; min-width: 80px;
+            box-shadow: 0 5px 10px rgba(233, 30, 99, 0.05); text-align: center; min-width: 80px;
         }
-        .score-val { font-size: 1.2rem; font-weight: 900; font-family: 'Fredoka'; }
+        .score-val { font-size: 1.2rem; font-weight: 900; font-family: 'Fredoka'; color: var(--accent); }
         
         #board-container {
             width: 100%; aspect-ratio: 1/1; background: var(--board-bg);
-            border-radius: 16px; padding: 10px; box-shadow: inset 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 16px; padding: 10px; box-shadow: inset 0 5px 15px rgba(0,0,0,0.05);
         }
         canvas#game-canvas { width: 100%; height: 100%; border-radius: 8px; display: block; }
         #spawn-area { width: 100%; height: 120px; display: flex; justify-content: space-around; align-items: center; }
@@ -72,55 +72,68 @@
         .shape-preview { width: 70px; height: 70px; transition: transform 0.1s; }
         .shape-preview.dragging { opacity: 0.9; z-index: 2000; position: fixed; transform: scale(1.2); pointer-events: none; }
 
-        /* === 小屋頁面 (商店) === */
-        #home-wrapper {
+        /* === 兌換商店頁面 === */
+        #shop-wrapper {
             width: 100%; max-width: 500px; height: 100%; padding: 60px 20px 100px 20px;
             display: flex; flex-direction: column; align-items: center;
             overflow-y: auto;
         }
         
-        /* 無尾熊展示區 */
-        .koala-room {
-            width: 200px; height: 200px; background: #fff9c4;
-            border-radius: 50%; border: 5px solid white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            display: flex; justify-content: center; align-items: center;
-            margin-bottom: 30px; position: relative;
+        .wallet-card {
+            background: linear-gradient(135deg, #ec407a, #d81b60);
+            color: white; width: 100%; padding: 20px; border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(233, 30, 99, 0.2); margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .room-decor { position: absolute; width: 100%; height: 100%; pointer-events: none; }
+        .coin-display { font-size: 2rem; font-weight: 900; font-family: 'Fredoka'; }
         
-        /* 錢包顯示 */
-        .wallet {
-            background: #fff; padding: 10px 25px; border-radius: 30px;
-            font-weight: bold; color: #f57f17; margin-bottom: 20px;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px;
-        }
-
-        /* 商店網格 */
-        .shop-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%;
-        }
-        .shop-item {
+        .shop-list { width: 100%; display: flex; flex-direction: column; gap: 15px; }
+        
+        .coupon-item {
             background: white; border-radius: 15px; padding: 15px;
-            text-align: center; cursor: pointer; transition: 0.2s;
-            border: 2px solid transparent; position: relative;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.2s;
+            border: 2px solid transparent;
         }
-        .shop-item.locked { opacity: 0.6; filter: grayscale(1); }
-        .shop-item.owned { border-color: #aed581; background: #f1f8e9; }
-        .shop-item.equipped { border-color: #558b2f; background: #dcedc8; box-shadow: 0 0 0 2px #558b2f; }
-        
-        .item-icon { font-size: 2rem; margin-bottom: 5px; }
-        .item-price { font-size: 0.8rem; font-weight: bold; color: #f57f17; }
-        .item-name { font-size: 0.8rem; color: #555; margin-bottom: 5px; }
+        .coupon-item:active { transform: scale(0.98); }
+        .coupon-icon { font-size: 2.5rem; margin-right: 15px; width: 50px; text-align: center; }
+        .coupon-info { flex: 1; }
+        .coupon-name { font-weight: bold; font-size: 1.1rem; color: #333; }
+        .coupon-price { color: #ec407a; font-weight: bold; font-size: 0.9rem; margin-top: 5px; }
+        .btn-redeem {
+            background: #ec407a; color: white; border: none; padding: 8px 15px;
+            border-radius: 20px; font-weight: bold; cursor: pointer;
+        }
+        .btn-redeem:disabled { background: #ccc; }
 
-        /* === SVG 樣式 === */
-        #koala-svg { width: 140px; height: 140px; }
-        .svg-accessory { display: none; } /* 預設隱藏飾品 */
+        /* === 隱藏的後台按鈕 === */
+        #secret-btn {
+            position: fixed; top: 10px; right: 10px; opacity: 0.1; font-size: 1.5rem;
+            z-index: 3000; cursor: pointer;
+        }
+
+        /* === 彈窗 === */
+        #overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 4000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            display: none;
+        }
+        .overlay-card {
+            background: white; padding: 30px; border-radius: 20px; width: 85%; max-width: 400px;
+            text-align: center; max-height: 80vh; overflow-y: auto;
+        }
+        .log-list { list-style: none; text-align: left; margin-top: 15px; }
+        .log-item { 
+            border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between;
+            font-size: 0.9rem;
+        }
+        .log-time { color: #888; font-size: 0.7rem; }
 
         /* 浮動文字 */
         .float-text {
             position: absolute; font-family: 'Fredoka'; font-weight: 900;
-            color: #ff8f00; font-size: 2rem; pointer-events: none;
+            color: #ec407a; font-size: 2rem; pointer-events: none;
             text-shadow: 2px 2px 0px white; z-index: 3000;
             animation: floatUp 1s forwards;
         }
@@ -129,13 +142,16 @@
 </head>
 <body>
 
+<!-- 隱藏後台按鈕 (右上角，幾乎透明) -->
+<div id="secret-btn" onclick="Admin.showLogs()">⚙️</div>
+
 <!-- 底部導航 -->
 <div class="nav-bar">
     <div class="nav-item active" onclick="switchPage('game')">
         <i class="fas fa-gamepad"></i>
     </div>
-    <div class="nav-item" onclick="switchPage('home')">
-        <i class="fas fa-home"></i>
+    <div class="nav-item" onclick="switchPage('shop')">
+        <i class="fas fa-gift"></i>
     </div>
 </div>
 
@@ -143,14 +159,10 @@
 <div id="game-page" class="page active">
     <div id="game-wrapper">
         <header>
+            <div style="font-weight:bold; color:var(--text-main); font-size:1.2rem;">無尾熊許願池 🐨</div>
             <div class="score-box">
-                <div style="font-size:0.7rem; color:#888;">SCORE</div>
-                <div class="score-val" id="score">0</div>
-            </div>
-            <div style="font-weight:bold; color:#558b2f;">賺葉子養無尾熊 🌿</div>
-            <div class="score-box">
-                <div style="font-size:0.7rem; color:#888;">LEAVES</div>
-                <div class="score-val" style="color:#f57f17;" id="game-leaves">0</div>
+                <div style="font-size:0.7rem; color:#888;">愛心幣</div>
+                <div class="score-val" id="game-coins">0</div>
             </div>
         </header>
 
@@ -161,181 +173,187 @@
     </div>
 </div>
 
-<!-- 2. 小屋頁面 -->
-<div id="home-page" class="page">
-    <div id="home-wrapper">
-        <div class="wallet">
-            <i class="fas fa-leaf"></i> <span id="total-leaves">0</span>
+<!-- 2. 兌換商店頁面 -->
+<div id="shop-page" class="page">
+    <div id="shop-wrapper">
+        <div class="wallet-card">
+            <div>
+                <div style="font-size:0.8rem; opacity:0.8;">目前持有愛心幣</div>
+                <div class="coin-display" id="total-coins">0</div>
+            </div>
+            <i class="fas fa-heart" style="font-size:3rem; opacity:0.5;"></i>
         </div>
 
-        <div class="koala-room">
-            <!-- 房間裝飾層 -->
-            <div class="room-decor" id="decor-layer"></div>
-            
-            <!-- 無尾熊本體 -->
-            <svg id="koala-svg" viewBox="0 0 100 100">
-                <!-- 身體 -->
-                <ellipse cx="50" cy="70" rx="35" ry="28" fill="#9e9e9e"/>
-                <ellipse cx="50" cy="70" rx="20" ry="18" fill="#e0e0e0"/>
-                <!-- 頭 -->
-                <circle cx="50" cy="40" r="28" fill="#9e9e9e"/>
-                <!-- 耳朵 -->
-                <circle cx="25" cy="30" r="10" fill="#9e9e9e"/>
-                <circle cx="75" cy="30" r="10" fill="#9e9e9e"/>
-                <circle cx="25" cy="30" r="6" fill="#f5f5f5"/>
-                <circle cx="75" cy="30" r="6" fill="#f5f5f5"/>
-                <!-- 臉 -->
-                <circle cx="42" cy="38" r="3" fill="#333"/>
-                <circle cx="58" cy="38" r="3" fill="#333"/>
-                <ellipse cx="50" cy="45" rx="6" ry="8" fill="#424242"/>
-                <circle cx="35" cy="45" r="4" fill="rgba(255,100,100,0.3)"/>
-                <circle cx="65" cy="45" r="4" fill="rgba(255,100,100,0.3)"/>
-                
-                <!-- === 飾品層 (預設隱藏) === -->
-                <!-- 蝴蝶結 -->
-                <g id="acc-bow" class="svg-accessory">
-                    <path d="M40 70 L30 60 L30 80 Z" fill="#e91e63"/>
-                    <path d="M60 70 L70 60 L70 80 Z" fill="#e91e63"/>
-                    <circle cx="50" cy="70" r="5" fill="#c2185b"/>
-                </g>
-                <!-- 花朵 -->
-                <g id="acc-flower" class="svg-accessory">
-                    <circle cx="25" cy="25" r="8" fill="#ffeb3b"/>
-                    <circle cx="25" cy="25" r="3" fill="#f57f17"/>
-                </g>
-                <!-- 帽子 -->
-                <g id="acc-hat" class="svg-accessory">
-                    <path d="M30 20 L70 20 L60 5 L40 5 Z" fill="#3e2723"/>
-                    <rect x="25" y="20" width="50" height="5" fill="#3e2723"/>
-                </g>
-                <!-- 眼鏡 -->
-                <g id="acc-glasses" class="svg-accessory">
-                    <circle cx="42" cy="38" r="7" stroke="#333" stroke-width="2" fill="none"/>
-                    <circle cx="58" cy="38" r="7" stroke="#333" stroke-width="2" fill="none"/>
-                    <line x1="49" y1="38" x2="51" y2="38" stroke="#333" stroke-width="2"/>
-                </g>
-            </svg>
-        </div>
-
-        <h3 style="margin-bottom:15px; color:#558b2f;">無尾熊百貨</h3>
-        <div class="shop-grid" id="shop-container">
+        <h3 style="margin-bottom:15px; color:var(--text-main); align-self:flex-start;">✨ 兌換妳的願望</h3>
+        <div class="shop-list" id="shop-container">
             <!-- JS 生成商品 -->
         </div>
     </div>
 </div>
 
+<!-- 後台紀錄彈窗 -->
+<div id="overlay">
+    <div class="overlay-card">
+        <h3>📋 兌換紀錄 (後台)</h3>
+        <div id="loading-text">載入中...</div>
+        <ul class="log-list" id="log-list"></ul>
+        <button onclick="Admin.close()" style="margin-top:20px; padding:10px 30px; border:none; background:#ccc; border-radius:20px;">關閉</button>
+    </div>
+</div>
+
 <script>
-    /* =========================================
-       1. 遊戲資料與商店系統
-    ========================================= */
-    const GameData = {
-        leaves: parseInt(localStorage.getItem('xr_leaves') || 0),
-        inventory: JSON.parse(localStorage.getItem('xr_inventory') || '[]'),
-        equipped: JSON.parse(localStorage.getItem('xr_equipped') || '{}')
+    /* =================================================================
+       ⚠️ 設定區：請在此修改
+    ================================================================= */
+    
+    // 1. Dreamlo API Keys (請填入你的 Key)
+    const DreamloConfig = {
+        privateKey: "", // 上傳用 (長的那串)
+        publicKey:  "", // 讀取用 (短的那串)
     };
 
-    const SHOP_ITEMS = [
-        { id: 'bow', name: '粉紅領結', price: 100, icon: '🎀', type: 'svg' },
-        { id: 'flower', name: '小花朵', price: 250, icon: '🌸', type: 'svg' },
-        { id: 'glasses', name: '文青眼鏡', price: 500, icon: '👓', type: 'svg' },
-        { id: 'hat', name: '紳士帽', price: 800, icon: '🎩', type: 'svg' },
-        { id: 'rug', name: '愛心毯', price: 300, icon: '🧶', type: 'decor', html: '<div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:3rem;">🧶</div>' },
-        { id: 'lamp', name: '小檯燈', price: 600, icon: '💡', type: 'decor', html: '<div style="position:absolute;top:20px;right:20px;font-size:2rem;">💡</div>' }
+    // 2. 獎品列表 (你可以自由新增或修改)
+    const REAL_PRIZES = [
+        { id: 'tea', name: '一杯手搖飲 (任選)', price: 500, icon: '🧋' },
+        { id: 'massage', name: '肩頸按摩券 (20分)', price: 1000, icon: '💆‍♀️' },
+        { id: 'food', name: '請吃一頓大餐', price: 3000, icon: '🍽️' },
+        { id: 'movie', name: '電影之夜 (含爆米花)', price: 5000, icon: '🎬' },
+        { id: 'wish', name: '無條件答應一個願望', price: 10000, icon: '🧞‍♂️' },
+        { id: 'cart', name: '清空購物車 (上限5000)', price: 50000, icon: '🛍️' }
     ];
 
-    function updateWallet() {
-        document.getElementById('total-leaves').innerText = GameData.leaves;
-        document.getElementById('game-leaves').innerText = GameData.leaves;
-        localStorage.setItem('xr_leaves', GameData.leaves);
+    /* =========================================
+       1. 資料與商店系統
+    ========================================= */
+    let userCoins = parseInt(localStorage.getItem('xr_love_coins') || 0);
+
+    function updateUI() {
+        document.getElementById('total-coins').innerText = userCoins;
+        document.getElementById('game-coins').innerText = userCoins;
+        localStorage.setItem('xr_love_coins', userCoins);
+        renderShop();
     }
 
     function renderShop() {
         const container = document.getElementById('shop-container');
         container.innerHTML = '';
         
-        SHOP_ITEMS.forEach(item => {
-            const owned = GameData.inventory.includes(item.id);
-            const equipped = GameData.equipped[item.type] === item.id;
-            
+        REAL_PRIZES.forEach(item => {
+            const canBuy = userCoins >= item.price;
             const div = document.createElement('div');
-            div.className = `shop-item ${owned ? 'owned' : ''} ${equipped ? 'equipped' : ''}`;
-            if (!owned && GameData.leaves < item.price) div.classList.add('locked');
-            
+            div.className = 'coupon-item';
             div.innerHTML = `
-                <div class="item-icon">${item.icon}</div>
-                <div class="item-name">${item.name}</div>
-                <div class="item-price">${owned ? (equipped ? '使用中' : '已擁有') : item.price + ' 🌿'}</div>
+                <div class="coupon-icon">${item.icon}</div>
+                <div class="coupon-info">
+                    <div class="coupon-name">${item.name}</div>
+                    <div class="coupon-price">${item.price} 愛心幣</div>
+                </div>
+                <button class="btn-redeem" ${canBuy ? '' : 'disabled'} onclick="redeemItem('${item.name}', ${item.price})">
+                    ${canBuy ? '兌換' : '不足'}
+                </button>
             `;
-            
-            div.onclick = () => buyOrEquip(item);
             container.appendChild(div);
         });
-        
-        updateCharacter();
     }
 
-    function buyOrEquip(item) {
-        if (GameData.inventory.includes(item.id)) {
-            // 裝備或卸下
-            if (GameData.equipped[item.type] === item.id) {
-                delete GameData.equipped[item.type]; // 卸下
-            } else {
-                GameData.equipped[item.type] = item.id; // 裝備
-            }
-            localStorage.setItem('xr_equipped', JSON.stringify(GameData.equipped));
-            renderShop();
-        } else {
-            // 購買
-            if (GameData.leaves >= item.price) {
-                if(confirm(`要花 ${item.price} 葉子買 ${item.name} 嗎？`)) {
-                    GameData.leaves -= item.price;
-                    GameData.inventory.push(item.id);
-                    localStorage.setItem('xr_leaves', GameData.leaves);
-                    localStorage.setItem('xr_inventory', JSON.stringify(GameData.inventory));
-                    updateWallet();
-                    renderShop();
-                    Sound.buy();
-                }
-            } else {
-                alert("葉子不夠喔！快去玩遊戲賺錢～");
-            }
-        }
-    }
-
-    function updateCharacter() {
-        // 重置 SVG 飾品
-        document.querySelectorAll('.svg-accessory').forEach(el => el.style.display = 'none');
-        // 重置 房間裝飾
-        document.getElementById('decor-layer').innerHTML = '';
-
-        // 顯示裝備中的物品
-        if (GameData.equipped['svg']) {
-            document.getElementById(`acc-${GameData.equipped['svg']}`).style.display = 'block';
-        }
-        if (GameData.equipped['decor']) {
-            const item = SHOP_ITEMS.find(i => i.id === GameData.equipped['decor']);
-            if(item) document.getElementById('decor-layer').innerHTML = item.html;
+    function redeemItem(itemName, price) {
+        if(confirm(`確定要花 ${price} 愛心幣兌換「${itemName}」嗎？\n(兌換後請截圖或直接跟男友說 XD)`)) {
+            userCoins -= price;
+            updateUI();
+            
+            // 上傳到雲端 (偷吃步：把商品名當作玩家名上傳)
+            Admin.uploadLog(itemName);
+            
+            alert(`🎉 兌換成功！\n\n妳獲得了：${itemName}\n\n(系統已偷偷通知男友準備履約)`);
         }
     }
 
     /* =========================================
-       2. 頁面切換邏輯
+       2. 後台系統 (Dreamlo Integration)
+    ========================================= */
+    const Admin = {
+        uploadLog: function(itemName) {
+            if(!DreamloConfig.privateKey) return;
+            // 格式：名字=兌換項目, 分數=時間戳記(確保順序)
+            // 為了避免中文亂碼，這裡做簡單處理，但 Dreamlo 支援 UTF8 通常沒問題
+            const msg = `兌換：${itemName}`;
+            // 使用負的時間戳記，這樣最新的會在最上面 (因為排行榜是分數高到低)
+            // 或者我們用正的時間戳記，然後讀取時自己反轉
+            // 這裡我們用一個隨機大數減去時間，確保最新的分數最高
+            const score = 2000000000 - Math.floor(Date.now() / 1000); 
+            
+            // 為了不覆蓋，我們在名字後面加個隨機碼
+            const uniqueName = `${msg}_${Math.floor(Math.random()*100)}`;
+            
+            const url = `https://www.dreamlo.com/lb/${DreamloConfig.privateKey}/add/${encodeURIComponent(uniqueName)}/${score}`;
+            fetch(url).catch(e => console.log("Upload failed"));
+        },
+
+        showLogs: function() {
+            document.getElementById('overlay').style.display = 'flex';
+            const list = document.getElementById('log-list');
+            const loading = document.getElementById('loading-text');
+            list.innerHTML = '';
+            loading.style.display = 'block';
+
+            if(!DreamloConfig.publicKey) {
+                loading.innerText = "尚未設定 API Key";
+                return;
+            }
+
+            const url = `https://www.dreamlo.com/lb/${DreamloConfig.publicKey}/json`;
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    loading.style.display = 'none';
+                    let entries = [];
+                    if(data.dreamlo && data.dreamlo.leaderboard && data.dreamlo.leaderboard.entry) {
+                        entries = data.dreamlo.leaderboard.entry;
+                        if(!Array.isArray(entries)) entries = [entries];
+                    }
+                    
+                    if(entries.length === 0) {
+                        list.innerHTML = '<li>尚無兌換紀錄</li>';
+                        return;
+                    }
+
+                    // 顯示資料
+                    entries.forEach(entry => {
+                        // 還原名字 (去掉隨機碼)
+                        let displayName = entry.name.split('_')[0];
+                        // 還原時間 (大約)
+                        // 這裡不精確還原時間了，直接顯示項目就好
+                        
+                        const li = document.createElement('li');
+                        li.className = 'log-item';
+                        li.innerHTML = `
+                            <span style="font-weight:bold; color:#880e4f;">${displayName}</span>
+                            <span style="color:#ec407a;">已兌換</span>
+                        `;
+                        list.appendChild(li);
+                    });
+                })
+                .catch(e => loading.innerText = "讀取失敗");
+        },
+        
+        close: function() {
+            document.getElementById('overlay').style.display = 'none';
+        }
+    };
+
+    /* =========================================
+       3. 頁面切換
     ========================================= */
     function switchPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(`${pageId}-page`).classList.add('active');
-        
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         event.currentTarget.classList.add('active');
-
-        if(pageId === 'home') {
-            updateWallet();
-            renderShop();
-        }
+        if(pageId === 'shop') updateUI();
     }
 
     /* =========================================
-       3. 遊戲引擎 (Block Puzzle)
+       4. 遊戲引擎 (簡化版 Block Puzzle)
     ========================================= */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const Sound = {
@@ -349,15 +367,14 @@
         },
         pickup: () => Sound.play(400, 'sine', 0.1),
         drop: () => Sound.play(200, 'triangle', 0.1),
-        buy: () => Sound.play(600, 'square', 0.2),
         clear: (n) => { for(let i=0;i<n;i++) setTimeout(()=>Sound.play(440*(1+i*0.5),'sine',0.3), i*50); }
     };
 
     const SHAPES = [
-        { m: [[1]], color: '#aed581' }, { m: [[1,1]], color: '#8bc34a' }, { m: [[1],[1]], color: '#8bc34a' },
-        { m: [[1,1,1]], color: '#689f38' }, { m: [[1],[1],[1]], color: '#689f38' }, { m: [[1,1],[1,1]], color: '#ffb74d' },
-        { m: [[1,1,1],[0,1,0]], color: '#4db6ac' }, { m: [[1,0],[1,0],[1,1]], color: '#ff8a65' },
-        { m: [[1,1,1,1]], color: '#558b2f' }, { m: [[1],[1],[1],[1]], color: '#558b2f' }
+        { m: [[1]], color: '#ef9a9a' }, { m: [[1,1]], color: '#f48fb1' }, { m: [[1],[1]], color: '#ce93d8' },
+        { m: [[1,1,1]], color: '#b39ddb' }, { m: [[1,1],[1,1]], color: '#90caf9' },
+        { m: [[1,1,1],[0,1,0]], color: '#80cbc4' }, { m: [[1,0],[1,0],[1,1]], color: '#a5d6a7' },
+        { m: [[1,1,1,1]], color: '#e6ee9c' }
     ];
 
     class BlockPuzzle {
@@ -367,7 +384,6 @@
             this.gridSize = 8;
             this.cellSize = this.canvas.width / this.gridSize;
             this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
-            this.score = 0;
             this.TOUCH_OFFSET = 100;
             this.currentShape = null;
             this.ghostShape = null;
@@ -375,8 +391,7 @@
             this.loop = this.loop.bind(this);
             requestAnimationFrame(this.loop);
             this.spawnShapes();
-            updateWallet();
-            updateCharacter(); // 初始化角色外觀
+            updateUI();
         }
 
         loop() {
@@ -388,7 +403,7 @@
         }
 
         drawGrid() {
-            this.ctx.strokeStyle = 'rgba(255,255,255,0.5)'; this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = 'white'; this.ctx.lineWidth = 2;
             for(let i=0; i<=this.gridSize; i++) {
                 let pos = i * this.cellSize;
                 this.ctx.beginPath(); this.ctx.moveTo(0, pos); this.ctx.lineTo(800, pos); this.ctx.stroke();
@@ -421,7 +436,7 @@
             this.ctx.save(); this.ctx.translate(cx, cy);
             this.ctx.fillStyle = color;
             this.ctx.beginPath(); this.ctx.roundRect(-size/2, -size/2, size, size, 10); this.ctx.fill();
-            this.ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            this.ctx.fillStyle = 'rgba(255,255,255,0.3)';
             this.ctx.beginPath(); this.ctx.arc(-size/4, -size/4, size/6, 0, Math.PI*2); this.ctx.fill();
             this.ctx.restore();
         }
@@ -524,7 +539,6 @@
                     if(shape.m[r][c]) this.grid[y+r][x+c] = shape.color;
                 }
             }
-            this.updateScore(10);
             this.checkLines();
         }
 
@@ -539,28 +553,16 @@
             if(totalLines > 0) {
                 rowsToClear.forEach(r => this.grid[r].fill(0));
                 colsToClear.forEach(c => { for(let r=0; r<this.gridSize; r++) this.grid[r][c] = 0; });
-                
                 Sound.clear(totalLines);
-                let points = totalLines * 100 * totalLines;
-                this.updateScore(points);
                 
-                // 獎勵葉子
-                let leavesEarned = totalLines * 5; // 每一行給 5 葉子
-                if(totalLines > 1) leavesEarned *= 2; // Combo 加倍
-                this.earnLeaves(leavesEarned);
+                // 獎勵機制：1行=10幣, Combo加倍
+                let coinsEarned = totalLines * 10;
+                if(totalLines > 1) coinsEarned *= totalLines;
                 
-                this.showFloatText(`+${leavesEarned} 🌿`);
+                userCoins += coinsEarned;
+                updateUI();
+                this.showFloatText(`+${coinsEarned} ❤️`);
             }
-        }
-
-        updateScore(points) {
-            this.score += points;
-            document.getElementById('score').innerText = this.score;
-        }
-        
-        earnLeaves(amount) {
-            GameData.leaves += amount;
-            updateWallet();
         }
 
         showFloatText(text) {
