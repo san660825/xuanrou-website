@@ -2162,6 +2162,98 @@ const dailyText = [
 const index = new Date().getDate() % dailyText.length;
 document.getElementById("daily-card").innerText = dailyText[index];
 </script>
+<script>
+/* ===========================
+   效能優化控制
+=========================== */
+
+// 1. 減少粒子數量（手機）
+if(window.innerWidth < 768){
+    document.querySelectorAll(".particle").forEach((p, i)=>{
+        if(i > 20) p.remove();
+    });
+}
+
+// 2. 暫停不可見動畫
+document.addEventListener("visibilitychange", ()=>{
+    if(document.hidden){
+        document.querySelectorAll("audio").forEach(a => a.pause());
+    }
+});
+
+// 3. 圖片懶加載
+const imageObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(entry => {
+        if(entry.isIntersecting){
+            const img = entry.target;
+            if(img.dataset.src){
+                img.src = img.dataset.src;
+                imageObserver.unobserve(img);
+            }
+        }
+    });
+});
+
+document.querySelectorAll("img[data-src]").forEach(img => {
+    imageObserver.observe(img);
+});
+
+// 4. 控制台彩蛋
+console.log("%c💚 瑄柔專屬網站 Ultra Max Edition", 
+    "font-size:20px; color:#4a7c4a; font-weight:bold;");
+console.log("%c這個網站是無尾熊用心為妳做的 ❤", 
+    "font-size:14px; color:#6f8f6f;");
+</script>
+<style>
+/* Toast 提示框 */
+.toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    z-index: 99999;
+    animation: toastIn 0.4s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+@keyframes toastIn {
+    from { opacity:0; transform: translateX(-50%) translateY(20px); }
+    to { opacity:1; transform: translateX(-50%) translateY(0); }
+}
+</style>
+
+<script>
+/* Toast 提示函數 */
+function showToast(message, duration = 2500){
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.innerText = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(()=>{
+        toast.style.animation = "toastIn 0.4s ease reverse";
+        setTimeout(()=> toast.remove(), 400);
+    }, duration);
+}
+
+/* 圖片載入失敗處理 */
+document.querySelectorAll("img").forEach(img => {
+    img.addEventListener("error", function(){
+        this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23e8f5e8' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%234a7c4a' font-size='16'%3E圖片載入失敗%3C/text%3E%3C/svg%3E";
+        showToast("⚠️ 部分圖片載入失敗");
+    });
+});
+
+/* 音樂播放成功提示 */
+audio.addEventListener("play", ()=>{
+    showToast("🎵 音樂播放中");
+});
+</script>
 
 </body>
 </html>
