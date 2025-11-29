@@ -2,344 +2,427 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>瑄柔 × 2025 · The Galaxy Promise</title>
+    <title>瑄柔的酪梨星球 · Avocado Planet</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="theme-color" content="#090a0f">
+    <meta name="theme-color" content="#558b2f">
+    <meta name="description" content="給瑄柔的專屬網站">
     
-    <!-- 引入特殊字體 -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Serif+TC:wght@400;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <!-- 引入圓潤可愛的字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ===========================
-           1. 宇宙核心變數
-        =========================== */
+        /* =========================================
+           1. AVOCADO PALETTE & VARIABLES
+        ========================================= */
         :root {
-            --bg-dark: #050505;
-            --neon-blue: #00f3ff;
-            --neon-pink: #ff00ff;
-            --neon-gold: #ffd700;
-            --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
-            --blur: blur(20px);
+            /* 牛油果色系 */
+            --avo-light: #f1f8e9;   /* 果肉最淺色 */
+            --avo-cream: #dcedc8;   /* 果肉中間色 */
+            --avo-green: #aed581;   /* 果肉綠 */
+            --avo-skin: #558b2f;    /* 果皮深綠 */
+            --avo-seed: #5d4037;    /* 果核棕色 */
+            --avo-seed-light: #8d6e63;
+            
+            /* 功能色 */
+            --white: #ffffff;
+            --glass: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --shadow: 0 12px 40px rgba(85, 139, 47, 0.15);
+            --shadow-hover: 0 20px 50px rgba(85, 139, 47, 0.25);
+            
+            /* 動畫變數 */
+            --bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-
+        /* =========================================
+           2. GLOBAL RESET & TYPOGRAPHY
+        ========================================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
-            background: var(--bg-dark);
-            color: white;
-            font-family: 'Noto Serif TC', sans-serif;
+            background-color: var(--avo-light);
+            color: var(--avo-seed);
+            font-family: 'Zen Maru Gothic', 'Nunito', sans-serif;
             overflow-x: hidden;
             min-height: 100vh;
+            cursor: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="%23aed581" stroke="%23558b2f" stroke-width="2"/></svg>') 12 12, auto;
         }
 
-        /* ===========================
-           2. 互動式星軌 Canvas
-        =========================== */
-        #canvas-bg {
+        /* 捲軸美化 */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--avo-light); }
+        ::-webkit-scrollbar-thumb { background: var(--avo-green); border-radius: 10px; border: 2px solid var(--avo-light); }
+
+        /* =========================================
+           3. CANVAS BACKGROUND
+        ========================================= */
+        #leaf-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
+            z-index: -1; opacity: 0.6; pointer-events: none;
         }
 
-        /* ===========================
-           3. 載入與入場 (Glitch Effect)
-        =========================== */
+        /* =========================================
+           4. LOADING SCREEN (AVOCADO SPLIT)
+        ========================================= */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999;
+            background: var(--avo-light); z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 1s ease;
+            transition: transform 0.8s ease-in-out;
         }
-        .glitch-text {
-            font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold;
-            position: relative; color: white; letter-spacing: 5px;
-        }
-        .glitch-text::before, .glitch-text::after {
-            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        }
-        .glitch-text::before { left: 2px; text-shadow: -1px 0 red; clip: rect(24px, 550px, 90px, 0); animation: glitch-anim 3s infinite linear alternate-reverse; }
-        .glitch-text::after { left: -2px; text-shadow: -1px 0 blue; clip: rect(85px, 550px, 140px, 0); animation: glitch-anim 2s infinite linear alternate-reverse; }
         
-        @keyframes glitch-anim {
-            0% { clip: rect(14px, 9999px, 127px, 0); }
-            20% { clip: rect(80px, 9999px, 20px, 0); }
-            40% { clip: rect(30px, 9999px, 100px, 0); }
-            60% { clip: rect(90px, 9999px, 10px, 0); }
-            80% { clip: rect(10px, 9999px, 60px, 0); }
-            100% { clip: rect(50px, 9999px, 100px, 0); }
+        .loader-avo {
+            width: 100px; height: 140px; background: var(--avo-skin);
+            border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+            position: relative; overflow: hidden;
+            animation: bounceAvo 1s infinite alternate;
+        }
+        .loader-avo::after {
+            content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px;
+            background: var(--avo-green);
+            border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+            border: 8px solid var(--avo-cream);
+        }
+        .loader-seed {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 40px; height: 40px; background: var(--avo-seed); border-radius: 50%;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2);
+        }
+        .loader-text {
+            margin-top: 20px; font-size: 1.2rem; font-weight: bold; color: var(--avo-skin);
+            letter-spacing: 2px; animation: pulse 1.5s infinite;
         }
 
-        .start-btn {
-            margin-top: 40px; padding: 15px 50px;
-            background: transparent; border: 1px solid var(--neon-blue);
-            color: var(--neon-blue); font-family: 'Orbitron'; letter-spacing: 3px;
-            cursor: pointer; transition: 0.3s; box-shadow: 0 0 10px var(--neon-blue);
-        }
-        .start-btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 30px var(--neon-blue); }
+        @keyframes bounceAvo { from { transform: translateY(0); } to { transform: translateY(-20px); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
 
-        /* ===========================
-           4. UI 組件 (Glassmorphism)
-        =========================== */
-        section { max-width: 800px; margin: 0 auto; padding: 80px 20px; position: relative; }
-        
-        .glass-panel {
-            background: var(--glass); backdrop-filter: var(--blur);
-            border: 1px solid var(--border); border-radius: 20px;
-            padding: 30px; margin-bottom: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        /* =========================================
+           5. UI COMPONENTS (GLASS & CARDS)
+        ========================================= */
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+
+        .glass-card {
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 2px solid var(--white); border-radius: 30px;
+            padding: 40px; margin-bottom: 40px;
+            box-shadow: var(--shadow);
+            transition: transform 0.4s var(--bounce), box-shadow 0.4s ease;
             position: relative; overflow: hidden;
         }
-        /* 流光邊框特效 */
-        .glass-panel::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-pink), transparent);
-            animation: borderFlow 3s linear infinite;
-        }
-        @keyframes borderFlow { 0% { left: -100%; } 100% { left: 100%; } }
-
-        .title {
-            font-family: 'Orbitron'; color: var(--neon-gold); font-size: 1.5rem;
-            margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px;
-            border-left: 4px solid var(--neon-pink); padding-left: 15px;
+        .glass-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: var(--shadow-hover);
         }
 
-        /* ===========================
-           5. 黑膠唱片播放器
-        =========================== */
-        .vinyl-container {
-            position: relative; width: 200px; height: 200px; margin: 0 auto 30px;
+        /* 標題樣式 */
+        .section-title {
+            text-align: center; font-size: 2rem; color: var(--avo-skin);
+            margin-bottom: 30px; position: relative; font-weight: 900;
         }
-        .vinyl {
-            width: 100%; height: 100%; border-radius: 50%;
-            background: url('https://cdn.pixabay.com/photo/2018/03/04/11/23/record-3198066_1280.jpg') center/cover;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
-            animation: spinVinyl 5s linear infinite;
-            animation-play-state: paused; /* 預設暫停 */
+        .section-title::before {
+            content: '🥑'; font-size: 1.5rem; margin-right: 10px; vertical-align: middle;
         }
-        .vinyl::after {
-            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 60px; height: 60px; background: url('photo6.jpg') center/cover; /* 中間放你們的照片 */
-            border-radius: 50%; border: 4px solid #111;
+        .section-title::after {
+            content: ''; display: block; width: 60px; height: 6px;
+            background: var(--avo-green); border-radius: 10px;
+            margin: 10px auto 0;
         }
-        @keyframes spinVinyl { 100% { transform: rotate(360deg); } }
 
-        /* ===========================
-           6. 刮刮樂 (Scratch Card)
-        =========================== */
-        .scratch-container {
-            position: relative; width: 300px; height: 150px; margin: 0 auto;
-            border-radius: 10px; overflow: hidden; cursor: crosshair;
+        /* 按鈕樣式 */
+        .btn {
+            display: inline-block; padding: 12px 35px;
+            background: var(--avo-skin); color: var(--white);
+            border-radius: 50px; text-decoration: none; font-weight: bold;
+            box-shadow: 0 5px 15px rgba(85, 139, 47, 0.3);
+            transition: 0.3s var(--bounce); border: none; cursor: pointer; font-size: 1rem;
         }
-        .hidden-msg {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; color: #333; display: flex; justify-content: center; align-items: center;
-            font-weight: bold; font-size: 1.2rem; text-align: center; padding: 10px;
+        .btn:hover { background: var(--avo-green); transform: scale(1.05); }
+        .btn:active { transform: scale(0.95); }
+
+        /* =========================================
+           6. HERO SECTION
+        ========================================= */
+        .hero {
+            min-height: 80vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            padding-top: 60px;
         }
-        canvas#scratch-canvas {
-            position: absolute; top: 0; left: 0; z-index: 2;
+        .hero h1 {
+            font-size: 3.5rem; color: var(--avo-skin); margin-bottom: 10px;
+            text-shadow: 2px 2px 0px var(--white);
+        }
+        .hero p { font-size: 1.2rem; color: var(--avo-seed-light); max-width: 600px; line-height: 1.8; }
+
+        /* =========================================
+           7. TIMERS (COMPLEX)
+        ========================================= */
+        .timer-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;
+            margin-top: 30px; width: 100%; max-width: 600px;
+        }
+        .timer-box {
+            background: var(--white); border-radius: 20px; padding: 15px;
+            text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 2px solid var(--avo-light);
+        }
+        .timer-val { font-size: 2rem; font-weight: 900; color: var(--avo-skin); display: block; }
+        .timer-label { font-size: 0.8rem; color: var(--avo-seed-light); font-weight: bold; }
+
+        /* =========================================
+           8. INTERACTIVE PET (AVOCADO)
+        ========================================= */
+        #pet-container {
+            width: 150px; height: 150px; margin: 0 auto 20px;
+            cursor: pointer; transition: 0.3s; position: relative;
+        }
+        #pet-svg { width: 100%; height: 100%; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1)); }
+        .pet-bubble {
+            position: absolute; top: -40px; right: -40px;
+            background: var(--white); padding: 10px 15px; border-radius: 20px 20px 20px 0;
+            font-size: 0.9rem; color: var(--avo-skin); box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            opacity: 0; transform: scale(0); transition: 0.3s var(--bounce); pointer-events: none;
+        }
+        .pet-bubble.show { opacity: 1; transform: scale(1); }
+
+        /* =========================================
+           9. PHOTO GALLERY (POLAROID STYLE)
+        ========================================= */
+        .gallery-scroll {
+            display: flex; overflow-x: auto; gap: 20px; padding: 20px 5px;
+            scroll-behavior: smooth;
+        }
+        .polaroid {
+            min-width: 220px; background: var(--white); padding: 10px 10px 40px 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); transform: rotate(var(--rot));
+            transition: 0.3s; border-radius: 4px; cursor: zoom-in;
+        }
+        .polaroid:hover { transform: rotate(0) scale(1.05); z-index: 10; box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+        .polaroid img { width: 100%; height: 250px; object-fit: cover; border-radius: 2px; background: #eee; }
+        .polaroid-caption {
+            text-align: center; margin-top: 15px; font-family: 'Dancing Script', cursive;
+            color: #555; font-size: 1.2rem;
+        }
+
+        /* =========================================
+           10. MUSIC PLAYER (MINIMALIST)
+        ========================================= */
+        .music-player {
+            display: flex; align-items: center; gap: 20px; background: var(--white);
+            padding: 15px 25px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            max-width: 500px; margin: 0 auto;
+        }
+        .play-btn {
+            width: 50px; height: 50px; background: var(--avo-skin); border-radius: 50%;
+            color: white; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: 0.3s; font-size: 1.2rem;
+        }
+        .music-info { flex: 1; }
+        .progress-bar {
+            width: 100%; height: 6px; background: #eee; border-radius: 10px;
+            margin-top: 8px; overflow: hidden; position: relative;
+        }
+        .progress-fill {
+            height: 100%; background: var(--avo-green); width: 0%; transition: width 0.1s linear;
+        }
+
+        /* =========================================
+           11. WISH JAR (MESSAGE BOARD)
+        ========================================= */
+        .wish-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
+        .wish-note {
+            background: #fff9c4; padding: 15px; border-radius: 2px 2px 15px 2px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1); font-size: 0.9rem;
+            position: relative; animation: popIn 0.5s var(--bounce);
+        }
+        .wish-note::before {
+            content: ''; position: absolute; top: 0; right: 0; border-width: 0 15px 15px 0;
+            border-style: solid; border-color: rgba(0,0,0,0.1) #fff; display: block; width: 0;
+        }
+        @keyframes popIn { from { opacity:0; transform: scale(0.5); } to { opacity:1; transform: scale(1); } }
+
+        /* RWD */
+        @media(max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .timer-grid { grid-template-columns: repeat(2, 1fr); }
+            .glass-card { padding: 25px; }
         }
     </style>
 </head>
 <body>
-
-<!-- 背景 Canvas -->
-<canvas id="canvas-bg"></canvas>
-
-<!-- 入場畫面 -->
+<!-- 1. 載入畫面 -->
 <div id="loader">
-    <div class="glitch-text" data-text="XUANROU 2025">XUANROU 2025</div>
-    <div style="color: #888; margin-top: 10px; font-family: 'Orbitron';">SYSTEM INITIALIZING...</div>
-    <button class="start-btn" onclick="startSystem()">ACCESS GRANTED</button>
-</div>
-<!-- 導航 (懸浮膠囊) -->
-<div style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 100; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 10px 30px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); display: flex; gap: 20px;">
-    <a href="#timer-sec" style="color: white; text-decoration: none;">⏳</a>
-    <a href="#music-sec" style="color: white; text-decoration: none;">🎵</a>
-    <a href="#scratch-sec" style="color: white; text-decoration: none;">🎁</a>
-    <a href="#letter-sec" style="color: white; text-decoration: none;">💌</a>
+    <div class="loader-avo">
+        <div class="loader-seed"></div>
+    </div>
+    <div class="loader-text">AVOCADO LOVE LOADING...</div>
 </div>
 
-<!-- 1. 計時器區塊 -->
-<section id="timer-sec" style="padding-top: 100px;">
-    <div class="glass-panel" style="text-align: center;">
-        <div class="title">MISSION: 2025.10.07</div>
+<!-- 2. 背景 Canvas -->
+<canvas id="leaf-canvas"></canvas>
+
+<!-- 3. 主內容容器 -->
+<div class="container">
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div id="pet-container" onclick="petInteraction()">
+            <div class="pet-bubble" id="pet-msg">摸摸我！</div>
+            <!-- SVG Avocado Character -->
+            <svg id="pet-svg" viewBox="0 0 100 120">
+                <path d="M50 5 C20 5 5 35 5 70 C5 100 25 115 50 115 C75 115 95 100 95 70 C95 35 80 5 50 5 Z" fill="#558b2f"/>
+                <path d="M50 12 C25 12 12 38 12 70 C12 95 28 108 50 108 C72 108 88 95 88 70 C88 38 75 12 50 12 Z" fill="#aed581"/>
+                <path d="M50 18 C30 18 18 40 18 70 C18 90 30 102 50 102 C70 102 82 90 82 70 C82 40 70 18 50 18 Z" fill="#dcedc8"/>
+                <circle cx="50" cy="75" r="22" fill="#5d4037"/>
+                <circle cx="56" cy="70" r="6" fill="rgba(255,255,255,0.3)"/>
+                <!-- Face -->
+                <circle cx="40" cy="75" r="2" fill="#fff" class="eye"/>
+                <circle cx="60" cy="75" r="2" fill="#fff" class="eye"/>
+                <path d="M47 82 Q50 85 53 82" stroke="#fff" stroke-width="1.5" fill="none" class="mouth"/>
+                <!-- Arms -->
+                <path d="M15 65 Q5 55 15 45" stroke="#558b2f" stroke-width="4" fill="none" stroke-linecap="round"/>
+                <path d="M85 65 Q95 55 85 45" stroke="#558b2f" stroke-width="4" fill="none" stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <h1>Hi, 瑄柔</h1>
+        <p>歡迎來到屬於妳的酪梨星球。<br>這裡沒有壞心情，只有滿滿的維生素 E 和愛。</p>
         
-        <!-- 智慧判斷顯示文字 -->
-        <div id="timer-status" style="color: var(--neon-blue); margin-bottom: 10px; letter-spacing: 2px;">
-            TARGET LOCKED
-        </div>
-
-        <div id="main-timer" style="font-family: 'Orbitron'; font-size: 2rem; font-weight: bold; text-shadow: 0 0 20px var(--neon-blue);">
-            00 : 00 : 00 : 00
-        </div>
-        <div style="display: flex; justify-content: center; gap: 15px; font-size: 0.8rem; color: #aaa; margin-top: 5px;">
-            <span>DAYS</span><span>HOURS</span><span>MINS</span><span>SECS</span>
-        </div>
-
-        <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-            <div style="color: var(--neon-gold); font-size: 1.2rem;">♉ TAURUS ♉</div>
-            <div style="font-size: 0.9rem; color: #ddd;">2009.05.19</div>
-            <div id="bday-countdown" style="margin-top: 5px; font-family: 'Orbitron'; color: var(--neon-pink);">
-                Birthday Loading...
+        <!-- 智慧計時器 -->
+        <div class="glass-card" style="margin-top: 40px; width: 100%;">
+            <div id="timer-title" style="color: var(--avo-skin); font-weight: bold; letter-spacing: 1px;">
+                距離我們的約定 (2025.10.07) 還有
+            </div>
+            <div class="timer-grid">
+                <div class="timer-box"><span class="timer-val" id="d">0</span><span class="timer-label">DAYS</span></div>
+                <div class="timer-box"><span class="timer-val" id="h">0</span><span class="timer-label">HOURS</span></div>
+                <div class="timer-box"><span class="timer-val" id="m">0</span><span class="timer-label">MINS</span></div>
+                <div class="timer-box"><span class="timer-val" id="s">0</span><span class="timer-label">SECS</span></div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- 2. 黑膠音樂播放器 -->
-<section id="music-sec">
-    <div class="glass-panel" style="text-align: center;">
-        <div class="title">SOUNDTRACK</div>
-        
-        <div class="vinyl-container">
-            <div class="vinyl" id="vinyl-disk"></div>
+    <!-- 金牛座生日模組 -->
+    <section>
+        <div class="glass-card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+            <div>
+                <h2 style="color: var(--avo-skin); margin-bottom: 5px;">♉ 金牛座女孩</h2>
+                <div style="color: var(--avo-seed-light);">生日：2009.05.19</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 0.9rem; color: #888;">距離下次生日還有</div>
+                <div id="bday-count" style="font-size: 1.8rem; font-weight: 900; color: var(--avo-green);">計算中...</div>
+            </div>
         </div>
+    </section>
 
-        <div style="font-size: 1.2rem; margin-bottom: 5px;">你知道你比晚霞好看嗎</div>
-        <div style="color: var(--neon-blue); font-size: 0.9rem;">Tr33</div>
-
-        <div style="margin-top: 20px; display: flex; justify-content: center; gap: 20px;">
-            <button onclick="controlMusic('play')" style="background: none; border: 1px solid white; color: white; width: 50px; height: 50px; border-radius: 50%; cursor: pointer;">▶</button>
-            <button onclick="controlMusic('pause')" style="background: none; border: 1px solid white; color: white; width: 50px; height: 50px; border-radius: 50%; cursor: pointer;">⏸</button>
+    <!-- 照片花園 (橫向捲動) -->
+    <section>
+        <div class="section-title">我們的酪梨花園</div>
+        <div class="gallery-scroll">
+            <!-- 請替換 src 為真實照片 -->
+            <div class="polaroid" style="--rot: -3deg;" onclick="openLightBox(this)">
+                <img src="photo1.jpg" onerror="this.src='https://placehold.co/400x500/dcedc8/558b2f?text=Memory+1'">
+                <div class="polaroid-caption">初次相遇</div>
+            </div>
+            <div class="polaroid" style="--rot: 2deg;" onclick="openLightBox(this)">
+                <img src="photo2.jpg" onerror="this.src='https://placehold.co/400x500/f1f8e9/558b2f?text=Memory+2'">
+                <div class="polaroid-caption">可愛的妳</div>
+            </div>
+            <div class="polaroid" style="--rot: -1deg;" onclick="openLightBox(this)">
+                <img src="photo3.jpg" onerror="this.src='https://placehold.co/400x500/aed581/558b2f?text=Memory+3'">
+                <div class="polaroid-caption">美好時光</div>
+            </div>
+            <div class="polaroid" style="--rot: 4deg;" onclick="openLightBox(this)">
+                <img src="photo4.jpg" onerror="this.src='https://placehold.co/400x500/dcedc8/558b2f?text=Memory+4'">
+                <div class="polaroid-caption">未來可期</div>
+            </div>
+            <div class="polaroid" style="--rot: -2deg;" onclick="openLightBox(this)">
+                <img src="photo6.jpg" onerror="this.src='https://placehold.co/400x500/f1f8e9/558b2f?text=Memory+5'">
+                <div class="polaroid-caption">我們</div>
+            </div>
         </div>
-        
-        <!-- 隱藏音源 -->
-        <audio id="bg-music" loop>
+    </section>
+
+    <!-- 音樂播放器 -->
+    <section>
+        <div class="section-title">心情點播</div>
+        <div class="music-player">
+            <div class="play-btn" onclick="toggleAudio()">
+                <i class="fas fa-play" id="play-icon"></i>
+            </div>
+            <div class="music-info">
+                <div style="font-weight: bold; color: var(--avo-skin);">你知道你比晚霞好看嗎</div>
+                <div style="font-size: 0.8rem; color: #888;">Tr33</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="audio-progress"></div>
+                </div>
+            </div>
+        </div>
+        <audio id="bg-audio" loop>
             <source src="你知道你比晚霞好看嗎 - Tr33 (youtube).mp3" type="audio/mpeg">
         </audio>
-    </div>
-</section>
+    </section>
 
-<!-- 3. 刮刮樂驚喜 -->
-<section id="scratch-sec">
-    <div class="glass-panel" style="text-align: center;">
-        <div class="title">SECRET MESSAGE</div>
-        <p style="margin-bottom: 20px; font-size: 0.9rem; color: #ccc;">用手指或滑鼠刮開銀色區域...</p>
-        
-        <div class="scratch-container">
-            <div class="hidden-msg">
-                瑄柔，<br>妳是這宇宙裡<br>我唯一的引力。
+    <!-- 許願瓶 (Local Storage) -->
+    <section>
+        <div class="section-title">酪梨許願瓶</div>
+        <div class="glass-card">
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="wish-input" placeholder="寫下一個小願望..." style="flex: 1; padding: 12px; border-radius: 20px; border: 2px solid var(--avo-cream); outline: none;">
+                <button class="btn" onclick="addWish()">貼上</button>
             </div>
-            <canvas id="scratch-canvas" width="300" height="150"></canvas>
+            <div class="wish-grid" id="wish-container">
+                <!-- 願望會動態產生在這裡 -->
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- 4. 打字機情書 -->
-<section id="letter-sec" style="margin-bottom: 100px;">
-    <div class="glass-panel">
-        <div class="title">LOG: 00:53 AM</div>
-        <div id="typewriter-text" style="font-family: 'Noto Serif TC'; line-height: 1.8; min-height: 150px; white-space: pre-wrap;"></div>
-        <span style="display: inline-block; width: 10px; height: 20px; background: var(--neon-blue); animation: blink 1s infinite;"></span>
-    </div>
-</section>
-<style>@keyframes blink{ 50% { opacity: 0; } }</style>
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 40px; color: var(--avo-seed-light); font-size: 0.9rem;">
+        Made with 🥑 & ❤ for XuanRou<br>
+        <span style="font-size: 0.8rem; opacity: 0.6;">Koala's Code Factory 2025</span>
+    </footer>
+
+</div>
+
+<!-- 燈箱 -->
+<div id="lightbox" onclick="this.style.display='none'" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 10000; display: none; justify-content: center; align-items: center;">
+    <img id="lb-img" src="" style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 0 30px rgba(255,255,255,0.2);">
+</div>
 <script>
-    /* ===========================
-       1. 互動式星軌 Canvas (黑科技)
-    =========================== */
-    const canvas = document.getElementById('canvas-bg');
-    const ctx = canvas.getContext('2d');
-    let width, height, particles = [];
-
-    function resize() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resize);
-    resize();
-
-    class Particle {
-        constructor() {
-            this.x = Math.random() * width;
-            this.y = Math.random() * height;
-            this.vx = (Math.random() - 0.5) * 0.5;
-            this.vy = (Math.random() - 0.5) * 0.5;
-            this.size = Math.random() * 2;
-        }
-        update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            if (this.x < 0 || this.x > width) this.vx *= -1;
-            if (this.y < 0 || this.y > height) this.vy *= -1;
-        }
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,255,255,0.8)';
-            ctx.fill();
-        }
-    }
-
-    for (let i = 0; i < 60; i++) particles.push(new Particle());
-
-    function animate() {
-        ctx.clearRect(0, 0, width, height);
-        particles.forEach((p, index) => {
-            p.update();
-            p.draw();
-            // 連線邏輯
-            for (let j = index + 1; j < particles.length; j++) {
-                const p2 = particles[j];
-                const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-                if (dist < 150) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = `rgba(255,255,255,${1 - dist/150})`;
-                    ctx.lineWidth = 0.5;
-                    ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(p2.x, p2.y);
-                    ctx.stroke();
-                }
-            }
-        });
-        requestAnimationFrame(animate);
-    }
-    animate();
-
-    /* ===========================
-       2. 系統啟動與音樂控制
-    =========================== */
-    const audio = document.getElementById('bg-music');
-    const vinyl = document.getElementById('vinyl-disk');
-    
-    function startSystem() {
+    /* =========================================
+       1. SYSTEM INITIALIZATION & LOADER
+    ========================================= */
+    window.addEventListener('load', () => {
         const loader = document.getElementById('loader');
-        loader.style.opacity = 0;
-        setTimeout(() => loader.style.display = 'none', 1000);
-        
-        // 嘗試播放
-        controlMusic('play');
-        // 啟動打字機
-        typeWriter();
-    }
+        // 模擬載入延遲，讓動畫跑一下
+        setTimeout(() => {
+            loader.style.transform = 'translateY(-100%)';
+            initCanvas(); // 啟動背景動畫
+            loadWishes(); // 載入願望
+        }, 1500);
+    });
 
-    function controlMusic(action) {
-        if(action === 'play') {
-            audio.play().then(() => {
-                vinyl.style.animationPlayState = 'running';
-            }).catch(e => console.log("Wait for interaction"));
-        } else {
-            audio.pause();
-            vinyl.style.animationPlayState = 'paused';
-        }
-    }
-
-    /* ===========================
-       3. 智慧計時器 (2025.10.07)
-    =========================== */
-    function updateTimers() {
+    /* =========================================
+       2. SMART TIMER LOGIC (2025-10-07)
+    ========================================= */
+    function updateTimer() {
         const targetDate = new Date(2025, 9, 7, 0, 53, 0); // 10月是9
         const now = new Date();
         let diff = targetDate - now;
-        const statusEl = document.getElementById('timer-status');
+        const title = document.getElementById('timer-title');
         
-        // 判斷是倒數還是累計
+        // 邏輯判斷：如果是未來，顯示倒數；如果是過去，顯示累計
         if (diff > 0) {
-            statusEl.innerText = "距離 2025.10.07 還有";
-            statusEl.style.color = "var(--neon-blue)";
+            title.innerHTML = '<i class="fas fa-hourglass-half"></i> 距離我們的約定 (2025.10.07) 還有';
+            title.style.color = "var(--avo-skin)";
         } else {
-            statusEl.innerText = "我們已經在一起";
-            statusEl.style.color = "var(--neon-pink)";
+            title.innerHTML = '<i class="fas fa-heart"></i> 我們已經在一起';
+            title.style.color = "#e91e63"; // 變成粉紅色
             diff = Math.abs(diff);
         }
 
@@ -348,73 +431,210 @@
         const m = Math.floor((diff / (1000 * 60)) % 60);
         const s = Math.floor((diff / 1000) % 60);
 
-        document.getElementById('main-timer').innerText = 
-            `${d} : ${h.toString().padStart(2,'0')} : ${m.toString().padStart(2,'0')} : ${s.toString().padStart(2,'0')}`;
+        document.getElementById('d').innerText = d;
+        document.getElementById('h').innerText = h;
+        document.getElementById('m').innerText = m;
+        document.getElementById('s').innerText = s;
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
 
-        // 生日倒數 (5/19)
+    /* =========================================
+       3. BIRTHDAY LOGIC (05-19)
+    ========================================= */
+    function updateBirthday() {
+        const now = new Date();
         const currentYear = now.getFullYear();
-        let nextBday = new Date(currentYear, 4, 19);
-        if (now > nextBday) nextBday.setFullYear(currentYear + 1);
-        const bDiff = nextBday - now;
-        const bd = Math.floor(bDiff / (1000 * 60 * 60 * 24));
-        document.getElementById('bday-countdown').innerText = `還有 ${bd} 天`;
-    }
-    setInterval(updateTimers, 1000);
-    updateTimers();
-
-    /* ===========================
-       4. 刮刮樂邏輯
-    =========================== */
-    const sCanvas = document.getElementById('scratch-canvas');
-    const sCtx = sCanvas.getContext('2d');
-    
-    // 填充銀色塗層
-    sCtx.fillStyle = '#C0C0C0';
-    sCtx.fillRect(0, 0, 300, 150);
-    sCtx.fillStyle = '#000';
-    sCtx.font = '20px Arial';
-    sCtx.fillText("刮開這裡", 110, 80);
-
-    let isDrawing = false;
-
-    function scratch(x, y) {
-        sCtx.globalCompositeOperation = 'destination-out';
-        sCtx.beginPath();
-        sCtx.arc(x, y, 20, 0, Math.PI * 2);
-        sCtx.fill();
-    }
-
-    sCanvas.addEventListener('mousedown', () => isDrawing = true);
-    sCanvas.addEventListener('mouseup', () => isDrawing = false);
-    sCanvas.addEventListener('mousemove', (e) => {
-        if (!isDrawing) return;
-        const rect = sCanvas.getBoundingClientRect();
-        scratch(e.clientX - rect.left, e.clientY - rect.top);
-    });
-    
-    // 手機觸控支援
-    sCanvas.addEventListener('touchstart', () => isDrawing = true);
-    sCanvas.addEventListener('touchend', () => isDrawing = false);
-    sCanvas.addEventListener('touchmove', (e) => {
-        if (!isDrawing) return;
-        e.preventDefault();
-        const rect = sCanvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        scratch(touch.clientX - rect.left, touch.clientY - rect.top);
-    });
-
-    /* ===========================
-       5. 打字機特效
-    =========================== */
-    const letterText = `瑄柔，\n\n這是一個關於 2025 年的約定。\n\n雖然時間還在倒數，但我的心已經提前抵達了那天凌晨的 12:53。\n\n金牛座的妳，值得這世上所有的耐心與溫柔。\n\n我會在這裡，一直等妳。\n\n—— Koala`;
-    let charIndex = 0;
-    
-    function typeWriter() {
-        if (charIndex < letterText.length) {
-            document.getElementById("typewriter-text").innerHTML += letterText.charAt(charIndex) === '\n' ? '<br>' : letterText.charAt(charIndex);
-            charIndex++;
-            setTimeout(typeWriter, 100);
+        let nextBday = new Date(currentYear, 4, 19); // 5月是4
+        
+        if (now > nextBday) {
+            nextBday.setFullYear(currentYear + 1);
         }
+        
+        const diff = nextBday - now;
+        const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        
+        document.getElementById('bday-count').innerText = `${days} 天`;
+    }
+    updateBirthday();
+
+    /* =========================================
+       4. INTERACTIVE PET (AVOCADO)
+    ========================================= */
+    const petMsgs = [
+        "妳今天好漂亮！", "要記得喝水喔！", "最喜歡瑄柔了！", 
+        "抱抱！", "我是妳的小酪梨～", "不要太累喔！", "無尾熊在想妳！"
+    ];
+    
+    function petInteraction() {
+        const pet = document.getElementById('pet-svg');
+        const bubble = document.getElementById('pet-msg');
+        
+        // 隨機動畫
+        pet.style.transform = `scale(1.1) rotate(${Math.random()*20 - 10}deg)`;
+        setTimeout(() => pet.style.transform = 'scale(1) rotate(0deg)', 200);
+        
+        // 隨機訊息
+        bubble.innerText = petMsgs[Math.floor(Math.random() * petMsgs.length)];
+        bubble.classList.add('show');
+        
+        // 3秒後隱藏訊息
+        setTimeout(() => bubble.classList.remove('show'), 3000);
+        
+        // 產生點擊愛心
+        createHeart();
+    }
+
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.innerHTML = '❤';
+        heart.style.position = 'fixed';
+        heart.style.left = (event.clientX) + 'px';
+        heart.style.top = (event.clientY) + 'px';
+        heart.style.color = '#ff6b6b';
+        heart.style.fontSize = '20px';
+        heart.style.pointerEvents = 'none';
+        heart.style.animation = 'floatUp 1s ease-out forwards';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+    }
+    
+    // CSS for heart animation
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = `@keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity:1; } 100% { transform: translateY(-50px) scale(1.5); opacity:0; } }`;
+    document.head.appendChild(styleSheet);
+
+    /* =========================================
+       5. WISH JAR (LOCAL STORAGE)
+    ========================================= */
+    function loadWishes() {
+        const wishes = JSON.parse(localStorage.getItem('xr_wishes')) || ["希望瑄柔天天開心", "一起去吃好吃的"];
+        const container = document.getElementById('wish-container');
+        container.innerHTML = '';
+        wishes.forEach(renderWish);
+    }
+
+    function renderWish(text) {
+        const div = document.createElement('div');
+        div.className = 'wish-note';
+        div.innerText = text;
+        // 隨機旋轉一點點
+        div.style.transform = `rotate(${Math.random()*4 - 2}deg)`;
+        document.getElementById('wish-container').prepend(div);
+    }
+
+    function addWish() {
+        const input = document.getElementById('wish-input');
+        const text = input.value.trim();
+        if (text) {
+            const wishes = JSON.parse(localStorage.getItem('xr_wishes')) || ["希望瑄柔天天開心", "一起去吃好吃的"];
+            wishes.push(text);
+            localStorage.setItem('xr_wishes', JSON.stringify(wishes));
+            renderWish(text);
+            input.value = '';
+        }
+    }
+
+    /* =========================================
+       6. AUDIO PLAYER
+    ========================================= */
+    const audio = document.getElementById('bg-audio');
+    const playIcon = document.getElementById('play-icon');
+    const progress = document.getElementById('audio-progress');
+
+    function toggleAudio() {
+        if (audio.paused) {
+            audio.play();
+            playIcon.className = 'fas fa-pause';
+        } else {
+            audio.pause();
+            playIcon.className = 'fas fa-play';
+        }
+    }
+
+    audio.addEventListener('timeupdate', () => {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        progress.style.width = pct + '%';
+    });
+
+    /* =========================================
+       7. LIGHTBOX
+    ========================================= */
+    function openLightBox(el) {
+        const src = el.querySelector('img').src;
+        document.getElementById('lb-img').src = src;
+        document.getElementById('lightbox').style.display = 'flex';
+    }
+</script>
+<script>
+    /* =========================================
+       8. BACKGROUND LEAF ANIMATION (CANVAS)
+    ========================================= */
+    function initCanvas() {
+        const canvas = document.getElementById('leaf-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Leaf {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 15 + 5;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 + 0.5;
+                this.rotation = Math.random() * 360;
+                this.rotSpeed = Math.random() * 2 - 1;
+                // 隨機顏色：淺綠、深綠、奶油色
+                const colors = ['#aed581', '#dcedc8', '#f1f8e9', '#81c784'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.rotation += this.rotSpeed;
+
+                if (this.y > height) this.y = -20;
+                if (this.x > width) this.x = -20;
+                if (this.x < -20) this.x = width;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.fillStyle = this.color;
+                
+                // 畫一個簡單的葉子形狀
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // 建立 40 片葉子
+        for (let i = 0; i < 40; i++) {
+            particles.push(new Leaf());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
     }
 </script>
 </body>
