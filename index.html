@@ -2,163 +2,156 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>瑄柔的酪梨星球 · Avocado Planet</title>
+    <title>瑄柔的無尾熊樂園 · Koala's Green World</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="theme-color" content="#558b2f">
-    <meta name="description" content="給瑄柔的專屬網站">
     
     <!-- 引入圓潤可愛的字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         /* =========================================
-           1. AVOCADO PALETTE & VARIABLES
+           1. THEME VARIABLES (EUCALYPTUS GREEN)
         ========================================= */
         :root {
-            /* 牛油果色系 */
-            --avo-light: #f1f8e9;   /* 果肉最淺色 */
-            --avo-cream: #dcedc8;   /* 果肉中間色 */
-            --avo-green: #aed581;   /* 果肉綠 */
-            --avo-skin: #558b2f;    /* 果皮深綠 */
-            --avo-seed: #5d4037;    /* 果核棕色 */
-            --avo-seed-light: #8d6e63;
+            /* 她喜歡的牛油果綠色系 (保留顏色，改意義) */
+            --theme-light: #f1f8e9;   /* 背景淺綠 */
+            --theme-cream: #dcedc8;   /* 裝飾嫩綠 */
+            --theme-green: #aed581;   /* 主色綠 */
+            --theme-deep: #558b2f;    /* 深綠 (尤加利葉) */
+            
+            /* 無尾熊色系 */
+            --koala-grey: #9e9e9e;
+            --koala-dark: #616161;
+            --koala-nose: #424242;
             
             /* 功能色 */
             --white: #ffffff;
-            --glass: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass: rgba(255, 255, 255, 0.7);
             --shadow: 0 12px 40px rgba(85, 139, 47, 0.15);
-            --shadow-hover: 0 20px 50px rgba(85, 139, 47, 0.25);
-            
-            /* 動畫變數 */
             --bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
-        /* =========================================
-           2. GLOBAL RESET & TYPOGRAPHY
-        ========================================= */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
-            background-color: var(--avo-light);
-            color: var(--avo-seed);
+            background-color: var(--theme-light);
+            color: var(--theme-deep);
             font-family: 'Zen Maru Gothic', 'Nunito', sans-serif;
             overflow-x: hidden;
             min-height: 100vh;
-            cursor: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="%23aed581" stroke="%23558b2f" stroke-width="2"/></svg>') 12 12, auto;
+            /* 滑鼠游標改成小樹葉 */
+            cursor: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 0 Q5 5 0 10 Q5 15 10 20 Q15 15 20 10 Q15 5 10 0" fill="%23558b2f" opacity="0.8"/></svg>') 10 10, auto;
         }
 
-        /* 捲軸美化 */
-        ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: var(--avo-light); }
-        ::-webkit-scrollbar-thumb { background: var(--avo-green); border-radius: 10px; border: 2px solid var(--avo-light); }
-
         /* =========================================
-           3. CANVAS BACKGROUND
+           2. CANVAS BACKGROUND
         ========================================= */
         #leaf-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; opacity: 0.6; pointer-events: none;
+            z-index: -1; opacity: 0.5; pointer-events: none;
         }
 
         /* =========================================
-           4. LOADING SCREEN (AVOCADO SPLIT)
+           3. LOADING SCREEN (KOALA)
         ========================================= */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--avo-light); z-index: 9999;
+            background: var(--theme-light); z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: transform 0.8s ease-in-out;
         }
         
-        .loader-avo {
-            width: 100px; height: 140px; background: var(--avo-skin);
-            border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
-            position: relative; overflow: hidden;
-            animation: bounceAvo 1s infinite alternate;
+        /* CSS 繪製簡單無尾熊頭 */
+        .loader-koala {
+            width: 100px; height: 100px; background: var(--koala-grey);
+            border-radius: 50%; position: relative;
+            box-shadow: 0 10px 0 rgba(0,0,0,0.1);
+            animation: bounceKoala 1s infinite alternate;
         }
-        .loader-avo::after {
-            content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px;
-            background: var(--avo-green);
-            border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
-            border: 8px solid var(--avo-cream);
+        /* 耳朵 */
+        .loader-koala::before, .loader-koala::after {
+            content: ''; position: absolute; top: 0; width: 35px; height: 35px;
+            background: var(--koala-grey); border-radius: 50%; z-index: -1;
         }
-        .loader-seed {
+        .loader-koala::before { left: -10px; }
+        .loader-koala::after { right: -10px; }
+        
+        /* 鼻子 */
+        .loader-nose {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 40px; height: 40px; background: var(--avo-seed); border-radius: 50%;
-            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2);
+            width: 30px; height: 40px; background: var(--koala-nose); border-radius: 40%;
         }
+        
         .loader-text {
-            margin-top: 20px; font-size: 1.2rem; font-weight: bold; color: var(--avo-skin);
+            margin-top: 30px; font-size: 1.2rem; font-weight: bold; color: var(--theme-deep);
             letter-spacing: 2px; animation: pulse 1.5s infinite;
         }
 
-        @keyframes bounceAvo { from { transform: translateY(0); } to { transform: translateY(-20px); } }
+        @keyframes bounceKoala { from { transform: translateY(0); } to { transform: translateY(-15px); } }
         @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
 
         /* =========================================
-           5. UI COMPONENTS (GLASS & CARDS)
+           4. UI COMPONENTS
         ========================================= */
         .container { max-width: 1000px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
 
         .glass-card {
-            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            background: var(--glass); backdrop-filter: blur(12px);
             border: 2px solid var(--white); border-radius: 30px;
             padding: 40px; margin-bottom: 40px;
             box-shadow: var(--shadow);
-            transition: transform 0.4s var(--bounce), box-shadow 0.4s ease;
-            position: relative; overflow: hidden;
+            transition: transform 0.4s var(--bounce);
         }
-        .glass-card:hover {
-            transform: translateY(-8px) scale(1.01);
-            box-shadow: var(--shadow-hover);
-        }
+        .glass-card:hover { transform: translateY(-8px); }
 
-        /* 標題樣式 */
         .section-title {
-            text-align: center; font-size: 2rem; color: var(--avo-skin);
+            text-align: center; font-size: 2rem; color: var(--theme-deep);
             margin-bottom: 30px; position: relative; font-weight: 900;
         }
-        .section-title::before {
-            content: '🥑'; font-size: 1.5rem; margin-right: 10px; vertical-align: middle;
-        }
+        .section-title::before { content: '🐨'; margin-right: 10px; }
         .section-title::after {
             content: ''; display: block; width: 60px; height: 6px;
-            background: var(--avo-green); border-radius: 10px;
-            margin: 10px auto 0;
+            background: var(--theme-green); border-radius: 10px; margin: 10px auto 0;
         }
 
-        /* 按鈕樣式 */
         .btn {
             display: inline-block; padding: 12px 35px;
-            background: var(--avo-skin); color: var(--white);
-            border-radius: 50px; text-decoration: none; font-weight: bold;
-            box-shadow: 0 5px 15px rgba(85, 139, 47, 0.3);
-            transition: 0.3s var(--bounce); border: none; cursor: pointer; font-size: 1rem;
+            background: var(--theme-deep); color: var(--white);
+            border-radius: 50px; border: none; cursor: pointer; font-size: 1rem;
+            transition: 0.3s var(--bounce);
         }
-        .btn:hover { background: var(--avo-green); transform: scale(1.05); }
-        .btn:active { transform: scale(0.95); }
+        .btn:hover { background: var(--theme-green); transform: scale(1.05); }
 
         /* =========================================
-           6. HERO SECTION
+           5. HERO & PET
         ========================================= */
         .hero {
             min-height: 80vh; display: flex; flex-direction: column;
             justify-content: center; align-items: center; text-align: center;
             padding-top: 60px;
         }
-        .hero h1 {
-            font-size: 3.5rem; color: var(--avo-skin); margin-bottom: 10px;
-            text-shadow: 2px 2px 0px var(--white);
+        .hero h1 { font-size: 3.5rem; color: var(--theme-deep); margin-bottom: 10px; }
+        .hero p { font-size: 1.2rem; color: #666; max-width: 600px; line-height: 1.8; }
+
+        /* 無尾熊互動區 */
+        #pet-container {
+            width: 180px; height: 160px; margin: 0 auto 20px;
+            cursor: pointer; transition: 0.3s; position: relative;
         }
-        .hero p { font-size: 1.2rem; color: var(--avo-seed-light); max-width: 600px; line-height: 1.8; }
+        #pet-svg { width: 100%; height: 100%; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1)); }
+        .pet-bubble {
+            position: absolute; top: -30px; right: -50px;
+            background: var(--white); padding: 10px 15px; border-radius: 20px 20px 20px 0;
+            font-size: 0.9rem; color: var(--theme-deep); box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            opacity: 0; transform: scale(0); transition: 0.3s var(--bounce); pointer-events: none;
+        }
+        .pet-bubble.show { opacity: 1; transform: scale(1); }
 
         /* =========================================
-           7. TIMERS (COMPLEX)
+           6. TIMERS
         ========================================= */
         .timer-grid {
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;
@@ -166,30 +159,13 @@
         }
         .timer-box {
             background: var(--white); border-radius: 20px; padding: 15px;
-            text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            border: 2px solid var(--avo-light);
+            text-align: center; border: 2px solid var(--theme-cream);
         }
-        .timer-val { font-size: 2rem; font-weight: 900; color: var(--avo-skin); display: block; }
-        .timer-label { font-size: 0.8rem; color: var(--avo-seed-light); font-weight: bold; }
+        .timer-val { font-size: 2rem; font-weight: 900; color: var(--theme-deep); display: block; }
+        .timer-label { font-size: 0.8rem; color: #888; font-weight: bold; }
 
         /* =========================================
-           8. INTERACTIVE PET (AVOCADO)
-        ========================================= */
-        #pet-container {
-            width: 150px; height: 150px; margin: 0 auto 20px;
-            cursor: pointer; transition: 0.3s; position: relative;
-        }
-        #pet-svg { width: 100%; height: 100%; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1)); }
-        .pet-bubble {
-            position: absolute; top: -40px; right: -40px;
-            background: var(--white); padding: 10px 15px; border-radius: 20px 20px 20px 0;
-            font-size: 0.9rem; color: var(--avo-skin); box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            opacity: 0; transform: scale(0); transition: 0.3s var(--bounce); pointer-events: none;
-        }
-        .pet-bubble.show { opacity: 1; transform: scale(1); }
-
-        /* =========================================
-           9. PHOTO GALLERY (POLAROID STYLE)
+           7. GALLERY & MUSIC & WISHES
         ========================================= */
         .gallery-scroll {
             display: flex; overflow-x: auto; gap: 20px; padding: 20px 5px;
@@ -200,100 +176,93 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1); transform: rotate(var(--rot));
             transition: 0.3s; border-radius: 4px; cursor: zoom-in;
         }
-        .polaroid:hover { transform: rotate(0) scale(1.05); z-index: 10; box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
-        .polaroid img { width: 100%; height: 250px; object-fit: cover; border-radius: 2px; background: #eee; }
-        .polaroid-caption {
-            text-align: center; margin-top: 15px; font-family: 'Dancing Script', cursive;
-            color: #555; font-size: 1.2rem;
-        }
-
-        /* =========================================
-           10. MUSIC PLAYER (MINIMALIST)
-        ========================================= */
+        .polaroid:hover { transform: rotate(0) scale(1.05); z-index: 10; }
+        .polaroid img { width: 100%; height: 250px; object-fit: cover; background: #eee; }
+        
         .music-player {
             display: flex; align-items: center; gap: 20px; background: var(--white);
             padding: 15px 25px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);
             max-width: 500px; margin: 0 auto;
         }
         .play-btn {
-            width: 50px; height: 50px; background: var(--avo-skin); border-radius: 50%;
+            width: 50px; height: 50px; background: var(--theme-deep); border-radius: 50%;
             color: white; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: 0.3s; font-size: 1.2rem;
+            cursor: pointer;
         }
-        .music-info { flex: 1; }
         .progress-bar {
             width: 100%; height: 6px; background: #eee; border-radius: 10px;
-            margin-top: 8px; overflow: hidden; position: relative;
+            margin-top: 8px; overflow: hidden;
         }
-        .progress-fill {
-            height: 100%; background: var(--avo-green); width: 0%; transition: width 0.1s linear;
-        }
+        .progress-fill { height: 100%; background: var(--theme-green); width: 0%; }
 
-        /* =========================================
-           11. WISH JAR (MESSAGE BOARD)
-        ========================================= */
         .wish-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
         .wish-note {
             background: #fff9c4; padding: 15px; border-radius: 2px 2px 15px 2px;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.1); font-size: 0.9rem;
-            position: relative; animation: popIn 0.5s var(--bounce);
-        }
-        .wish-note::before {
-            content: ''; position: absolute; top: 0; right: 0; border-width: 0 15px 15px 0;
-            border-style: solid; border-color: rgba(0,0,0,0.1) #fff; display: block; width: 0;
+            animation: popIn 0.5s var(--bounce);
         }
         @keyframes popIn { from { opacity:0; transform: scale(0.5); } to { opacity:1; transform: scale(1); } }
 
-        /* RWD */
         @media(max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
             .timer-grid { grid-template-columns: repeat(2, 1fr); }
-            .glass-card { padding: 25px; }
         }
     </style>
 </head>
 <body>
-<!-- 1. 載入畫面 -->
+<!-- 1. 載入畫面 (無尾熊版) -->
 <div id="loader">
-    <div class="loader-avo">
-        <div class="loader-seed"></div>
+    <div class="loader-koala">
+        <div class="loader-nose"></div>
     </div>
-    <div class="loader-text">AVOCADO LOVE LOADING...</div>
+    <div class="loader-text">KOALA HUGGING...</div>
 </div>
 
-<!-- 2. 背景 Canvas -->
+<!-- 2. 背景 Canvas (尤加利葉) -->
 <canvas id="leaf-canvas"></canvas>
 
-<!-- 3. 主內容容器 -->
+<!-- 3. 主內容 -->
 <div class="container">
     
     <!-- Hero Section -->
     <section class="hero">
         <div id="pet-container" onclick="petInteraction()">
-            <div class="pet-bubble" id="pet-msg">摸摸我！</div>
-            <!-- SVG Avocado Character -->
-            <svg id="pet-svg" viewBox="0 0 100 120">
-                <path d="M50 5 C20 5 5 35 5 70 C5 100 25 115 50 115 C75 115 95 100 95 70 C95 35 80 5 50 5 Z" fill="#558b2f"/>
-                <path d="M50 12 C25 12 12 38 12 70 C12 95 28 108 50 108 C72 108 88 95 88 70 C88 38 75 12 50 12 Z" fill="#aed581"/>
-                <path d="M50 18 C30 18 18 40 18 70 C18 90 30 102 50 102 C70 102 82 90 82 70 C82 40 70 18 50 18 Z" fill="#dcedc8"/>
-                <circle cx="50" cy="75" r="22" fill="#5d4037"/>
-                <circle cx="56" cy="70" r="6" fill="rgba(255,255,255,0.3)"/>
-                <!-- Face -->
-                <circle cx="40" cy="75" r="2" fill="#fff" class="eye"/>
-                <circle cx="60" cy="75" r="2" fill="#fff" class="eye"/>
-                <path d="M47 82 Q50 85 53 82" stroke="#fff" stroke-width="1.5" fill="none" class="mouth"/>
-                <!-- Arms -->
-                <path d="M15 65 Q5 55 15 45" stroke="#558b2f" stroke-width="4" fill="none" stroke-linecap="round"/>
-                <path d="M85 65 Q95 55 85 45" stroke="#558b2f" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <div class="pet-bubble" id="pet-msg">抱抱！</div>
+            <!-- SVG Koala Character -->
+            <svg id="pet-svg" viewBox="0 0 120 120">
+                <!-- Ears -->
+                <circle cx="20" cy="40" r="18" fill="#9e9e9e"/>
+                <circle cx="100" cy="40" r="18" fill="#9e9e9e"/>
+                <circle cx="20" cy="40" r="10" fill="#f5f5f5"/>
+                <circle cx="100" cy="40" r="10" fill="#f5f5f5"/>
+                
+                <!-- Head -->
+                <ellipse cx="60" cy="60" rx="45" ry="40" fill="#9e9e9e"/>
+                
+                <!-- Eyes -->
+                <circle cx="45" cy="55" r="4" fill="#333"/>
+                <circle cx="75" cy="55" r="4" fill="#333"/>
+                
+                <!-- Nose (Big Koala Nose) -->
+                <ellipse cx="60" cy="65" rx="12" ry="16" fill="#424242"/>
+                <ellipse cx="58" cy="62" rx="3" ry="4" fill="rgba(255,255,255,0.2)"/>
+                
+                <!-- Cheeks -->
+                <circle cx="30" cy="65" r="5" fill="rgba(255,182,193,0.4)"/>
+                <circle cx="90" cy="65" r="5" fill="rgba(255,182,193,0.4)"/>
+                
+                <!-- Paws (Holding invisible tree) -->
+                <circle cx="40" cy="95" r="10" fill="#9e9e9e"/>
+                <circle cx="80" cy="95" r="10" fill="#9e9e9e"/>
             </svg>
         </div>
 
         <h1>Hi, 瑄柔</h1>
-        <p>歡迎來到屬於妳的酪梨星球。<br>這裡沒有壞心情，只有滿滿的維生素 E 和愛。</p>
+        <p>歡迎來到無尾熊的秘密森林。<br>這裡有妳最愛的綠色，還有隨時準備抱住妳的我。</p>
         
         <!-- 智慧計時器 -->
         <div class="glass-card" style="margin-top: 40px; width: 100%;">
-            <div id="timer-title" style="color: var(--avo-skin); font-weight: bold; letter-spacing: 1px;">
+            <div id="timer-title" style="color: var(--theme-deep); font-weight: bold; letter-spacing: 1px;">
                 距離我們的約定 (2025.10.07) 還有
             </div>
             <div class="timer-grid">
@@ -309,53 +278,49 @@
     <section>
         <div class="glass-card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
             <div>
-                <h2 style="color: var(--avo-skin); margin-bottom: 5px;">♉ 金牛座女孩</h2>
-                <div style="color: var(--avo-seed-light);">生日：2009.05.19</div>
+                <h2 style="color: var(--theme-deep); margin-bottom: 5px;">♉ 金牛座女孩</h2>
+                <div style="color: #666;">生日：2009.05.19</div>
             </div>
             <div style="text-align: right;">
                 <div style="font-size: 0.9rem; color: #888;">距離下次生日還有</div>
-                <div id="bday-count" style="font-size: 1.8rem; font-weight: 900; color: var(--avo-green);">計算中...</div>
+                <div id="bday-count" style="font-size: 1.8rem; font-weight: 900; color: var(--theme-green);">計算中...</div>
             </div>
         </div>
     </section>
 
-    <!-- 照片花園 (橫向捲動) -->
+    <!-- 照片回憶 -->
     <section>
-        <div class="section-title">我們的酪梨花園</div>
+        <div class="section-title">尤加利葉花園</div>
         <div class="gallery-scroll">
-            <!-- 請替換 src 為真實照片 -->
+            <!-- 替換為真實照片 -->
             <div class="polaroid" style="--rot: -3deg;" onclick="openLightBox(this)">
-                <img src="photo1.jpg" onerror="this.src='https://placehold.co/400x500/dcedc8/558b2f?text=Memory+1'">
+                <img src="photo1.jpg" onerror="this.src='https://placehold.co/400x500/dcedc8/558b2f?text=Memory'">
                 <div class="polaroid-caption">初次相遇</div>
             </div>
             <div class="polaroid" style="--rot: 2deg;" onclick="openLightBox(this)">
-                <img src="photo2.jpg" onerror="this.src='https://placehold.co/400x500/f1f8e9/558b2f?text=Memory+2'">
+                <img src="photo2.jpg" onerror="this.src='https://placehold.co/400x500/f1f8e9/558b2f?text=Cute'">
                 <div class="polaroid-caption">可愛的妳</div>
             </div>
             <div class="polaroid" style="--rot: -1deg;" onclick="openLightBox(this)">
-                <img src="photo3.jpg" onerror="this.src='https://placehold.co/400x500/aed581/558b2f?text=Memory+3'">
+                <img src="photo3.jpg" onerror="this.src='https://placehold.co/400x500/aed581/558b2f?text=Love'">
                 <div class="polaroid-caption">美好時光</div>
             </div>
             <div class="polaroid" style="--rot: 4deg;" onclick="openLightBox(this)">
-                <img src="photo4.jpg" onerror="this.src='https://placehold.co/400x500/dcedc8/558b2f?text=Memory+4'">
+                <img src="photo4.jpg" onerror="this.src='https://placehold.co/400x500/dcedc8/558b2f?text=Future'">
                 <div class="polaroid-caption">未來可期</div>
-            </div>
-            <div class="polaroid" style="--rot: -2deg;" onclick="openLightBox(this)">
-                <img src="photo6.jpg" onerror="this.src='https://placehold.co/400x500/f1f8e9/558b2f?text=Memory+5'">
-                <div class="polaroid-caption">我們</div>
             </div>
         </div>
     </section>
 
     <!-- 音樂播放器 -->
     <section>
-        <div class="section-title">心情點播</div>
+        <div class="section-title">森林點播</div>
         <div class="music-player">
             <div class="play-btn" onclick="toggleAudio()">
                 <i class="fas fa-play" id="play-icon"></i>
             </div>
             <div class="music-info">
-                <div style="font-weight: bold; color: var(--avo-skin);">你知道你比晚霞好看嗎</div>
+                <div style="font-weight: bold; color: var(--theme-deep);">你知道你比晚霞好看嗎</div>
                 <div style="font-size: 0.8rem; color: #888;">Tr33</div>
                 <div class="progress-bar">
                     <div class="progress-fill" id="audio-progress"></div>
@@ -367,24 +332,22 @@
         </audio>
     </section>
 
-    <!-- 許願瓶 (Local Storage) -->
+    <!-- 許願瓶 -->
     <section>
-        <div class="section-title">酪梨許願瓶</div>
+        <div class="section-title">無尾熊的許願樹洞</div>
         <div class="glass-card">
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <input type="text" id="wish-input" placeholder="寫下一個小願望..." style="flex: 1; padding: 12px; border-radius: 20px; border: 2px solid var(--avo-cream); outline: none;">
+                <input type="text" id="wish-input" placeholder="寫下一個小願望..." style="flex: 1; padding: 12px; border-radius: 20px; border: 2px solid var(--theme-cream); outline: none;">
                 <button class="btn" onclick="addWish()">貼上</button>
             </div>
-            <div class="wish-grid" id="wish-container">
-                <!-- 願望會動態產生在這裡 -->
-            </div>
+            <div class="wish-grid" id="wish-container"></div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer style="text-align: center; padding: 40px; color: var(--avo-seed-light); font-size: 0.9rem;">
-        Made with 🥑 & ❤ for XuanRou<br>
-        <span style="font-size: 0.8rem; opacity: 0.6;">Koala's Code Factory 2025</span>
+    <footer style="text-align: center; padding: 40px; color: #888; font-size: 0.9rem;">
+        Made with 🐨 & ❤ for XuanRou<br>
+        <span style="font-size: 0.8rem; opacity: 0.6;">Koala's Love Factory 2025</span>
     </footer>
 
 </div>
@@ -395,34 +358,32 @@
 </div>
 <script>
     /* =========================================
-       1. SYSTEM INITIALIZATION & LOADER
+       1. SYSTEM INITIALIZATION
     ========================================= */
     window.addEventListener('load', () => {
         const loader = document.getElementById('loader');
-        // 模擬載入延遲，讓動畫跑一下
         setTimeout(() => {
             loader.style.transform = 'translateY(-100%)';
-            initCanvas(); // 啟動背景動畫
+            initCanvas(); // 啟動森林背景
             loadWishes(); // 載入願望
         }, 1500);
     });
 
     /* =========================================
-       2. SMART TIMER LOGIC (2025-10-07)
+       2. SMART TIMER (2025-10-07)
     ========================================= */
     function updateTimer() {
-        const targetDate = new Date(2025, 9, 7, 0, 53, 0); // 10月是9
+        const targetDate = new Date(2025, 9, 7, 0, 53, 0); 
         const now = new Date();
         let diff = targetDate - now;
         const title = document.getElementById('timer-title');
         
-        // 邏輯判斷：如果是未來，顯示倒數；如果是過去，顯示累計
         if (diff > 0) {
             title.innerHTML = '<i class="fas fa-hourglass-half"></i> 距離我們的約定 (2025.10.07) 還有';
-            title.style.color = "var(--avo-skin)";
+            title.style.color = "var(--theme-deep)";
         } else {
             title.innerHTML = '<i class="fas fa-heart"></i> 我們已經在一起';
-            title.style.color = "#e91e63"; // 變成粉紅色
+            title.style.color = "#e91e63"; 
             diff = Math.abs(diff);
         }
 
@@ -445,7 +406,7 @@
     function updateBirthday() {
         const now = new Date();
         const currentYear = now.getFullYear();
-        let nextBday = new Date(currentYear, 4, 19); // 5月是4
+        let nextBday = new Date(currentYear, 4, 19); 
         
         if (now > nextBday) {
             nextBday.setFullYear(currentYear + 1);
@@ -453,45 +414,40 @@
         
         const diff = nextBday - now;
         const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-        
         document.getElementById('bday-count').innerText = `${days} 天`;
     }
     updateBirthday();
 
     /* =========================================
-       4. INTERACTIVE PET (AVOCADO)
+       4. INTERACTIVE KOALA
     ========================================= */
     const petMsgs = [
-        "妳今天好漂亮！", "要記得喝水喔！", "最喜歡瑄柔了！", 
-        "抱抱！", "我是妳的小酪梨～", "不要太累喔！", "無尾熊在想妳！"
+        "像無尾熊一樣抱緊妳！", "妳今天好漂亮～", "要記得喝水喔！", 
+        "最喜歡瑄柔了！", "我要掛在妳身上～", "不要太累喔！", "無尾熊愛妳！"
     ];
     
     function petInteraction() {
         const pet = document.getElementById('pet-svg');
         const bubble = document.getElementById('pet-msg');
         
-        // 隨機動畫
-        pet.style.transform = `scale(1.1) rotate(${Math.random()*20 - 10}deg)`;
+        // 搖晃動畫
+        pet.style.transform = `scale(1.1) rotate(${Math.random()*10 - 5}deg)`;
         setTimeout(() => pet.style.transform = 'scale(1) rotate(0deg)', 200);
         
         // 隨機訊息
         bubble.innerText = petMsgs[Math.floor(Math.random() * petMsgs.length)];
         bubble.classList.add('show');
-        
-        // 3秒後隱藏訊息
         setTimeout(() => bubble.classList.remove('show'), 3000);
         
-        // 產生點擊愛心
         createHeart();
     }
 
     function createHeart() {
         const heart = document.createElement('div');
-        heart.innerHTML = '❤';
+        heart.innerHTML = '🐨'; // 噴出無尾熊或愛心
         heart.style.position = 'fixed';
         heart.style.left = (event.clientX) + 'px';
         heart.style.top = (event.clientY) + 'px';
-        heart.style.color = '#ff6b6b';
         heart.style.fontSize = '20px';
         heart.style.pointerEvents = 'none';
         heart.style.animation = 'floatUp 1s ease-out forwards';
@@ -499,16 +455,15 @@
         setTimeout(() => heart.remove(), 1000);
     }
     
-    // CSS for heart animation
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `@keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity:1; } 100% { transform: translateY(-50px) scale(1.5); opacity:0; } }`;
     document.head.appendChild(styleSheet);
 
     /* =========================================
-       5. WISH JAR (LOCAL STORAGE)
+       5. WISH JAR
     ========================================= */
     function loadWishes() {
-        const wishes = JSON.parse(localStorage.getItem('xr_wishes')) || ["希望瑄柔天天開心", "一起去吃好吃的"];
+        const wishes = JSON.parse(localStorage.getItem('xr_koala_wishes')) || ["希望瑄柔天天開心", "一起去動物園"];
         const container = document.getElementById('wish-container');
         container.innerHTML = '';
         wishes.forEach(renderWish);
@@ -518,7 +473,6 @@
         const div = document.createElement('div');
         div.className = 'wish-note';
         div.innerText = text;
-        // 隨機旋轉一點點
         div.style.transform = `rotate(${Math.random()*4 - 2}deg)`;
         document.getElementById('wish-container').prepend(div);
     }
@@ -527,16 +481,16 @@
         const input = document.getElementById('wish-input');
         const text = input.value.trim();
         if (text) {
-            const wishes = JSON.parse(localStorage.getItem('xr_wishes')) || ["希望瑄柔天天開心", "一起去吃好吃的"];
+            const wishes = JSON.parse(localStorage.getItem('xr_koala_wishes')) || ["希望瑄柔天天開心", "一起去動物園"];
             wishes.push(text);
-            localStorage.setItem('xr_wishes', JSON.stringify(wishes));
+            localStorage.setItem('xr_koala_wishes', JSON.stringify(wishes));
             renderWish(text);
             input.value = '';
         }
     }
 
     /* =========================================
-       6. AUDIO PLAYER
+       6. AUDIO & LIGHTBOX
     ========================================= */
     const audio = document.getElementById('bg-audio');
     const playIcon = document.getElementById('play-icon');
@@ -557,9 +511,6 @@
         progress.style.width = pct + '%';
     });
 
-    /* =========================================
-       7. LIGHTBOX
-    ========================================= */
     function openLightBox(el) {
         const src = el.querySelector('img').src;
         document.getElementById('lb-img').src = src;
@@ -568,7 +519,7 @@
 </script>
 <script>
     /* =========================================
-       8. BACKGROUND LEAF ANIMATION (CANVAS)
+       7. EUCALYPTUS LEAF BACKGROUND
     ========================================= */
     function initCanvas() {
         const canvas = document.getElementById('leaf-canvas');
@@ -587,13 +538,13 @@
             constructor() {
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
-                this.size = Math.random() * 15 + 5;
+                this.size = Math.random() * 10 + 5; // 葉子大小
                 this.speedX = Math.random() * 1 - 0.5;
                 this.speedY = Math.random() * 1 + 0.5;
                 this.rotation = Math.random() * 360;
                 this.rotSpeed = Math.random() * 2 - 1;
-                // 隨機顏色：淺綠、深綠、奶油色
-                const colors = ['#aed581', '#dcedc8', '#f1f8e9', '#81c784'];
+                // 尤加利葉色系
+                const colors = ['#aed581', '#dcedc8', '#81c784', '#66bb6a'];
                 this.color = colors[Math.floor(Math.random() * colors.length)];
             }
 
@@ -613,16 +564,16 @@
                 ctx.rotate(this.rotation * Math.PI / 180);
                 ctx.fillStyle = this.color;
                 
-                // 畫一個簡單的葉子形狀
+                // 繪製尤加利葉形狀 (細長橢圓)
                 ctx.beginPath();
-                ctx.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2);
+                ctx.ellipse(0, 0, this.size, this.size / 3, 0, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.restore();
             }
         }
 
-        // 建立 40 片葉子
-        for (let i = 0; i < 40; i++) {
+        // 建立 50 片葉子
+        for (let i = 0; i < 50; i++) {
             particles.push(new Leaf());
         }
 
