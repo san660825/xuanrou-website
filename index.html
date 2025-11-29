@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>無尾熊拼圖：地獄挑戰版</title>
+    <title>無尾熊拼圖：雙重模式版</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="theme-color" content="#558b2f">
     
@@ -14,7 +14,6 @@
             --bg-color: #f1f8e9;
             --board-bg: #dcedc8;
             --text-main: #33691e;
-            --bomb-color: #e53935; /* 炸彈紅 */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -50,7 +49,7 @@
             width: 70px; height: 70px; transition: transform 0.3s;
         }
         .koala-panic { animation: shake 0.5s infinite; }
-        @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 10% { transform: translate(-1px, -2px) rotate(-1deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 30% { transform: translate(3px, 2px) rotate(0deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 50% { transform: translate(-1px, 2px) rotate(-1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 70% { transform: translate(3px, 1px) rotate(-1deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 90% { transform: translate(1px, 2px) rotate(0deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, -1px); } }
 
         #board-container {
             position: relative; width: 100%; aspect-ratio: 1/1;
@@ -67,19 +66,17 @@
         }
         .shape-preview.dragging {
             opacity: 0.9; z-index: 1000; position: fixed; pointer-events: none;
-            transform: scale(1.1); filter: drop-shadow(0 20px 40px rgba(0,0,0,0.4));
+            transform: scale(1.1); filter: drop-shadow(0 30px 50px rgba(0,0,0,0.3));
         }
 
-        /* 排行榜按鈕 */
+        /* 按鈕樣式 */
         .rank-btn {
             position: absolute; top: 20px; right: 20px;
             background: #fbc02d; color: white; border: none; padding: 8px 15px;
             border-radius: 20px; font-weight: bold; cursor: pointer;
             box-shadow: 0 4px 0 #f57f17; z-index: 100;
         }
-        .rank-btn:active { transform: translateY(4px); box-shadow: none; }
-
-        /* 遮罩與彈窗 */
+        
         #overlay, #rank-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(85, 139, 47, 0.95); z-index: 2000;
@@ -93,27 +90,23 @@
             text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
             width: 85%; max-width: 400px;
         }
-        
-        .rank-list {
-            list-style: none; text-align: left; margin: 20px 0; max-height: 300px; overflow-y: auto;
-        }
-        .rank-item {
-            display: flex; justify-content: space-between; padding: 10px;
-            border-bottom: 1px solid #eee; font-family: 'Fredoka';
-        }
-        .rank-item.me { background: #f1f8e9; color: #558b2f; font-weight: bold; border-radius: 10px; }
-        .rank-num { width: 30px; font-weight: bold; color: #888; }
 
-        .btn-start {
-            background: #8bc34a; color: white; border: none;
-            padding: 15px 40px; font-size: 1.5rem; border-radius: 50px;
+        .mode-select {
+            display: flex; flex-direction: column; gap: 15px; margin-top: 20px;
+        }
+        .btn-mode {
+            border: none; padding: 15px; font-size: 1.2rem; border-radius: 50px;
             cursor: pointer; font-family: 'Zen Maru Gothic'; font-weight: bold;
-            box-shadow: 0 5px 0 #558b2f;
+            transition: 0.2s; color: white; position: relative; overflow: hidden;
         }
-        .btn-close {
-            background: #ccc; color: #555; border: none; padding: 10px 30px;
-            border-radius: 20px; font-weight: bold; cursor: pointer; margin-top: 10px;
-        }
+        .btn-easy { background: #8bc34a; box-shadow: 0 5px 0 #558b2f; }
+        .btn-hard { background: #e53935; box-shadow: 0 5px 0 #b71c1c; }
+        .btn-mode:active { transform: translateY(5px); box-shadow: none; }
+        
+        .rank-list { list-style: none; text-align: left; margin: 20px 0; max-height: 300px; overflow-y: auto; }
+        .rank-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .rank-item.me { background: #f1f8e9; color: #558b2f; font-weight: bold; border-radius: 10px; }
+        .btn-close { background: #ccc; color: #555; border: none; padding: 10px 30px; border-radius: 20px; margin-top: 10px; }
 
         .float-text {
             position: absolute; font-family: 'Fredoka'; font-weight: 900;
@@ -126,16 +119,28 @@
 </head>
 <body>
 
-<!-- 排行榜按鈕 -->
 <button class="rank-btn" onclick="showRank()">🏆 排行榜</button>
 
-<!-- 遊戲開始/結束遮罩 -->
+<!-- 遊戲開始/模式選擇遮罩 -->
 <div id="overlay">
     <div class="overlay-card">
-        <h1 style="color: #558b2f;">無尾熊拼圖<br><span style="font-size:0.6em; color:#e53935;">🔥 地獄挑戰版</span></h1>
-        <p style="color: #666; margin: 15px 0;">小心！炸彈方塊即將出現。<br>倒數歸零前必須消除它！</p>
-        <div id="final-score" style="font-size: 2rem; font-weight: bold; color: #f57f17; display: none; margin-bottom: 20px;">0</div>
-        <button class="btn-start" id="start-btn">開始挑戰</button>
+        <h1 style="color: #558b2f; margin-bottom: 5px;">無尾熊拼圖</h1>
+        <p style="color: #888; font-size: 0.9rem;">瑄柔，今天想玩哪一種？</p>
+        
+        <div id="final-score" style="font-size: 1.5rem; font-weight: bold; color: #f57f17; display: none; margin: 15px 0;">
+            0 分
+        </div>
+
+        <div class="mode-select">
+            <button class="btn-mode btn-easy" onclick="game.start('easy')">
+                <i class="fas fa-coffee"></i> 輕鬆模式
+                <div style="font-size: 0.7rem; opacity: 0.8;">無炸彈 · 純放鬆</div>
+            </button>
+            <button class="btn-mode btn-hard" onclick="game.start('hard')">
+                <i class="fas fa-fire"></i> 地獄模式
+                <div style="font-size: 0.7rem; opacity: 0.8;">炸彈倒數 · 變態方塊</div>
+            </button>
+        </div>
     </div>
 </div>
 
@@ -143,9 +148,8 @@
 <div id="rank-overlay">
     <div class="overlay-card">
         <h2>🏆 全球高手榜</h2>
-        <ul class="rank-list" id="rank-list">
-            <!-- JS 生成 -->
-        </ul>
+        <div style="font-size:0.8rem; color:#888; margin-bottom:10px;">(顯示地獄模式分數)</div>
+        <ul class="rank-list" id="rank-list"></ul>
         <button class="btn-close" onclick="closeRank()">關閉</button>
     </div>
 </div>
@@ -156,8 +160,6 @@
             <span class="score-label">SCORE</span>
             <span class="score-val" id="score">0</span>
         </div>
-        
-        <!-- 無尾熊 SVG -->
         <div id="koala-mascot">
             <svg viewBox="0 0 80 80">
                 <circle cx="15" cy="25" r="12" fill="#9e9e9e"/>
@@ -173,7 +175,6 @@
                 <circle cx="60" cy="45" r="4" fill="rgba(255,100,100,0.3)"/>
             </svg>
         </div>
-
         <div class="score-box">
             <span class="score-label">BEST</span>
             <span class="score-val" id="best-score">0</span>
@@ -183,120 +184,105 @@
     <div id="board-container">
         <canvas id="game-canvas" width="800" height="800"></canvas>
     </div>
-
     <div id="spawn-area"></div>
 </div>
 
 <script>
-    /* =========================================
-       1. AUDIO SYNTHESIZER
-    ========================================= */
+    /* 1. 音效系統 */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const Sound = {
         play: (freq, type, dur, vol=0.1) => {
             if(audioCtx.state === 'suspended') audioCtx.resume();
-            const o = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
             o.type = type; o.frequency.setValueAtTime(freq, audioCtx.currentTime);
             g.gain.setValueAtTime(vol, audioCtx.currentTime);
             g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
-            o.connect(g); g.connect(audioCtx.destination);
-            o.start(); o.stop(audioCtx.currentTime + dur);
+            o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + dur);
         },
         pickup: () => Sound.play(400, 'sine', 0.1),
         drop: () => Sound.play(200, 'triangle', 0.1, 0.2),
         clear: (n) => { for(let i=0;i<n;i++) setTimeout(()=>Sound.play(440*(1+i*0.5),'sine',0.3,0.2), i*50); },
-        bomb: () => Sound.play(100, 'sawtooth', 0.8, 0.3), // 炸彈爆炸聲
-        tick: () => Sound.play(800, 'square', 0.05, 0.05)  // 倒數聲
+        bomb: () => Sound.play(100, 'sawtooth', 0.8, 0.3)
     };
 
-    /* =========================================
-       2. EXPANDED SHAPES (更多變態形狀)
-    ========================================= */
-    const SHAPES = [
-        // 基礎
+    /* 2. 方塊定義 (分簡單與困難) */
+    const SHAPES_EASY = [
         { m: [[1]], color: '#aed581' },
         { m: [[1,1]], color: '#8bc34a' },
         { m: [[1],[1]], color: '#8bc34a' },
-        { m: [[1,1],[1,1]], color: '#ffb74d' }, // 田
-        { m: [[1,1,1],[0,1,0]], color: '#4db6ac' }, // T
-        { m: [[1,0],[1,0],[1,1]], color: '#ff8a65' }, // L
-        { m: [[1,1,1,1]], color: '#558b2f' }, // 4長條
-        // 進階 (難度UP)
-        { m: [[1,1,1],[1,0,1]], color: '#ba68c8' }, // U型
-        { m: [[1,0,0],[1,1,1],[0,0,1]], color: '#7986cb' }, // 閃電加長
-        { m: [[1,0,1],[1,1,1],[1,0,1]], color: '#e57373' }, // H型
-        { m: [[0,1,0],[1,1,1],[0,1,0]], color: '#4dd0e1' }, // 十字
-        { m: [[1,1,1],[1,1,1],[1,1,1]], color: '#90a4ae' }, // 3x3 巨型方塊 (惡夢)
-        { m: [[1,0,0,0,0],[1,1,1,1,1]], color: '#f06292' }, // 5格L
-        { m: [[1],[1],[1],[1],[1]], color: '#558b2f' } // 5格長條
+        { m: [[1,1,1]], color: '#689f38' },
+        { m: [[1],[1],[1]], color: '#689f38' },
+        { m: [[1,1],[1,1]], color: '#ffb74d' },
+        { m: [[1,1,1],[0,1,0]], color: '#4db6ac' },
+        { m: [[1,0],[1,0],[1,1]], color: '#ff8a65' },
+        { m: [[1,1,1,1]], color: '#558b2f' },
+        { m: [[1],[1],[1],[1]], color: '#558b2f' }
     ];
 
-    /* =========================================
-       3. FAKE GLOBAL RANKING
-    ========================================= */
+    const SHAPES_HARD = [
+        ...SHAPES_EASY, // 包含基礎方塊
+        { m: [[1,1,1],[1,0,1]], color: '#ba68c8' }, // U型
+        { m: [[1,0,0],[1,1,1],[0,0,1]], color: '#7986cb' }, // 閃電加長
+        { m: [[0,1,0],[1,1,1],[0,1,0]], color: '#4dd0e1' }, // 十字
+        { m: [[1,1,1],[1,1,1],[1,1,1]], color: '#90a4ae' }, // 3x3
+        { m: [[1,0,0,0,0],[1,1,1,1,1]], color: '#f06292' }  // 5格L
+    ];
+
+    /* 3. 假排名資料 */
     const FAKE_PLAYERS = [
-        {name: "KoalaMaster", score: 12500},
-        {name: "ForestKing", score: 9800},
-        {name: "Eucalyptus", score: 8540},
-        {name: "LazyBear", score: 7200},
-        {name: "BambooLover", score: 5600},
-        {name: "SleepyHead", score: 4300},
-        {name: "GreenLeaf", score: 3100}
+        {name: "KoalaKing", score: 15200}, {name: "ForestMaster", score: 12800},
+        {name: "Eucalyptus", score: 9540}, {name: "LazyBear", score: 7200},
+        {name: "Bamboo", score: 5600}
     ];
 
     function showRank() {
         const list = document.getElementById('rank-list');
         list.innerHTML = '';
-        
-        // 插入玩家當前分數
-        const myScore = parseInt(document.getElementById('score').innerText);
-        let allPlayers = [...FAKE_PLAYERS, {name: "瑄柔 (妳)", score: myScore, isMe: true}];
-        
-        // 排序
+        // 抓取地獄模式最高分來排名
+        const myBest = localStorage.getItem('xr_puzzle_best_hard') || 0;
+        let allPlayers = [...FAKE_PLAYERS, {name: "瑄柔 (妳)", score: parseInt(myBest), isMe: true}];
         allPlayers.sort((a,b) => b.score - a.score);
         
         allPlayers.forEach((p, i) => {
             const li = document.createElement('li');
             li.className = `rank-item ${p.isMe ? 'me' : ''}`;
-            li.innerHTML = `<span class="rank-num">#${i+1}</span><span>${p.name}</span><span>${p.score}</span>`;
+            li.innerHTML = `<span style="width:30px;font-weight:bold;">#${i+1}</span><span>${p.name}</span><span>${p.score}</span>`;
             list.appendChild(li);
         });
-        
         document.getElementById('rank-overlay').style.display = 'flex';
     }
     function closeRank() { document.getElementById('rank-overlay').style.display = 'none'; }
 
-    /* =========================================
-       4. GAME ENGINE
-    ========================================= */
+    /* 4. 遊戲核心 */
     class BlockPuzzle {
         constructor() {
             this.canvas = document.getElementById('game-canvas');
             this.ctx = this.canvas.getContext('2d');
             this.gridSize = 8;
             this.cellSize = this.canvas.width / this.gridSize;
-            // Grid now stores objects: { color: string, bomb: number|null } or 0
             this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
             
             this.score = 0;
-            this.bestScore = localStorage.getItem('xr_puzzle_best') || 0;
+            this.mode = 'easy'; // 當前模式
             this.particles = [];
             this.currentShape = null;
             this.ghostShape = null;
-            this.TOUCH_OFFSET = 100; // 手機手指偏移量
-            this.bombsActive = false; // 分數高於 500 開啟炸彈
+            this.TOUCH_OFFSET = 100; // 手指偏移
 
-            document.getElementById('best-score').innerText = this.bestScore;
             this.loop = this.loop.bind(this);
             requestAnimationFrame(this.loop);
         }
 
-        start() {
+        start(mode) {
+            this.mode = mode;
             this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
             this.score = 0;
-            this.bombsActive = false;
             this.updateScore(0);
+            
+            // 讀取該模式的最高分
+            const savedBest = localStorage.getItem(`xr_puzzle_best_${mode}`) || 0;
+            document.getElementById('best-score').innerText = savedBest;
+
             document.getElementById('overlay').style.display = 'none';
             document.getElementById('final-score').style.display = 'none';
             this.spawnShapes();
@@ -338,7 +324,6 @@
             for(let r=0; r<this.gridSize; r++) {
                 for(let c=0; c<this.gridSize; c++) {
                     if(this.grid[r][c] !== 0) {
-                        // 繪製方塊與炸彈
                         this.drawCell(c, r, this.grid[r][c].color, 1, this.grid[r][c].bomb);
                     }
                 }
@@ -354,47 +339,42 @@
             this.ctx.save();
             this.ctx.translate(cx, cy);
             this.ctx.scale(scale, scale);
-            
-            // 炸彈方塊變紅色
             this.ctx.fillStyle = bombTimer !== null ? '#e53935' : color;
-            
             this.ctx.beginPath();
             this.ctx.roundRect(-size/2, -size/2, size, size, 10);
             this.ctx.fill();
-            
-            // 高光
             this.ctx.fillStyle = 'rgba(255,255,255,0.2)';
             this.ctx.beginPath();
             this.ctx.arc(-size/4, -size/4, size/6, 0, Math.PI*2);
             this.ctx.fill();
 
-            // 繪製炸彈數字
             if(bombTimer !== null) {
                 this.ctx.fillStyle = 'white';
                 this.ctx.font = 'bold 40px Arial';
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
                 this.ctx.fillText(bombTimer, 0, 0);
-                
-                // 炸彈外圈閃爍
                 if(bombTimer <= 3) {
                     this.ctx.strokeStyle = `rgba(255,255,0,${Math.abs(Math.sin(Date.now()/100))})`;
                     this.ctx.lineWidth = 5;
                     this.ctx.strokeRect(-size/2, -size/2, size, size);
                 }
             }
-
             this.ctx.restore();
         }
 
         spawnShapes() {
             const container = document.getElementById('spawn-area');
             container.innerHTML = '';
+            // 根據模式選擇形狀庫
+            const pool = this.mode === 'hard' ? SHAPES_HARD : SHAPES_EASY;
+
             for(let i=0; i<3; i++) {
-                const shapeData = SHAPES[Math.floor(Math.random() * SHAPES.length)];
-                // 隨機賦予炸彈屬性 (如果分數夠高)
+                const shapeData = pool[Math.floor(Math.random() * pool.length)];
                 let shapeWithBomb = JSON.parse(JSON.stringify(shapeData));
-                if(this.score > 500 && Math.random() < 0.3) {
+                
+                // 只有地獄模式且分數>300才會有炸彈
+                if(this.mode === 'hard' && this.score > 300 && Math.random() < 0.3) {
                     shapeWithBomb.hasBomb = true;
                 }
                 this.createDraggableShape(shapeWithBomb, container);
@@ -408,7 +388,7 @@
             const ctx = el.getContext('2d');
             const rows = data.m.length;
             const cols = data.m[0].length;
-            const size = 12; // 預覽稍微縮小以適應複雜形狀
+            const size = 12;
             const offsetX = (80 - cols*size)/2;
             const offsetY = (80 - rows*size)/2;
             
@@ -502,14 +482,9 @@
                 this.place(shape, finalX, finalY);
                 this.currentShape.el.remove();
                 Sound.drop();
-                
-                // 檢查是否需要生成新方塊
                 if(document.getElementById('spawn-area').children.length === 0) {
                     setTimeout(() => this.spawnShapes(), 500);
                 }
-                
-                // 檢查是否遊戲結束 (沒地方放)
-                // 這裡簡化處理：如果炸彈爆炸會觸發 GameOver
             } else {
                 this.currentShape.el.classList.remove('dragging');
                 this.currentShape.el.style.position = '';
@@ -536,31 +511,23 @@
         }
 
         place(shape, x, y) {
-            // 1. 放置新方塊
             let bombPlaced = false;
             for(let r=0; r<shape.m.length; r++) {
                 for(let c=0; c<shape.m[0].length; c++) {
                     if(shape.m[r][c]) {
-                        // 如果這個形狀帶有炸彈，隨機選一個格子變成炸彈
                         let isBomb = false;
                         if(shape.hasBomb && !bombPlaced && Math.random() > 0.5) {
-                            isBomb = true;
-                            bombPlaced = true;
+                            isBomb = true; bombPlaced = true;
                         }
-                        // 確保至少有一個炸彈如果 flag 是 true
                         if(shape.hasBomb && !bombPlaced && r==shape.m.length-1 && c==shape.m[0].length-1) {
                             isBomb = true;
                         }
-
-                        this.grid[y+r][x+c] = {
-                            color: shape.color,
-                            bomb: isBomb ? 9 : null // 炸彈倒數 9 回合
-                        };
+                        this.grid[y+r][x+c] = { color: shape.color, bomb: isBomb ? 9 : null };
                     }
                 }
             }
 
-            // 2. 更新所有現存炸彈的倒數
+            // 炸彈倒數
             let gameOver = false;
             for(let r=0; r<this.gridSize; r++) {
                 for(let c=0; c<this.gridSize; c++) {
@@ -595,7 +562,6 @@
                 if(full) colsToClear.push(c);
             }
 
-            // 執行消除
             rowsToClear.forEach(r => {
                 for(let c=0; c<this.gridSize; c++) {
                     this.createParticles(c, r, this.grid[r][c].color);
@@ -626,18 +592,20 @@
             Sound.bomb();
             this.setKoalaEmotion('panic');
             document.getElementById('overlay').style.display = 'flex';
-            document.getElementById('final-score').innerText = `最終分數: ${this.score}\n(${reason})`;
+            document.getElementById('final-score').innerText = `最終分數: ${this.score}\n(${reason || '沒地方放了'})`;
             document.getElementById('final-score').style.display = 'block';
-            document.getElementById('start-btn').innerText = "再挑戰一次";
         }
 
         updateScore(points) {
             this.score += points;
             document.getElementById('score').innerText = this.score;
-            if(this.score > this.bestScore) {
-                this.bestScore = this.score;
-                localStorage.setItem('xr_puzzle_best', this.bestScore);
-                document.getElementById('best-score').innerText = this.bestScore;
+            
+            // 分開儲存不同模式的最高分
+            const key = `xr_puzzle_best_${this.mode}`;
+            const currentBest = parseInt(localStorage.getItem(key) || 0);
+            if(this.score > currentBest) {
+                localStorage.setItem(key, this.score);
+                document.getElementById('best-score').innerText = this.score;
             }
         }
 
@@ -689,7 +657,6 @@
     }
 
     const game = new BlockPuzzle();
-    document.getElementById('start-btn').addEventListener('click', () => game.start());
     document.body.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
 </script>
 </body>
