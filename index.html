@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>無尾熊拼圖：雙重模式版</title>
+    <title>無尾熊拼圖：全球連線版</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="theme-color" content="#558b2f">
     
@@ -77,13 +77,14 @@
             box-shadow: 0 4px 0 #f57f17; z-index: 100;
         }
         
-        #overlay, #rank-overlay {
+        #overlay, #rank-overlay, #name-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(85, 139, 47, 0.95); z-index: 2000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 0.3s;
         }
         #rank-overlay { background: rgba(0,0,0,0.85); display: none; }
+        #name-overlay { background: rgba(0,0,0,0.85); display: none; z-index: 3000; }
         
         .overlay-card {
             background: white; padding: 30px; border-radius: 30px;
@@ -105,8 +106,19 @@
         
         .rank-list { list-style: none; text-align: left; margin: 20px 0; max-height: 300px; overflow-y: auto; }
         .rank-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
-        .rank-item.me { background: #f1f8e9; color: #558b2f; font-weight: bold; border-radius: 10px; }
+        .rank-item:nth-child(1) { color: #fbc02d; font-weight: 900; font-size: 1.1em; }
+        .rank-item:nth-child(2) { color: #9e9e9e; font-weight: bold; }
+        .rank-item:nth-child(3) { color: #a1887f; font-weight: bold; }
+        
         .btn-close { background: #ccc; color: #555; border: none; padding: 10px 30px; border-radius: 20px; margin-top: 10px; }
+        
+        /* 輸入名字 */
+        input.name-input {
+            padding: 10px; border: 2px solid #aed581; border-radius: 10px;
+            font-size: 1.2rem; text-align: center; width: 80%; margin: 15px 0;
+            outline: none; font-family: 'Zen Maru Gothic';
+        }
+        .btn-submit { background: #4db6ac; color: white; border: none; padding: 10px 30px; border-radius: 20px; }
 
         .float-text {
             position: absolute; font-family: 'Fredoka'; font-weight: 900;
@@ -119,9 +131,9 @@
 </head>
 <body>
 
-<button class="rank-btn" onclick="showRank()">🏆 排行榜</button>
+<button class="rank-btn" onclick="Leaderboard.show()">🏆 排行榜</button>
 
-<!-- 遊戲開始/模式選擇遮罩 -->
+<!-- 遊戲開始/模式選擇 -->
 <div id="overlay">
     <div class="overlay-card">
         <h1 style="color: #558b2f; margin-bottom: 5px;">無尾熊拼圖</h1>
@@ -138,19 +150,29 @@
             </button>
             <button class="btn-mode btn-hard" onclick="game.start('hard')">
                 <i class="fas fa-fire"></i> 地獄模式
-                <div style="font-size: 0.7rem; opacity: 0.8;">炸彈倒數 · 變態方塊</div>
+                <div style="font-size: 0.7rem; opacity: 0.8;">炸彈倒數 · 全球排名</div>
             </button>
         </div>
     </div>
 </div>
 
-<!-- 排行榜遮罩 -->
+<!-- 排行榜 -->
 <div id="rank-overlay">
     <div class="overlay-card">
-        <h2>🏆 全球高手榜</h2>
-        <div style="font-size:0.8rem; color:#888; margin-bottom:10px;">(顯示地獄模式分數)</div>
+        <h2>🏆 真實全球榜 (地獄)</h2>
+        <div id="rank-loading" style="color:#888;">載入中...</div>
         <ul class="rank-list" id="rank-list"></ul>
-        <button class="btn-close" onclick="closeRank()">關閉</button>
+        <button class="btn-close" onclick="Leaderboard.close()">關閉</button>
+    </div>
+</div>
+
+<!-- 輸入名字 -->
+<div id="name-overlay">
+    <div class="overlay-card">
+        <h2>🎉 新紀錄！</h2>
+        <p>妳太厲害了！請輸入暱稱：</p>
+        <input type="text" id="player-name" class="name-input" placeholder="例如：瑄柔" maxlength="10">
+        <button class="btn-submit" onclick="Leaderboard.submit()">上傳成績</button>
     </div>
 </div>
 
@@ -188,7 +210,110 @@
 </div>
 
 <script>
-    /* 1. 音效系統 */
+    /* =================================================================
+       ⚠️ 設定區：請在此填入 Dreamlo.com 的代碼
+       1. 去 http://dreamlo.com/ 點擊按鈕
+       2. 複製 Private Code 貼到下方 privateKey
+       3. 複製 Public Code 貼到下方 publicKey
+    ================================================================= */
+    const DreamloConfig = {
+        privateKey: "", // 範例: "7s8d6f8s7d6f8s7d6f..." (上傳用)
+        publicKey:  "", // 範例: "5f5e5d5c..." (讀取用)
+    };
+
+    /* 1. 排行榜管理器 */
+    const Leaderboard = {
+        show: function() {
+            document.getElementById('rank-overlay').style.display = 'flex';
+            this.fetchScores();
+        },
+        close: function() {
+            document.getElementById('rank-overlay').style.display = 'none';
+        },
+        fetchScores: function() {
+            const list = document.getElementById('rank-list');
+            const loading = document.getElementById('rank-loading');
+            list.innerHTML = '';
+            loading.style.display = 'block';
+
+            if(!DreamloConfig.publicKey) {
+                loading.innerText = "尚未設定排行榜金鑰 (請看程式碼說明)";
+                return;
+            }
+
+            // 使用 Dreamlo API
+            const url = `https://www.dreamlo.com/lb/${DreamloConfig.publicKey}/json`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    loading.style.display = 'none';
+                    let scores = [];
+                    
+                    if (data.dreamlo && data.dreamlo.leaderboard && data.dreamlo.leaderboard.entry) {
+                        let entries = data.dreamlo.leaderboard.entry;
+                        // 如果只有一筆資料，API 會回傳物件而不是陣列，需轉換
+                        if (!Array.isArray(entries)) entries = [entries];
+                        scores = entries;
+                    }
+
+                    if(scores.length === 0) {
+                        list.innerHTML = '<li style="text-align:center;">目前還沒有人上榜，快來當第一名！</li>';
+                        return;
+                    }
+
+                    scores.forEach((entry, index) => {
+                        const li = document.createElement('li');
+                        li.className = 'rank-item';
+                        // 標記自己 (簡單判斷名字)
+                        const myName = localStorage.getItem('xr_player_name');
+                        if(entry.name === myName) li.style.background = '#f1f8e9';
+
+                        li.innerHTML = `
+                            <span style="width:30px;font-weight:bold;">#${index+1}</span>
+                            <span>${entry.name}</span>
+                            <span>${entry.score}</span>
+                        `;
+                        list.appendChild(li);
+                    });
+                })
+                .catch(err => {
+                    loading.innerText = "連線失敗，請檢查網路";
+                    console.error(err);
+                });
+        },
+        checkNewRecord: function(score) {
+            // 只有地獄模式才上傳
+            if(game.mode !== 'hard') return;
+            if(!DreamloConfig.privateKey) return;
+
+            // 顯示輸入名字視窗
+            this.tempScore = score;
+            document.getElementById('name-overlay').style.display = 'flex';
+            
+            // 預填上次的名字
+            const savedName = localStorage.getItem('xr_player_name');
+            if(savedName) document.getElementById('player-name').value = savedName;
+        },
+        submit: function() {
+            const nameInput = document.getElementById('player-name');
+            const name = nameInput.value.trim() || "無名無尾熊";
+            localStorage.setItem('xr_player_name', name); // 記住名字
+
+            const score = this.tempScore;
+            const url = `https://www.dreamlo.com/lb/${DreamloConfig.privateKey}/add/${encodeURIComponent(name)}/${score}`;
+
+            fetch(url)
+                .then(() => {
+                    alert('上傳成功！');
+                    document.getElementById('name-overlay').style.display = 'none';
+                    this.show(); // 顯示排行榜
+                })
+                .catch(err => alert('上傳失敗，請檢查網路'));
+        }
+    };
+
+    /* 2. 音效系統 */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const Sound = {
         play: (freq, type, dur, vol=0.1) => {
@@ -205,53 +330,19 @@
         bomb: () => Sound.play(100, 'sawtooth', 0.8, 0.3)
     };
 
-    /* 2. 方塊定義 (分簡單與困難) */
+    /* 3. 方塊定義 */
     const SHAPES_EASY = [
-        { m: [[1]], color: '#aed581' },
-        { m: [[1,1]], color: '#8bc34a' },
-        { m: [[1],[1]], color: '#8bc34a' },
-        { m: [[1,1,1]], color: '#689f38' },
-        { m: [[1],[1],[1]], color: '#689f38' },
-        { m: [[1,1],[1,1]], color: '#ffb74d' },
-        { m: [[1,1,1],[0,1,0]], color: '#4db6ac' },
-        { m: [[1,0],[1,0],[1,1]], color: '#ff8a65' },
-        { m: [[1,1,1,1]], color: '#558b2f' },
-        { m: [[1],[1],[1],[1]], color: '#558b2f' }
+        { m: [[1]], color: '#aed581' }, { m: [[1,1]], color: '#8bc34a' }, { m: [[1],[1]], color: '#8bc34a' },
+        { m: [[1,1,1]], color: '#689f38' }, { m: [[1],[1],[1]], color: '#689f38' }, { m: [[1,1],[1,1]], color: '#ffb74d' },
+        { m: [[1,1,1],[0,1,0]], color: '#4db6ac' }, { m: [[1,0],[1,0],[1,1]], color: '#ff8a65' },
+        { m: [[1,1,1,1]], color: '#558b2f' }, { m: [[1],[1],[1],[1]], color: '#558b2f' }
     ];
-
     const SHAPES_HARD = [
-        ...SHAPES_EASY, // 包含基礎方塊
-        { m: [[1,1,1],[1,0,1]], color: '#ba68c8' }, // U型
-        { m: [[1,0,0],[1,1,1],[0,0,1]], color: '#7986cb' }, // 閃電加長
-        { m: [[0,1,0],[1,1,1],[0,1,0]], color: '#4dd0e1' }, // 十字
-        { m: [[1,1,1],[1,1,1],[1,1,1]], color: '#90a4ae' }, // 3x3
-        { m: [[1,0,0,0,0],[1,1,1,1,1]], color: '#f06292' }  // 5格L
+        ...SHAPES_EASY,
+        { m: [[1,1,1],[1,0,1]], color: '#ba68c8' }, { m: [[1,0,0],[1,1,1],[0,0,1]], color: '#7986cb' },
+        { m: [[0,1,0],[1,1,1],[0,1,0]], color: '#4dd0e1' }, { m: [[1,1,1],[1,1,1],[1,1,1]], color: '#90a4ae' },
+        { m: [[1,0,0,0,0],[1,1,1,1,1]], color: '#f06292' }
     ];
-
-    /* 3. 假排名資料 */
-    const FAKE_PLAYERS = [
-        {name: "KoalaKing", score: 15200}, {name: "ForestMaster", score: 12800},
-        {name: "Eucalyptus", score: 9540}, {name: "LazyBear", score: 7200},
-        {name: "Bamboo", score: 5600}
-    ];
-
-    function showRank() {
-        const list = document.getElementById('rank-list');
-        list.innerHTML = '';
-        // 抓取地獄模式最高分來排名
-        const myBest = localStorage.getItem('xr_puzzle_best_hard') || 0;
-        let allPlayers = [...FAKE_PLAYERS, {name: "瑄柔 (妳)", score: parseInt(myBest), isMe: true}];
-        allPlayers.sort((a,b) => b.score - a.score);
-        
-        allPlayers.forEach((p, i) => {
-            const li = document.createElement('li');
-            li.className = `rank-item ${p.isMe ? 'me' : ''}`;
-            li.innerHTML = `<span style="width:30px;font-weight:bold;">#${i+1}</span><span>${p.name}</span><span>${p.score}</span>`;
-            list.appendChild(li);
-        });
-        document.getElementById('rank-overlay').style.display = 'flex';
-    }
-    function closeRank() { document.getElementById('rank-overlay').style.display = 'none'; }
 
     /* 4. 遊戲核心 */
     class BlockPuzzle {
@@ -261,14 +352,12 @@
             this.gridSize = 8;
             this.cellSize = this.canvas.width / this.gridSize;
             this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
-            
             this.score = 0;
-            this.mode = 'easy'; // 當前模式
+            this.mode = 'easy';
             this.particles = [];
             this.currentShape = null;
             this.ghostShape = null;
-            this.TOUCH_OFFSET = 100; // 手指偏移
-
+            this.TOUCH_OFFSET = 100;
             this.loop = this.loop.bind(this);
             requestAnimationFrame(this.loop);
         }
@@ -278,11 +367,8 @@
             this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
             this.score = 0;
             this.updateScore(0);
-            
-            // 讀取該模式的最高分
             const savedBest = localStorage.getItem(`xr_puzzle_best_${mode}`) || 0;
             document.getElementById('best-score').innerText = savedBest;
-
             document.getElementById('overlay').style.display = 'none';
             document.getElementById('final-score').style.display = 'none';
             this.spawnShapes();
@@ -335,7 +421,6 @@
             const size = this.cellSize - padding * 2;
             const cx = x * this.cellSize + this.cellSize/2;
             const cy = y * this.cellSize + this.cellSize/2;
-            
             this.ctx.save();
             this.ctx.translate(cx, cy);
             this.ctx.scale(scale, scale);
@@ -347,7 +432,6 @@
             this.ctx.beginPath();
             this.ctx.arc(-size/4, -size/4, size/6, 0, Math.PI*2);
             this.ctx.fill();
-
             if(bombTimer !== null) {
                 this.ctx.fillStyle = 'white';
                 this.ctx.font = 'bold 40px Arial';
@@ -366,14 +450,10 @@
         spawnShapes() {
             const container = document.getElementById('spawn-area');
             container.innerHTML = '';
-            // 根據模式選擇形狀庫
             const pool = this.mode === 'hard' ? SHAPES_HARD : SHAPES_EASY;
-
             for(let i=0; i<3; i++) {
                 const shapeData = pool[Math.floor(Math.random() * pool.length)];
                 let shapeWithBomb = JSON.parse(JSON.stringify(shapeData));
-                
-                // 只有地獄模式且分數>300才會有炸彈
                 if(this.mode === 'hard' && this.score > 300 && Math.random() < 0.3) {
                     shapeWithBomb.hasBomb = true;
                 }
@@ -391,7 +471,6 @@
             const size = 12;
             const offsetX = (80 - cols*size)/2;
             const offsetY = (80 - rows*size)/2;
-            
             ctx.fillStyle = data.hasBomb ? '#e53935' : data.color;
             for(let r=0; r<rows; r++) {
                 for(let c=0; c<cols; c++) {
@@ -402,15 +481,12 @@
                     }
                 }
             }
-
             const handleStart = (e) => {
-                e.preventDefault();
-                Sound.pickup();
+                e.preventDefault(); Sound.pickup();
                 el.classList.add('dragging');
                 this.currentShape = { el, data, startX: e.clientX || e.touches[0].clientX, startY: e.clientY || e.touches[0].clientY };
                 this.moveShape(e);
             };
-
             el.addEventListener('mousedown', handleStart);
             el.addEventListener('touchstart', handleStart);
             container.appendChild(el);
@@ -422,42 +498,34 @@
                 const cx = ev.clientX || ev.touches[0].clientX;
                 const cy = ev.clientY || ev.touches[0].clientY;
                 const el = this.currentShape.el;
-                
                 el.style.left = (cx - 40) + 'px';
                 el.style.top = (cy - 40 - this.TOUCH_OFFSET) + 'px';
-
                 const rect = this.canvas.getBoundingClientRect();
                 const x = (cx - rect.left) * (this.canvas.width / rect.width);
                 const y = (cy - this.TOUCH_OFFSET - rect.top) * (this.canvas.height / rect.height);
-                
                 const gx = Math.floor(x / this.cellSize);
                 const gy = Math.floor(y / this.cellSize);
-                
                 const shape = this.currentShape.data;
                 const rows = shape.m.length;
                 const cols = shape.m[0].length;
                 const finalX = gx - Math.floor(cols/2);
                 const finalY = gy - Math.floor(rows/2);
-
                 if(this.canPlace(shape.m, finalX, finalY)) {
                     this.ghostShape = { x: finalX, y: finalY, shape: shape };
                 } else {
                     this.ghostShape = null;
                 }
             };
-
             const end = (ev) => {
                 document.removeEventListener('mousemove', move);
                 document.removeEventListener('touchmove', move);
                 document.removeEventListener('mouseup', end);
                 document.removeEventListener('touchend', end);
-                
                 if(!this.currentShape) return;
                 const cx = ev.clientX || (ev.changedTouches ? ev.changedTouches[0].clientX : 0);
                 const cy = ev.clientY || (ev.changedTouches ? ev.changedTouches[0].clientY : 0);
                 this.tryPlaceShape(cx, cy);
             };
-
             document.addEventListener('mousemove', move);
             document.addEventListener('touchmove', move, {passive: false});
             document.addEventListener('mouseup', end);
@@ -471,20 +539,16 @@
             const y = (my - this.TOUCH_OFFSET - rect.top) * (this.canvas.height / rect.height);
             const gx = Math.floor(x / this.cellSize);
             const gy = Math.floor(y / this.cellSize);
-            
             const shape = this.currentShape.data;
             const rows = shape.m.length;
             const cols = shape.m[0].length;
             const finalX = gx - Math.floor(cols/2);
             const finalY = gy - Math.floor(rows/2);
-
             if(this.canPlace(shape.m, finalX, finalY)) {
                 this.place(shape, finalX, finalY);
                 this.currentShape.el.remove();
                 Sound.drop();
-                if(document.getElementById('spawn-area').children.length === 0) {
-                    setTimeout(() => this.spawnShapes(), 500);
-                }
+                if(document.getElementById('spawn-area').children.length === 0) setTimeout(() => this.spawnShapes(), 500);
             } else {
                 this.currentShape.el.classList.remove('dragging');
                 this.currentShape.el.style.position = '';
@@ -499,11 +563,8 @@
             for(let r=0; r<matrix.length; r++) {
                 for(let c=0; c<matrix[0].length; c++) {
                     if(matrix[r][c]) {
-                        const nx = x + c;
-                        const ny = y + r;
-                        if(nx < 0 || nx >= this.gridSize || ny < 0 || ny >= this.gridSize || this.grid[ny][nx] !== 0) {
-                            return false;
-                        }
+                        const nx = x + c; const ny = y + r;
+                        if(nx < 0 || nx >= this.gridSize || ny < 0 || ny >= this.gridSize || this.grid[ny][nx] !== 0) return false;
                     }
                 }
             }
@@ -516,18 +577,12 @@
                 for(let c=0; c<shape.m[0].length; c++) {
                     if(shape.m[r][c]) {
                         let isBomb = false;
-                        if(shape.hasBomb && !bombPlaced && Math.random() > 0.5) {
-                            isBomb = true; bombPlaced = true;
-                        }
-                        if(shape.hasBomb && !bombPlaced && r==shape.m.length-1 && c==shape.m[0].length-1) {
-                            isBomb = true;
-                        }
+                        if(shape.hasBomb && !bombPlaced && Math.random() > 0.5) { isBomb = true; bombPlaced = true; }
+                        if(shape.hasBomb && !bombPlaced && r==shape.m.length-1 && c==shape.m[0].length-1) isBomb = true;
                         this.grid[y+r][x+c] = { color: shape.color, bomb: isBomb ? 9 : null };
                     }
                 }
             }
-
-            // 炸彈倒數
             let gameOver = false;
             for(let r=0; r<this.gridSize; r++) {
                 for(let c=0; c<this.gridSize; c++) {
@@ -537,46 +592,20 @@
                     }
                 }
             }
-
-            if(gameOver) {
-                this.triggerGameOver("炸彈爆炸了！💥");
-                return;
-            }
-
+            if(gameOver) { this.triggerGameOver("炸彈爆炸了！💥"); return; }
             this.updateScore(10);
             this.checkLines();
         }
 
         checkLines() {
-            let rowsToClear = [];
-            let colsToClear = [];
-
-            for(let r=0; r<this.gridSize; r++) {
-                if(this.grid[r].every(cell => cell !== 0)) rowsToClear.push(r);
-            }
+            let rowsToClear = []; let colsToClear = [];
+            for(let r=0; r<this.gridSize; r++) if(this.grid[r].every(cell => cell !== 0)) rowsToClear.push(r);
             for(let c=0; c<this.gridSize; c++) {
-                let full = true;
-                for(let r=0; r<this.gridSize; r++) {
-                    if(this.grid[r][c] === 0) full = false;
-                }
+                let full = true; for(let r=0; r<this.gridSize; r++) if(this.grid[r][c] === 0) full = false;
                 if(full) colsToClear.push(c);
             }
-
-            rowsToClear.forEach(r => {
-                for(let c=0; c<this.gridSize; c++) {
-                    this.createParticles(c, r, this.grid[r][c].color);
-                    this.grid[r][c] = 0;
-                }
-            });
-            colsToClear.forEach(c => {
-                for(let r=0; r<this.gridSize; r++) {
-                    if(!rowsToClear.includes(r)) {
-                        this.createParticles(c, r, this.grid[r][c].color);
-                        this.grid[r][c] = 0;
-                    }
-                }
-            });
-
+            rowsToClear.forEach(r => { for(let c=0; c<this.gridSize; c++) { this.createParticles(c, r, this.grid[r][c].color); this.grid[r][c] = 0; } });
+            colsToClear.forEach(c => { for(let r=0; r<this.gridSize; r++) { if(!rowsToClear.includes(r)) { this.createParticles(c, r, this.grid[r][c].color); this.grid[r][c] = 0; } } });
             const totalLines = rowsToClear.length + colsToClear.length;
             if(totalLines > 0) {
                 Sound.clear(totalLines);
@@ -594,13 +623,13 @@
             document.getElementById('overlay').style.display = 'flex';
             document.getElementById('final-score').innerText = `最終分數: ${this.score}\n(${reason || '沒地方放了'})`;
             document.getElementById('final-score').style.display = 'block';
+            // 檢查是否破紀錄並上傳
+            Leaderboard.checkNewRecord(this.score);
         }
 
         updateScore(points) {
             this.score += points;
             document.getElementById('score').innerText = this.score;
-            
-            // 分開儲存不同模式的最高分
             const key = `xr_puzzle_best_${this.mode}`;
             const currentBest = parseInt(localStorage.getItem(key) || 0);
             if(this.score > currentBest) {
@@ -613,12 +642,7 @@
             const cx = gx * this.cellSize + this.cellSize/2;
             const cy = gy * this.cellSize + this.cellSize/2;
             for(let i=0; i<5; i++) {
-                this.particles.push({
-                    x: cx, y: cy,
-                    vx: (Math.random() - 0.5) * 10,
-                    vy: (Math.random() - 0.5) * 10,
-                    life: 1, color: color, size: Math.random() * 10 + 5
-                });
+                this.particles.push({ x: cx, y: cy, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10, life: 1, color: color, size: Math.random() * 10 + 5 });
             }
         }
 
@@ -626,33 +650,18 @@
             for(let i=this.particles.length-1; i>=0; i--) {
                 let p = this.particles[i];
                 p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.life -= 0.05;
-                if(p.life <= 0) {
-                    this.particles.splice(i, 1);
-                } else {
-                    this.ctx.globalAlpha = p.life;
-                    this.ctx.fillStyle = p.color;
-                    this.ctx.beginPath();
-                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-                    this.ctx.fill();
-                    this.ctx.globalAlpha = 1;
-                }
+                if(p.life <= 0) { this.particles.splice(i, 1); } else { this.ctx.globalAlpha = p.life; this.ctx.fillStyle = p.color; this.ctx.beginPath(); this.ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); this.ctx.fill(); this.ctx.globalAlpha = 1; }
             }
         }
 
         showFloatText(text) {
-            const el = document.createElement('div');
-            el.className = 'float-text';
-            el.innerText = text;
-            el.style.left = '50%'; el.style.top = '40%';
-            el.style.transform = 'translate(-50%, -50%)';
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 1000);
+            const el = document.createElement('div'); el.className = 'float-text'; el.innerText = text;
+            el.style.left = '50%'; el.style.top = '40%'; el.style.transform = 'translate(-50%, -50%)';
+            document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
         }
 
         setKoalaEmotion(state) {
-            const k = document.getElementById('koala-mascot');
-            k.className = '';
-            k.classList.add(`koala-${state}`);
+            const k = document.getElementById('koala-mascot'); k.className = ''; k.classList.add(`koala-${state}`);
         }
     }
 
