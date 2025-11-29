@@ -2,360 +2,420 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>瑄柔的專屬星球 · My Universe</title>
+    <title>瑄柔 × 2025 · The Galaxy Promise</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#090a0f">
     
-    <!-- 高級字體 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Cinzel:wght@400;700&family=Outfit:wght@300;600&display=swap" rel="stylesheet">
+    <!-- 引入特殊字體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Serif+TC:wght@400;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 
     <style>
         /* ===========================
-           CORE VARIABLES
+           1. 宇宙核心變數
         =========================== */
         :root {
-            --bg-deep: #0f0c29;
-            --bg-gradient: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
-            --glass: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --text-main: #ffffff;
-            --text-sub: #dcdcdc;
-            --accent: #ffd700; /* 金色，象徵金牛座與星光 */
-            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --bg-dark: #050505;
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-gold: #ffd700;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --blur: blur(20px);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+
         body {
-            font-family: 'Outfit', 'Noto Serif TC', sans-serif;
-            background: var(--bg-deep);
-            color: var(--text-main);
+            background: var(--bg-dark);
+            color: white;
+            font-family: 'Noto Serif TC', sans-serif;
             overflow-x: hidden;
             min-height: 100vh;
         }
 
         /* ===========================
-           BACKGROUND: STARRY NIGHT
+           2. 互動式星軌 Canvas
         =========================== */
-        #star-bg {
+        #canvas-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-gradient); z-index: -2;
+            z-index: -1; background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
         }
-        .star {
-            position: absolute; background: white; border-radius: 50%;
-            animation: twinkle var(--duration) ease-in-out infinite;
-            opacity: var(--opacity);
-        }
-        @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
 
         /* ===========================
-           WELCOME OVERLAY (MUSIC TRIGGER)
+           3. 載入與入場 (Glitch Effect)
         =========================== */
-        #welcome-overlay {
+        #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 99999;
+            background: #000; z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 1.2s ease;
+            transition: opacity 1s ease;
         }
-        .enter-btn {
-            margin-top: 30px; padding: 12px 40px;
-            background: transparent; border: 1px solid rgba(255,255,255,0.5);
-            color: white; letter-spacing: 3px; border-radius: 30px;
-            cursor: pointer; transition: 0.4s; font-family: 'Cinzel', serif;
+        .glitch-text {
+            font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold;
+            position: relative; color: white; letter-spacing: 5px;
         }
-        .enter-btn:hover { background: white; color: black; box-shadow: 0 0 25px rgba(255,255,255,0.6); }
+        .glitch-text::before, .glitch-text::after {
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+        .glitch-text::before { left: 2px; text-shadow: -1px 0 red; clip: rect(24px, 550px, 90px, 0); animation: glitch-anim 3s infinite linear alternate-reverse; }
+        .glitch-text::after { left: -2px; text-shadow: -1px 0 blue; clip: rect(85px, 550px, 140px, 0); animation: glitch-anim 2s infinite linear alternate-reverse; }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(14px, 9999px, 127px, 0); }
+            20% { clip: rect(80px, 9999px, 20px, 0); }
+            40% { clip: rect(30px, 9999px, 100px, 0); }
+            60% { clip: rect(90px, 9999px, 10px, 0); }
+            80% { clip: rect(10px, 9999px, 60px, 0); }
+            100% { clip: rect(50px, 9999px, 100px, 0); }
+        }
+
+        .start-btn {
+            margin-top: 40px; padding: 15px 50px;
+            background: transparent; border: 1px solid var(--neon-blue);
+            color: var(--neon-blue); font-family: 'Orbitron'; letter-spacing: 3px;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 0 10px var(--neon-blue);
+        }
+        .start-btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 30px var(--neon-blue); }
 
         /* ===========================
-           GLASSMORPHISM CARD
+           4. UI 組件 (Glassmorphism)
         =========================== */
-        section { max-width: 900px; margin: 0 auto; padding: 60px 20px; }
+        section { max-width: 800px; margin: 0 auto; padding: 80px 20px; position: relative; }
         
-        .glass-card {
-            background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
-            box-shadow: var(--shadow); text-align: center; position: relative; overflow: hidden;
-            transition: transform 0.3s ease;
+        .glass-panel {
+            background: var(--glass); backdrop-filter: var(--blur);
+            border: 1px solid var(--border); border-radius: 20px;
+            padding: 30px; margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative; overflow: hidden;
         }
-        .glass-card:hover { transform: translateY(-5px); }
-        
-        /* 金牛座裝飾 */
-        .taurus-icon {
-            font-size: 4rem; color: var(--accent); margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
-            animation: floatIcon 6s ease-in-out infinite;
+        /* 流光邊框特效 */
+        .glass-panel::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-pink), transparent);
+            animation: borderFlow 3s linear infinite;
         }
-        @keyframes floatIcon { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes borderFlow { 0% { left: -100%; } 100% { left: 100%; } }
 
-        /* ===========================
-           TIMERS & TEXT
-        =========================== */
-        .timer-display {
-            font-family: 'Cinzel', sans-serif; font-size: 1.8rem;
-            margin: 20px 0; color: var(--accent); letter-spacing: 2px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-        .timer-label { font-size: 0.9rem; color: var(--text-sub); letter-spacing: 1px; text-transform: uppercase; }
-        
-        .section-title {
-            font-family: 'Noto Serif TC', serif; font-size: 1.8rem; margin-bottom: 30px;
-            position: relative; display: inline-block;
-        }
-        .section-title::after {
-            content: ''; display: block; width: 40px; height: 2px;
-            background: var(--accent); margin: 10px auto 0;
+        .title {
+            font-family: 'Orbitron'; color: var(--neon-gold); font-size: 1.5rem;
+            margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px;
+            border-left: 4px solid var(--neon-pink); padding-left: 15px;
         }
 
         /* ===========================
-           PHOTO GRID
+           5. 黑膠唱片播放器
         =========================== */
-        .photo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
-        .photo-item {
-            border-radius: 12px; overflow: hidden; aspect-ratio: 3/4; position: relative; cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.2);
+        .vinyl-container {
+            position: relative; width: 200px; height: 200px; margin: 0 auto 30px;
         }
-        .photo-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .photo-item:hover img { transform: scale(1.1); }
+        .vinyl {
+            width: 100%; height: 100%; border-radius: 50%;
+            background: url('https://cdn.pixabay.com/photo/2018/03/04/11/23/record-3198066_1280.jpg') center/cover;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            animation: spinVinyl 5s linear infinite;
+            animation-play-state: paused; /* 預設暫停 */
+        }
+        .vinyl::after {
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 60px; background: url('photo6.jpg') center/cover; /* 中間放你們的照片 */
+            border-radius: 50%; border: 4px solid #111;
+        }
+        @keyframes spinVinyl { 100% { transform: rotate(360deg); } }
 
-        /* Music Control */
-        #music-control {
-            position: fixed; bottom: 20px; right: 20px; z-index: 100;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);
-            padding: 10px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3);
-            cursor: pointer; animation: spin 8s linear infinite;
-            animation-play-state: paused;
+        /* ===========================
+           6. 刮刮樂 (Scratch Card)
+        =========================== */
+        .scratch-container {
+            position: relative; width: 300px; height: 150px; margin: 0 auto;
+            border-radius: 10px; overflow: hidden; cursor: crosshair;
         }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .hidden-msg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; color: #333; display: flex; justify-content: center; align-items: center;
+            font-weight: bold; font-size: 1.2rem; text-align: center; padding: 10px;
+        }
+        canvas#scratch-canvas {
+            position: absolute; top: 0; left: 0; z-index: 2;
+        }
     </style>
 </head>
 <body>
 
-<!-- 1. 背景星空 -->
-<div id="star-bg"></div>
+<!-- 背景 Canvas -->
+<canvas id="canvas-bg"></canvas>
 
-<!-- 2. 入場畫面 -->
-<div id="welcome-overlay">
-    <div style="font-family: 'Cinzel'; font-size: 2rem; letter-spacing: 5px; color: white; text-shadow: 0 0 20px rgba(255,255,255,0.5);">XuanRou</div>
-    <div style="color: #aaa; margin-top: 10px; font-size: 0.9rem;">2025.10.07 · 00:53 AM</div>
-    <button class="enter-btn" onclick="enterUniverse()">ENTER</button>
+<!-- 入場畫面 -->
+<div id="loader">
+    <div class="glitch-text" data-text="XUANROU 2025">XUANROU 2025</div>
+    <div style="color: #888; margin-top: 10px; font-family: 'Orbitron';">SYSTEM INITIALIZING...</div>
+    <button class="start-btn" onclick="startSystem()">ACCESS GRANTED</button>
 </div>
-<!-- 導航 -->
-<nav style="position: fixed; top: 0; width: 100%; padding: 20px; text-align: center; z-index: 50; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);">
-    <span style="font-family:'Cinzel'; font-weight:bold; letter-spacing:2px;">XR × KL</span>
-</nav>
+<!-- 導航 (懸浮膠囊) -->
+<div style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 100; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 10px 30px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); display: flex; gap: 20px;">
+    <a href="#timer-sec" style="color: white; text-decoration: none;">⏳</a>
+    <a href="#music-sec" style="color: white; text-decoration: none;">🎵</a>
+    <a href="#scratch-sec" style="color: white; text-decoration: none;">🎁</a>
+    <a href="#letter-sec" style="color: white; text-decoration: none;">💌</a>
+</div>
 
-<!-- Hero: 在一起計時器 -->
-<section style="margin-top: 80px;">
-    <div class="glass-card">
-        <div class="timer-label">WE HAVE BEEN TOGETHER FOR</div>
-        <div id="love-timer" class="timer-display">計算中...</div>
-        <div style="font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-top: 10px;">
-            起始於 2025年10月7日 凌晨 00:53
-        </div>
-        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 25px 0;">
-        <p style="line-height: 1.8; font-size: 1.05rem;">
-            瑄柔，從那個凌晨開始，時間對我來說有了新的意義。<br>
-            每一秒鐘，都是屬於我們的。
-        </p>
-    </div>
-</section>
-
-<!-- Birthday: 金牛座生日倒數 -->
-<section>
-    <div class="glass-card" style="border-color: var(--accent);">
-        <div class="taurus-icon">♉</div>
-        <div class="section-title" style="color: var(--accent);">瑄柔生日倒數</div>
+<!-- 1. 計時器區塊 -->
+<section id="timer-sec" style="padding-top: 100px;">
+    <div class="glass-panel" style="text-align: center;">
+        <div class="title">MISSION: 2025.10.07</div>
         
-        <div style="margin-bottom: 20px;">
-            <span style="background: rgba(255,215,0,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; color: var(--accent); border: 1px solid var(--accent);">
-                2009.05.19 · 金牛座
-            </span>
+        <!-- 智慧判斷顯示文字 -->
+        <div id="timer-status" style="color: var(--neon-blue); margin-bottom: 10px; letter-spacing: 2px;">
+            TARGET LOCKED
         </div>
 
-        <div id="bday-timer" class="timer-display" style="font-size: 1.5rem;">
-            000 天 00 時 00 分 00 秒
+        <div id="main-timer" style="font-family: 'Orbitron'; font-size: 2rem; font-weight: bold; text-shadow: 0 0 20px var(--neon-blue);">
+            00 : 00 : 00 : 00
         </div>
-        <p style="font-size: 0.9rem; color: #ccc;">
-            這一天，是全宇宙最可愛的日子。
-        </p>
+        <div style="display: flex; justify-content: center; gap: 15px; font-size: 0.8rem; color: #aaa; margin-top: 5px;">
+            <span>DAYS</span><span>HOURS</span><span>MINS</span><span>SECS</span>
+        </div>
+
+        <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+            <div style="color: var(--neon-gold); font-size: 1.2rem;">♉ TAURUS ♉</div>
+            <div style="font-size: 0.9rem; color: #ddd;">2009.05.19</div>
+            <div id="bday-countdown" style="margin-top: 5px; font-family: 'Orbitron'; color: var(--neon-pink);">
+                Birthday Loading...
+            </div>
+        </div>
     </div>
 </section>
 
-<!-- Photos: 回憶 -->
-<section>
-    <div class="section-title">我們的瞬間</div>
-    <div class="photo-grid">
-        <!-- 替換圖片路徑，onerror 防止破圖 -->
-        <div class="photo-item"><img src="photo1.jpg" onerror="this.src='https://placehold.co/400x500/24243e/FFF?text=Love'"></div>
-        <div class="photo-item"><img src="photo2.jpg" onerror="this.src='https://placehold.co/400x500/24243e/FFF?text=Story'"></div>
-        <div class="photo-item"><img src="photo3.jpg" onerror="this.src='https://placehold.co/400x500/24243e/FFF?text=Memory'"></div>
-        <div class="photo-item"><img src="photo4.jpg" onerror="this.src='https://placehold.co/400x500/24243e/FFF?text=Future'"></div>
-    </div>
-</section>
-
-<!-- Interaction: 每日情話 -->
-<section style="margin-bottom: 80px;">
-    <div class="glass-card">
-        <div class="section-title">想對妳說</div>
-        <div id="daily-msg" style="font-size: 1.2rem; line-height: 1.6; min-height: 60px;">
-            點擊下方按鈕，聽聽我的心裡話。
+<!-- 2. 黑膠音樂播放器 -->
+<section id="music-sec">
+    <div class="glass-panel" style="text-align: center;">
+        <div class="title">SOUNDTRACK</div>
+        
+        <div class="vinyl-container">
+            <div class="vinyl" id="vinyl-disk"></div>
         </div>
-        <button onclick="newMsg()" style="margin-top: 20px; padding: 10px 25px; background: rgba(255,255,255,0.1); border: 1px solid white; color: white; border-radius: 20px; cursor: pointer; transition: 0.3s;">
-            換一句
-        </button>
+
+        <div style="font-size: 1.2rem; margin-bottom: 5px;">你知道你比晚霞好看嗎</div>
+        <div style="color: var(--neon-blue); font-size: 0.9rem;">Tr33</div>
+
+        <div style="margin-top: 20px; display: flex; justify-content: center; gap: 20px;">
+            <button onclick="controlMusic('play')" style="background: none; border: 1px solid white; color: white; width: 50px; height: 50px; border-radius: 50%; cursor: pointer;">▶</button>
+            <button onclick="controlMusic('pause')" style="background: none; border: 1px solid white; color: white; width: 50px; height: 50px; border-radius: 50%; cursor: pointer;">⏸</button>
+        </div>
+        
+        <!-- 隱藏音源 -->
+        <audio id="bg-music" loop>
+            <source src="你知道你比晚霞好看嗎 - Tr33 (youtube).mp3" type="audio/mpeg">
+        </audio>
     </div>
 </section>
 
-<!-- 音樂控制鈕 -->
-<div id="music-control" onclick="toggleMusic()">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-</div>
+<!-- 3. 刮刮樂驚喜 -->
+<section id="scratch-sec">
+    <div class="glass-panel" style="text-align: center;">
+        <div class="title">SECRET MESSAGE</div>
+        <p style="margin-bottom: 20px; font-size: 0.9rem; color: #ccc;">用手指或滑鼠刮開銀色區域...</p>
+        
+        <div class="scratch-container">
+            <div class="hidden-msg">
+                瑄柔，<br>妳是這宇宙裡<br>我唯一的引力。
+            </div>
+            <canvas id="scratch-canvas" width="300" height="150"></canvas>
+        </div>
+    </div>
+</section>
 
-<!-- 隱藏音源 -->
-<audio id="bg-music" loop>
-    <source src="你知道你比晚霞好看嗎 - Tr33 (youtube).mp3" type="audio/mpeg">
-</audio>
+<!-- 4. 打字機情書 -->
+<section id="letter-sec" style="margin-bottom: 100px;">
+    <div class="glass-panel">
+        <div class="title">LOG: 00:53 AM</div>
+        <div id="typewriter-text" style="font-family: 'Noto Serif TC'; line-height: 1.8; min-height: 150px; white-space: pre-wrap;"></div>
+        <span style="display: inline-block; width: 10px; height: 20px; background: var(--neon-blue); animation: blink 1s infinite;"></span>
+    </div>
+</section>
+<style>@keyframes blink{ 50% { opacity: 0; } }</style>
 <script>
     /* ===========================
-       1. 星空背景生成
+       1. 互動式星軌 Canvas (黑科技)
     =========================== */
-    function createStars() {
-        const bg = document.getElementById('star-bg');
-        const count = 100; // 星星數量
-        for(let i=0; i<count; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            const x = Math.random() * 100;
-            const y = Math.random() * 100;
-            const size = Math.random() * 2 + 1;
-            const duration = Math.random() * 3 + 2;
-            
-            star.style.left = x + '%';
-            star.style.top = y + '%';
-            star.style.width = size + 'px';
-            star.style.height = size + 'px';
-            star.style.setProperty('--duration', duration + 's');
-            star.style.setProperty('--opacity', Math.random());
-            
-            bg.appendChild(star);
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d');
+    let width, height, particles = [];
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = (Math.random() - 0.5) * 0.5;
+            this.vy = (Math.random() - 0.5) * 0.5;
+            this.size = Math.random() * 2;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < 0 || this.x > width) this.vx *= -1;
+            if (this.y < 0 || this.y > height) this.vy *= -1;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
+            ctx.fill();
         }
     }
-    createStars();
+
+    for (let i = 0; i < 60; i++) particles.push(new Particle());
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach((p, index) => {
+            p.update();
+            p.draw();
+            // 連線邏輯
+            for (let j = index + 1; j < particles.length; j++) {
+                const p2 = particles[j];
+                const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                if (dist < 150) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(255,255,255,${1 - dist/150})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                }
+            }
+        });
+        requestAnimationFrame(animate);
+    }
+    animate();
 
     /* ===========================
-       2. 音樂與入場控制
+       2. 系統啟動與音樂控制
     =========================== */
     const audio = document.getElementById('bg-music');
-    const musicBtn = document.getElementById('music-control');
-
-    function enterUniverse() {
-        const overlay = document.getElementById('welcome-overlay');
+    const vinyl = document.getElementById('vinyl-disk');
+    
+    function startSystem() {
+        const loader = document.getElementById('loader');
+        loader.style.opacity = 0;
+        setTimeout(() => loader.style.display = 'none', 1000);
         
-        // 播放音樂
-        audio.volume = 0.5;
-        audio.play().then(() => {
-            musicBtn.style.animationPlayState = 'running';
-        }).catch(e => console.log("Audio play failed", e));
-
-        // 淡出特效
-        overlay.style.opacity = 0;
-        setTimeout(() => {
-            overlay.style.display = 'none';
-        }, 1200);
+        // 嘗試播放
+        controlMusic('play');
+        // 啟動打字機
+        typeWriter();
     }
 
-    function toggleMusic() {
-        if(audio.paused) {
-            audio.play();
-            musicBtn.style.animationPlayState = 'running';
-            musicBtn.style.opacity = 1;
+    function controlMusic(action) {
+        if(action === 'play') {
+            audio.play().then(() => {
+                vinyl.style.animationPlayState = 'running';
+            }).catch(e => console.log("Wait for interaction"));
         } else {
             audio.pause();
-            musicBtn.style.animationPlayState = 'paused';
-            musicBtn.style.opacity = 0.5;
+            vinyl.style.animationPlayState = 'paused';
         }
     }
 
     /* ===========================
-       3. 在一起計時器 (2025/10/07 00:53)
+       3. 智慧計時器 (2025.10.07)
     =========================== */
-    function updateLoveTimer() {
-        // 設定精確時間：月份是 0-based (10月是 9)
-        const startDate = new Date(2025, 9, 7, 0, 53, 0); 
+    function updateTimers() {
+        const targetDate = new Date(2025, 9, 7, 0, 53, 0); // 10月是9
         const now = new Date();
+        let diff = targetDate - now;
+        const statusEl = document.getElementById('timer-status');
         
-        let diff = now - startDate;
-
-        // 如果現在時間還沒到 2025/10/07 (測試用，或未來網站)
-        // 為了顯示效果，如果 diff 是負數，我們顯示 "倒數計時中" 或取絕對值
-        // 這裡假設現在已經是未來，或者我們顯示 "距離那一天還有..."
-        let prefix = "";
-        if (diff < 0) {
+        // 判斷是倒數還是累計
+        if (diff > 0) {
+            statusEl.innerText = "距離 2025.10.07 還有";
+            statusEl.style.color = "var(--neon-blue)";
+        } else {
+            statusEl.innerText = "我們已經在一起";
+            statusEl.style.color = "var(--neon-pink)";
             diff = Math.abs(diff);
-            prefix = "距離在一起還有 ";
         }
 
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((diff / (1000 * 60)) % 60);
-        const seconds = Math.floor((diff / 1000) % 60);
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const m = Math.floor((diff / (1000 * 60)) % 60);
+        const s = Math.floor((diff / 1000) % 60);
 
-        document.getElementById('love-timer').innerHTML = 
-            `<div style="font-size:0.6em; margin-bottom:5px;">${prefix}</div>` +
-            `${days}天 ${hours}時 ${minutes}分 ${seconds}秒`;
-    }
-    setInterval(updateLoveTimer, 1000);
-    updateLoveTimer();
+        document.getElementById('main-timer').innerText = 
+            `${d} : ${h.toString().padStart(2,'0')} : ${m.toString().padStart(2,'0')} : ${s.toString().padStart(2,'0')}`;
 
-    /* ===========================
-       4. 生日倒數 (2009/05/19)
-    =========================== */
-    function updateBirthdayTimer() {
-        const now = new Date();
+        // 生日倒數 (5/19)
         const currentYear = now.getFullYear();
-        
-        // 設定今年生日 5月19日 (月份是 4)
-        let nextBday = new Date(currentYear, 4, 19, 0, 0, 0);
-        
-        // 如果今年生日已經過了，就算明年的
-        if (now > nextBday) {
-            nextBday.setFullYear(currentYear + 1);
-        }
-        
-        const diff = nextBday - now;
-        
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((diff / (1000 * 60)) % 60);
-        const seconds = Math.floor((diff / 1000) % 60);
-        
-        document.getElementById('bday-timer').innerText = 
-            `${days}天 ${hours}時 ${minutes}分 ${seconds}秒`;
+        let nextBday = new Date(currentYear, 4, 19);
+        if (now > nextBday) nextBday.setFullYear(currentYear + 1);
+        const bDiff = nextBday - now;
+        const bd = Math.floor(bDiff / (1000 * 60 * 60 * 24));
+        document.getElementById('bday-countdown').innerText = `還有 ${bd} 天`;
     }
-    setInterval(updateBirthdayTimer, 1000);
-    updateBirthdayTimer();
+    setInterval(updateTimers, 1000);
+    updateTimers();
 
     /* ===========================
-       5. 隨機情話
+       4. 刮刮樂邏輯
     =========================== */
-    const messages = [
-        "妳是我的凌晨 12:53，也是我的一生。",
-        "金牛座的妳或許固執，但我願意用一輩子去包容。",
-        "不管未來怎樣，2025/10/07 那一刻永遠暫停在我心裡。",
-        "妳不需要改變什麼，妳現在的樣子就是我最喜歡的樣子。",
-        "想牽著妳的手，從 2025 走到很久很久以後。"
-    ];
-    function newMsg() {
-        const el = document.getElementById('daily-msg');
-        el.style.opacity = 0;
-        setTimeout(() => {
-            el.innerText = messages[Math.floor(Math.random() * messages.length)];
-            el.style.opacity = 1;
-        }, 300);
-    }
-    // 初始化一句
-    newMsg();
+    const sCanvas = document.getElementById('scratch-canvas');
+    const sCtx = sCanvas.getContext('2d');
+    
+    // 填充銀色塗層
+    sCtx.fillStyle = '#C0C0C0';
+    sCtx.fillRect(0, 0, 300, 150);
+    sCtx.fillStyle = '#000';
+    sCtx.font = '20px Arial';
+    sCtx.fillText("刮開這裡", 110, 80);
 
+    let isDrawing = false;
+
+    function scratch(x, y) {
+        sCtx.globalCompositeOperation = 'destination-out';
+        sCtx.beginPath();
+        sCtx.arc(x, y, 20, 0, Math.PI * 2);
+        sCtx.fill();
+    }
+
+    sCanvas.addEventListener('mousedown', () => isDrawing = true);
+    sCanvas.addEventListener('mouseup', () => isDrawing = false);
+    sCanvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        const rect = sCanvas.getBoundingClientRect();
+        scratch(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    
+    // 手機觸控支援
+    sCanvas.addEventListener('touchstart', () => isDrawing = true);
+    sCanvas.addEventListener('touchend', () => isDrawing = false);
+    sCanvas.addEventListener('touchmove', (e) => {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const rect = sCanvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        scratch(touch.clientX - rect.left, touch.clientY - rect.top);
+    });
+
+    /* ===========================
+       5. 打字機特效
+    =========================== */
+    const letterText = `瑄柔，\n\n這是一個關於 2025 年的約定。\n\n雖然時間還在倒數，但我的心已經提前抵達了那天凌晨的 12:53。\n\n金牛座的妳，值得這世上所有的耐心與溫柔。\n\n我會在這裡，一直等妳。\n\n—— Koala`;
+    let charIndex = 0;
+    
+    function typeWriter() {
+        if (charIndex < letterText.length) {
+            document.getElementById("typewriter-text").innerHTML += letterText.charAt(charIndex) === '\n' ? '<br>' : letterText.charAt(charIndex);
+            charIndex++;
+            setTimeout(typeWriter, 100);
+        }
+    }
 </script>
 </body>
 </html>
