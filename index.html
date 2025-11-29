@@ -17,7 +17,6 @@
         :root {
             --bg-color: #f1f8e9;      /* 背景淺綠 */
             --board-bg: #dcedc8;      /* 棋盤底色 */
-            --grid-line: rgba(255,255,255,0.4);
             
             /* 方塊顏色 (牛油果色階) */
             --block-1: #aed581;       /* 淺綠 */
@@ -59,7 +58,7 @@
         .score-box {
             background: white; padding: 10px 20px; border-radius: 30px;
             box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center;
-            min-width: 120px;
+            min-width: 100px;
         }
         .score-label { font-size: 0.8rem; color: #888; font-weight: bold; }
         .score-val { font-size: 1.5rem; font-weight: 900; color: var(--text-main); font-family: 'Fredoka'; }
@@ -144,7 +143,7 @@
         .overlay-card {
             background: white; padding: 40px; border-radius: 30px;
             text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            max-width: 80%; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 85%; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
@@ -177,9 +176,10 @@
         <h1 style="color: #558b2f; margin-bottom: 10px;">無尾熊拼圖森林</h1>
         <p style="color: #666; margin-bottom: 20px;">瑄柔，準備好來場腦力激盪了嗎？</p>
         <div id="final-score" style="font-size: 2rem; font-weight: bold; color: #f57f17; display: none; margin-bottom: 20px;">0 分</div>
-        <button class="btn-start" onclick="game.start()">開始遊戲</button>
+        <button class="btn-start" id="start-btn">開始遊戲</button>
     </div>
 </div>
+
 <div id="game-wrapper">
     
     <!-- 頂部資訊 -->
@@ -192,21 +192,15 @@
         <!-- 無尾熊吉祥物 (SVG) -->
         <div id="koala-mascot" class="koala-normal">
             <svg viewBox="0 0 80 80">
-                <!-- Ears -->
                 <circle cx="15" cy="25" r="12" fill="#9e9e9e"/>
                 <circle cx="65" cy="25" r="12" fill="#9e9e9e"/>
                 <circle cx="15" cy="25" r="8" fill="#f5f5f5"/>
                 <circle cx="65" cy="25" r="8" fill="#f5f5f5"/>
-                <!-- Head -->
                 <ellipse cx="40" cy="40" rx="32" ry="28" fill="#9e9e9e"/>
-                <!-- Eyes -->
                 <circle cx="28" cy="35" r="3" fill="#333"/>
                 <circle cx="52" cy="35" r="3" fill="#333"/>
-                <!-- Nose -->
                 <ellipse cx="40" cy="42" rx="8" ry="10" fill="#424242"/>
-                <!-- Mouth (Controlled by CSS) -->
                 <path class="mouth" d="M35 55 Q40 60 45 55" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
-                <!-- Cheeks -->
                 <circle cx="20" cy="45" r="4" fill="rgba(255,100,100,0.3)"/>
                 <circle cx="60" cy="45" r="4" fill="rgba(255,100,100,0.3)"/>
             </svg>
@@ -224,16 +218,12 @@
     </div>
 
     <!-- 待選方塊區 -->
-    <div id="spawn-area">
-        <!-- 形狀會由 JS 動態生成 -->
-    </div>
+    <div id="spawn-area"></div>
 
 </div>
-
 <script>
     /* =========================================
-       AUDIO SYNTHESIZER (Web Audio API)
-       不需要外部檔案，程式碼即時合成音效
+       1. AUDIO SYNTHESIZER (音效合成)
     ========================================= */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
@@ -254,7 +244,6 @@
         pickup: () => Sound.playTone(400, 'sine', 0.1),
         drop: () => Sound.playTone(200, 'triangle', 0.1, 0.2),
         clear: (count) => {
-            // 消除音效：根據消除行數播放和弦
             const base = 440;
             for(let i=0; i<count; i++) {
                 setTimeout(() => {
@@ -264,50 +253,44 @@
         },
         gameover: () => {
             Sound.playTone(150, 'sawtooth', 0.5, 0.2);
-            setTimeout(() => Sound.playTone(100, 'sawtooth', 0.8, 0.2), 400);
         }
     };
 
     /* =========================================
-       SHAPE DEFINITIONS (方塊資料庫)
+       2. SHAPE DEFINITIONS (方塊形狀)
     ========================================= */
     const SHAPES = [
-        { m: [[1]], color: '#aed581' }, // 單點
-        { m: [[1,1]], color: '#8bc34a' }, // 2條
+        { m: [[1]], color: '#aed581' },
+        { m: [[1,1]], color: '#8bc34a' },
         { m: [[1],[1]], color: '#8bc34a' },
-        { m: [[1,1,1]], color: '#689f38' }, // 3條
+        { m: [[1,1,1]], color: '#689f38' },
         { m: [[1],[1],[1]], color: '#689f38' },
-        { m: [[1,1],[1,1]], color: '#ffb74d' }, // 田字
-        { m: [[1,1,1],[0,1,0]], color: '#4db6ac' }, // T型
+        { m: [[1,1],[1,1]], color: '#ffb74d' },
+        { m: [[1,1,1],[0,1,0]], color: '#4db6ac' },
         { m: [[0,1,0],[1,1,1]], color: '#4db6ac' },
-        { m: [[1,0],[1,1],[1,0]], color: '#4db6ac' },
-        { m: [[0,1],[1,1],[0,1]], color: '#4db6ac' },
-        { m: [[1,0],[1,0],[1,1]], color: '#ff8a65' }, // L型
-        { m: [[1,1,1,1]], color: '#558b2f' }, // 長條
+        { m: [[1,0],[1,0],[1,1]], color: '#ff8a65' },
+        { m: [[1,1,1,1]], color: '#558b2f' },
         { m: [[1],[1],[1],[1]], color: '#558b2f' },
-        { m: [[1,1,0],[0,1,1]], color: '#ba68c8' }, // Z型
-        { m: [[0,1,1],[1,1,0]], color: '#ba68c8' }
+        { m: [[1,1,0],[0,1,1]], color: '#ba68c8' }
     ];
-</script>
-<script>
+
     /* =========================================
-       GAME ENGINE
+       3. GAME ENGINE CLASS (遊戲核心)
     ========================================= */
     class BlockPuzzle {
         constructor() {
             this.canvas = document.getElementById('game-canvas');
             this.ctx = this.canvas.getContext('2d');
-            this.gridSize = 8; // 8x8 網格
+            this.gridSize = 8;
             this.cellSize = this.canvas.width / this.gridSize;
             this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
             this.score = 0;
             this.bestScore = localStorage.getItem('xr_puzzle_best') || 0;
             this.particles = [];
+            this.currentShape = null;
             
-            // 綁定 UI
             document.getElementById('best-score').innerText = this.bestScore;
             
-            // 啟動渲染迴圈
             this.loop = this.loop.bind(this);
             requestAnimationFrame(this.loop);
         }
@@ -320,22 +303,14 @@
             setTimeout(() => document.getElementById('overlay').style.display = 'none', 500);
             this.spawnShapes();
             this.setKoalaEmotion('normal');
+            Sound.pickup(); // Start sound
         }
 
-        // 渲染主迴圈
         loop() {
-            // 清空畫布
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            
-            // 繪製網格背景
             this.drawGrid();
-            
-            // 繪製已放置的方塊
             this.drawPlacedBlocks();
-            
-            // 繪製特效粒子
             this.updateParticles();
-
             requestAnimationFrame(this.loop);
         }
 
@@ -344,9 +319,7 @@
             this.ctx.lineWidth = 2;
             for(let i=0; i<=this.gridSize; i++) {
                 let pos = i * this.cellSize;
-                // 橫線
                 this.ctx.beginPath(); this.ctx.moveTo(0, pos); this.ctx.lineTo(800, pos); this.ctx.stroke();
-                // 直線
                 this.ctx.beginPath(); this.ctx.moveTo(pos, 0); this.ctx.lineTo(pos, 800); this.ctx.stroke();
             }
         }
@@ -370,23 +343,17 @@
             this.ctx.save();
             this.ctx.translate(cx, cy);
             this.ctx.scale(scale, scale);
-            
-            // 圓角方塊
             this.ctx.fillStyle = color;
             this.ctx.beginPath();
             this.ctx.roundRect(-size/2, -size/2, size, size, 10);
             this.ctx.fill();
-            
-            // 內部高光 (立體感)
             this.ctx.fillStyle = 'rgba(255,255,255,0.2)';
             this.ctx.beginPath();
             this.ctx.arc(-size/4, -size/4, size/6, 0, Math.PI*2);
             this.ctx.fill();
-
             this.ctx.restore();
         }
 
-        // 生成底部三個待選方塊
         spawnShapes() {
             const container = document.getElementById('spawn-area');
             container.innerHTML = '';
@@ -394,19 +361,16 @@
                 const shapeData = SHAPES[Math.floor(Math.random() * SHAPES.length)];
                 this.createDraggableShape(shapeData, container);
             }
-            this.checkGameOver();
         }
 
         createDraggableShape(data, container) {
             const el = document.createElement('canvas');
             el.width = 80; el.height = 80;
             el.className = 'shape-preview';
-            
-            // 繪製預覽圖
             const ctx = el.getContext('2d');
             const rows = data.m.length;
             const cols = data.m[0].length;
-            const size = 15; // 預覽方塊大小
+            const size = 15;
             const offsetX = (80 - cols*size)/2;
             const offsetY = (80 - rows*size)/2;
             
@@ -421,7 +385,6 @@
                 }
             }
 
-            // 拖曳邏輯
             const handleStart = (e) => {
                 e.preventDefault();
                 Sound.pickup();
@@ -440,12 +403,9 @@
                 if(!this.currentShape) return;
                 const cx = ev.clientX || ev.touches[0].clientX;
                 const cy = ev.clientY || ev.touches[0].clientY;
-                
                 const el = this.currentShape.el;
-                el.style.left = (cx - 40) + 'px'; // 40 is half of 80px width
+                el.style.left = (cx - 40) + 'px';
                 el.style.top = (cy - 40) + 'px';
-                
-                // 簡單的吸附預覽 (Ghost Piece) - 這裡簡化處理，直接判斷放置
             };
 
             const end = (ev) => {
@@ -455,10 +415,8 @@
                 document.removeEventListener('touchend', end);
                 
                 if(!this.currentShape) return;
-                
                 const cx = ev.clientX || (ev.changedTouches ? ev.changedTouches[0].clientX : 0);
                 const cy = ev.clientY || (ev.changedTouches ? ev.changedTouches[0].clientY : 0);
-                
                 this.tryPlaceShape(cx, cy);
             };
 
@@ -470,21 +428,14 @@
 
         tryPlaceShape(mx, my) {
             const rect = this.canvas.getBoundingClientRect();
-            // 校正座標
             const x = (mx - rect.left) * (this.canvas.width / rect.width);
             const y = (my - rect.top) * (this.canvas.height / rect.height);
-            
-            // 轉換為網格座標
             const gx = Math.floor(x / this.cellSize);
             const gy = Math.floor(y / this.cellSize);
             
-            // 修正：因為手指按的是方塊中心，我們要根據方塊形狀做偏移
-            // 這裡做一個簡單的中心對齊判定
             const shape = this.currentShape.data;
             const rows = shape.m.length;
             const cols = shape.m[0].length;
-            
-            // 嘗試放置的左上角座標
             const finalX = gx - Math.floor(cols/2);
             const finalY = gy - Math.floor(rows/2);
 
@@ -492,20 +443,14 @@
                 this.place(shape, finalX, finalY);
                 this.currentShape.el.remove();
                 Sound.drop();
-                
-                // 檢查是否這輪方塊都用完了
                 if(document.getElementById('spawn-area').children.length === 0) {
                     setTimeout(() => this.spawnShapes(), 500);
-                } else {
-                    this.checkGameOver();
                 }
             } else {
-                // 放回原處
                 this.currentShape.el.classList.remove('dragging');
                 this.currentShape.el.style.position = '';
                 this.currentShape.el.style.left = '';
                 this.currentShape.el.style.top = '';
-                this.currentShape.el.style.transform = '';
             }
             this.currentShape = null;
         }
@@ -516,7 +461,6 @@
                     if(matrix[r][c]) {
                         const nx = x + c;
                         const ny = y + r;
-                        // 邊界檢查 & 碰撞檢查
                         if(nx < 0 || nx >= this.gridSize || ny < 0 || ny >= this.gridSize || this.grid[ny][nx] !== 0) {
                             return false;
                         }
@@ -537,18 +481,14 @@
             this.updateScore(10);
             this.checkLines();
         }
-</script>
-<script>
+
         checkLines() {
-            let linesCleared = 0;
             let rowsToClear = [];
             let colsToClear = [];
 
-            // 檢查橫排
             for(let r=0; r<this.gridSize; r++) {
                 if(this.grid[r].every(cell => cell !== 0)) rowsToClear.push(r);
             }
-            // 檢查直排
             for(let c=0; c<this.gridSize; c++) {
                 let full = true;
                 for(let r=0; r<this.gridSize; r++) {
@@ -557,7 +497,6 @@
                 if(full) colsToClear.push(c);
             }
 
-            // 執行消除
             rowsToClear.forEach(r => {
                 for(let c=0; c<this.gridSize; c++) {
                     this.createParticles(c, r, this.grid[r][c]);
@@ -566,7 +505,6 @@
             });
             colsToClear.forEach(c => {
                 for(let r=0; r<this.gridSize; r++) {
-                    // 避免重複產生粒子
                     if(!rowsToClear.includes(r)) {
                         this.createParticles(c, r, this.grid[r][c]);
                         this.grid[r][c] = 0;
@@ -577,12 +515,9 @@
             const totalLines = rowsToClear.length + colsToClear.length;
             if(totalLines > 0) {
                 Sound.clear(totalLines);
-                // 分數計算：連擊加成
                 let points = totalLines * 100 * totalLines; 
                 this.updateScore(points);
                 this.showFloatText(totalLines > 1 ? `COMBO x${totalLines}!` : "Nice!");
-                
-                // 無尾熊反應
                 this.setKoalaEmotion('happy');
                 setTimeout(() => this.setKoalaEmotion('normal'), 2000);
             }
@@ -598,31 +533,15 @@
             }
         }
 
-        checkGameOver() {
-            // 檢查剩下的方塊是否還能放入
-            const shapes = document.getElementById('spawn-area').children;
-            if(shapes.length === 0) return;
-
-            // 這裡需要一個機制去獲取 DOM 對應的 shape data
-            // 為了簡化，我們假設如果無法放置任何一個，就結束
-            // (實際完整版應該遍歷每個剩餘方塊的每個可能位置)
-            // 這裡做一個簡單的延遲檢查，避免誤判
-        }
-
-        // --- 特效系統 ---
-
         createParticles(gx, gy, color) {
             const cx = gx * this.cellSize + this.cellSize/2;
             const cy = gy * this.cellSize + this.cellSize/2;
-            
             for(let i=0; i<5; i++) {
                 this.particles.push({
                     x: cx, y: cy,
                     vx: (Math.random() - 0.5) * 10,
                     vy: (Math.random() - 0.5) * 10,
-                    life: 1,
-                    color: color,
-                    size: Math.random() * 10 + 5
+                    life: 1, color: color, size: Math.random() * 10 + 5
                 });
             }
         }
@@ -630,11 +549,7 @@
         updateParticles() {
             for(let i=this.particles.length-1; i>=0; i--) {
                 let p = this.particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += 0.5; // 重力
-                p.life -= 0.05;
-                
+                p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.life -= 0.05;
                 if(p.life <= 0) {
                     this.particles.splice(i, 1);
                 } else {
@@ -652,8 +567,7 @@
             const el = document.createElement('div');
             el.className = 'float-text';
             el.innerText = text;
-            el.style.left = '50%';
-            el.style.top = '40%';
+            el.style.left = '50%'; el.style.top = '40%';
             el.style.transform = 'translate(-50%, -50%)';
             document.body.appendChild(el);
             setTimeout(() => el.remove(), 1000);
@@ -668,10 +582,14 @@
 
     // 初始化遊戲
     const game = new BlockPuzzle();
+    
+    // 綁定開始按鈕
+    document.getElementById('start-btn').addEventListener('click', () => {
+        game.start();
+    });
 
-    // 防止手機下拉刷新干擾遊戲
+    // 防止手機下拉刷新
     document.body.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
-
 </script>
 </body>
 </html>
