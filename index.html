@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>無尾熊許願池 🐨✨</title>
+    <title>無尾熊許願池 🐨🚀</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="theme-color" content="#ffcdd2">
     
@@ -26,6 +26,8 @@
             height: 100vh;
             display: flex; flex-direction: column;
             color: var(--text-main);
+            /* ⚠️ 關鍵修正：禁止瀏覽器原生手勢，解決拖曳延遲 */
+            touch-action: none; 
         }
 
         /* === 1. 頂部養成區 === */
@@ -132,11 +134,16 @@
             display: flex; justify-content: space-around; align-items: center; 
             margin-top: 5px;
         }
-        .shape-preview { width: 60px; height: 60px; }
-        .shape-preview.dragging { opacity: 0.8; z-index: 2000; position: fixed; transform: scale(1.2); pointer-events: none; }
+        .shape-preview { width: 60px; height: 60px; touch-action: none; } /* 確保方塊本身也不觸發原生手勢 */
+        .shape-preview.dragging { 
+            opacity: 0.9; z-index: 2000; position: fixed; 
+            transform: scale(1.1); pointer-events: none; 
+            /* 使用 will-change 優化效能 */
+            will-change: left, top;
+        }
 
         /* === 商店區 === */
-        #shop-wrapper { width: 100%; height: 100%; padding: 10px 20px; overflow-y: auto; }
+        #shop-wrapper { width: 100%; height: 100%; padding: 10px 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .wallet-card {
             background: linear-gradient(135deg, #ff80ab, #ff4081); color: white;
             padding: 15px; border-radius: 20px; margin-bottom: 15px;
@@ -398,7 +405,7 @@
             this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
             this.currentShape = null;
             this.ghostShape = null;
-            this.TOUCH_OFFSET = 80; // 縮短偏移量
+            this.TOUCH_OFFSET = 100; // 向上偏移量，讓手指不擋住方塊
             this.isGameOver = false;
             
             this.loop = this.loop.bind(this);
@@ -484,13 +491,19 @@
             container.appendChild(el);
         }
         
-        // 磁吸 + 縮短偏移
+        // 🚀 極速拖曳邏輯
         moveShape(e) {
             const move = (ev) => {
                 if(!this.currentShape) return;
-                const cx = ev.clientX || ev.touches[0].clientX; const cy = ev.clientY || ev.touches[0].clientY;
+                ev.preventDefault(); // 確保不觸發捲動
+
+                const cx = ev.clientX || ev.touches[0].clientX; 
+                const cy = ev.clientY || ev.touches[0].clientY;
                 const el = this.currentShape.el;
-                el.style.left = (cx - 30) + 'px'; el.style.top = (cy - 30 - this.TOUCH_OFFSET) + 'px';
+                
+                // 直接跟隨手指，並上移 TOUCH_OFFSET
+                el.style.left = (cx - 30) + 'px'; 
+                el.style.top = (cy - 30 - this.TOUCH_OFFSET) + 'px';
                 
                 const boardRect = this.canvas.getBoundingClientRect();
                 const elRect = el.getBoundingClientRect();
