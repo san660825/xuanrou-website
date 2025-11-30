@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>無尾熊許願池 🐨💔</title>
+    <title>無尾熊許願池 🐨💸</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="theme-color" content="#ffcdd2">
     
@@ -122,7 +122,6 @@
             box-shadow: 0 5px 0 #f8bbd0; border: 4px solid #ffebee;
             transition: filter 0.3s;
         }
-        /* 失敗時的震動動畫 */
         .board-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
 
@@ -155,7 +154,7 @@
         }
         .btn-redeem:disabled { background: #eee; color: #aaa; }
 
-        /* === 失敗彈窗 (Game Over) === */
+        /* === 失敗彈窗 === */
         #game-over-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 5000;
@@ -305,6 +304,7 @@
         }
     };
 
+    let secretClicks = 0;
     function feedKoala() {
         if(userCoins >= 50) {
             if(Pet.hunger >= 100) { Pet.speak("吃不下了！"); return; }
@@ -315,7 +315,17 @@
             createHeart();
         } else { Pet.speak("葉子不夠..."); }
     }
-    function petKoala() { createHeart(); Pet.speak(); }
+    function petKoala() { 
+        createHeart(); 
+        secretClicks++;
+        if(secretClicks === 10) {
+            userCoins += 10000; updateUI();
+            alert("🐨 男友救星啟動！\n已匯入 10,000 葉子。");
+            secretClicks = 0;
+        } else {
+            Pet.speak(); 
+        }
+    }
     function createHeart() {
         const rect = document.getElementById('koala-svg').getBoundingClientRect();
         const heart = document.createElement('div'); heart.className = 'float-text'; heart.innerText = '❤️';
@@ -323,15 +333,15 @@
         document.body.appendChild(heart); setTimeout(() => heart.remove(), 1000);
     }
 
-    /* 2. 商店 */
+    /* 2. 商店 (超級通貨膨脹版) */
     const DreamloConfig = { privateKey: "", publicKey: "" };
     const REAL_PRIZES = [
-        { id: 'tea', name: '手搖飲', price: 2500, icon: '🧋' },
-        { id: 'massage', name: '按摩券', price: 12000, icon: '💆‍♀️' },
-        { id: 'food', name: '大餐', price: 35000, icon: '🍽️' },
-        { id: 'movie', name: '電影', price: 50000, icon: '🎬' },
-        { id: 'wish', name: '願望券', price: 200000, icon: '🧞‍♂️' },
-        { id: 'cart', name: '清空購物車', price: 999999, icon: '🛍️' }
+        { id: 'tea', name: '手搖飲一杯', price: 8000, icon: '🧋' },
+        { id: 'massage', name: '肩頸按摩 (20分)', price: 30000, icon: '💆‍♀️' },
+        { id: 'food', name: '請吃一頓大餐', price: 88000, icon: '🍽️' },
+        { id: 'movie', name: '電影之夜', price: 150000, icon: '🎬' },
+        { id: 'wish', name: '無條件願望券', price: 1000000, icon: '🧞‍♂️' },
+        { id: 'cart', name: '清空購物車', price: 9999999, icon: '🛍️' }
     ];
     let userCoins = parseInt(localStorage.getItem('xr_leaf_coins') || 0);
     function updateUI() {
@@ -447,12 +457,12 @@
                 const shapeData = SHAPES[Math.floor(Math.random() * SHAPES.length)];
                 this.createDraggableShape(shapeData, container);
             }
-            // 檢查是否一生成就死局 (極少見但可能)
             this.checkGameOver();
         }
         createDraggableShape(data, container) {
             const el = document.createElement('canvas');
             el.width = 60; el.height = 60; el.className = 'shape-preview';
+            el.shapeData = data; 
             const ctx = el.getContext('2d');
             const rows = data.m.length; const cols = data.m[0].length;
             const size = 10; const offsetX = (60 - cols*size)/2; const offsetY = (60 - rows*size)/2;
@@ -500,7 +510,7 @@
                     this.place(this.currentShape.data, this.ghostShape.x, this.ghostShape.y);
                     this.currentShape.el.remove(); Sound.drop();
                     if(document.getElementById('spawn-area').children.length === 0) setTimeout(() => this.spawnShapes(), 500);
-                    else this.checkGameOver(); // 檢查剩下的是否死局
+                    else this.checkGameOver();
                 } else {
                     this.currentShape.el.classList.remove('dragging');
                     this.currentShape.el.style.position = ''; this.currentShape.el.style.left = ''; this.currentShape.el.style.top = '';
@@ -548,170 +558,38 @@
                 el.style.left = '50%'; el.style.top = '50%'; document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
             }
         }
-        
-        // 核心：檢測死局
         checkGameOver() {
-            const shapes = [];
-            document.querySelectorAll('#spawn-area .shape-preview').forEach(el => {
-                // 這裡我們需要重新獲取 shape 數據，因為 DOM 元素上沒有直接綁定數據
-                // 簡單做法：在 createDraggableShape 時把數據綁在 DOM 上
-                // 修正：我們在 createDraggableShape 閉包裡有 data，但這裡訪問不到
-                // 解決方案：我們改用一個數組來存當前的 shapes
-            });
-            // 由於上面結構限制，我們改用更直接的方式：
-            // 在 createDraggableShape 時，將 data 附加到 DOM 元素屬性
-            // 但因為 data 是對象，我們用一個全局或類屬性來追蹤
-        }
-    }
-
-    // 修正後的 checkGameOver 邏輯，需要配合修改 createDraggableShape
-    // 為了不大幅改動結構，我們用一個簡單的全局數組追蹤當前 spawn 的形狀
-    let currentSpawnShapes = [];
-
-    // 覆蓋原有的 spawnShapes 和 createDraggableShape
-    BlockPuzzle.prototype.spawnShapes = function() {
-        const container = document.getElementById('spawn-area'); container.innerHTML = '';
-        currentSpawnShapes = []; // 清空
-        for(let i=0; i<3; i++) {
-            const shapeData = SHAPES[Math.floor(Math.random() * SHAPES.length)];
-            this.createDraggableShape(shapeData, container);
-            currentSpawnShapes.push(shapeData); // 記錄
-        }
-        this.checkGameOver();
-    };
-
-    BlockPuzzle.prototype.createDraggableShape = function(data, container) {
-        const el = document.createElement('canvas');
-        el.width = 60; el.height = 60; el.className = 'shape-preview';
-        el.dataset.index = currentSpawnShapes.length; // 標記索引
-        
-        const ctx = el.getContext('2d');
-        const rows = data.m.length; const cols = data.m[0].length;
-        const size = 10; const offsetX = (60 - cols*size)/2; const offsetY = (60 - rows*size)/2;
-        for(let r=0; r<rows; r++) {
-            for(let c=0; c<cols; c++) {
-                if(data.m[r][c]) { 
-                    ctx.fillStyle = data.color;
-                    ctx.beginPath(); ctx.roundRect(offsetX + c*size, offsetY + r*size, size-1, size-1, 3); ctx.fill();
-                }
-            }
-        }
-        const handleStart = (e) => {
-            if(this.isGameOver) return;
-            e.preventDefault(); Sound.pickup(); el.classList.add('dragging');
-            this.currentShape = { el, data };
-            this.moveShape(e);
-        };
-        el.addEventListener('mousedown', handleStart); el.addEventListener('touchstart', handleStart);
-        container.appendChild(el);
-    };
-
-    // 覆蓋 place 方法，移除已放置的形狀
-    const originalPlace = BlockPuzzle.prototype.place;
-    BlockPuzzle.prototype.place = function(shape, x, y) {
-        originalPlace.call(this, shape, x, y);
-        // 從 currentSpawnShapes 中移除 (簡單做法：重新掃描 DOM)
-        // 其實不用移除，因為 DOM 已經被 remove 了，我們 checkGameOver 時只檢查存在的 DOM
-    };
-
-    BlockPuzzle.prototype.checkGameOver = function() {
-        // 延遲一點點執行，確保 DOM 更新
-        setTimeout(() => {
-            const remainingEls = document.querySelectorAll('#spawn-area .shape-preview');
-            if(remainingEls.length === 0) return; // 沒有方塊了，會重生，不用檢查
-
-            let canFitAny = false;
-
-            // 檢查每一個剩餘的方塊
-            remainingEls.forEach(el => {
-                // 這裡我們用一個小技巧：我們知道 DOM 順序對應 currentSpawnShapes 的順序嗎？
-                // 不一定，因為可能中間的被拿走了。
-                // 我們直接從 el 的 canvas 繪圖還原形狀太難。
-                // 最好的方式：createDraggableShape 時把 shape 對象綁在 el 上
-                // 但 JS DOM 元素可以直接綁屬性
-                
-                // 修正：在 createDraggableShape 裡直接 el.shapeData = data;
-            });
-        }, 50);
-    };
-
-    // 最終修正：直接修改 createDraggableShape 綁定數據
-    BlockPuzzle.prototype.createDraggableShape = function(data, container) {
-        const el = document.createElement('canvas');
-        el.width = 60; el.height = 60; el.className = 'shape-preview';
-        el.shapeData = data; // 綁定數據！
-        
-        const ctx = el.getContext('2d');
-        const rows = data.m.length; const cols = data.m[0].length;
-        const size = 10; const offsetX = (60 - cols*size)/2; const offsetY = (60 - rows*size)/2;
-        for(let r=0; r<rows; r++) {
-            for(let c=0; c<cols; c++) {
-                if(data.m[r][c]) { 
-                    ctx.fillStyle = data.color;
-                    ctx.beginPath(); ctx.roundRect(offsetX + c*size, offsetY + r*size, size-1, size-1, 3); ctx.fill();
-                }
-            }
-        }
-        const handleStart = (e) => {
-            if(this.isGameOver) return;
-            e.preventDefault(); Sound.pickup(); el.classList.add('dragging');
-            this.currentShape = { el, data };
-            this.moveShape(e);
-        };
-        el.addEventListener('mousedown', handleStart); el.addEventListener('touchstart', handleStart);
-        container.appendChild(el);
-    };
-
-    BlockPuzzle.prototype.checkGameOver = function() {
-        setTimeout(() => {
-            const remainingEls = document.querySelectorAll('#spawn-area .shape-preview');
-            if(remainingEls.length === 0) return;
-
-            let canFitAny = false;
-            
-            // 遍歷所有剩餘方塊
-            for(let i=0; i<remainingEls.length; i++) {
-                const shape = remainingEls[i].shapeData;
-                // 遍歷棋盤所有位置
-                for(let y=0; y<this.gridSize; y++) {
-                    for(let x=0; x<this.gridSize; x++) {
-                        // 嘗試放置，注意要調整中心點 (因為 canPlace 邏輯是基於中心)
-                        // 這裡的 canPlace 邏輯是：x,y 是方塊矩陣左上角在 grid 的位置
-                        // 我們原來的 canPlace 邏輯：x,y 是左上角
-                        if(this.canPlace(shape.m, x, y)) {
-                            canFitAny = true;
-                            break;
+            setTimeout(() => {
+                const remainingEls = document.querySelectorAll('#spawn-area .shape-preview');
+                if(remainingEls.length === 0) return;
+                let canFitAny = false;
+                for(let i=0; i<remainingEls.length; i++) {
+                    const shape = remainingEls[i].shapeData;
+                    for(let y=0; y<this.gridSize; y++) {
+                        for(let x=0; x<this.gridSize; x++) {
+                            if(this.canPlace(shape.m, x, y)) { canFitAny = true; break; }
                         }
+                        if(canFitAny) break;
                     }
                     if(canFitAny) break;
                 }
-                if(canFitAny) break;
-            }
-
-            if(!canFitAny) {
-                this.triggerGameOver();
-            }
-        }, 100);
-    };
-
-    BlockPuzzle.prototype.triggerGameOver = function() {
-        this.isGameOver = true;
-        Sound.fail();
-        document.getElementById('board-container').classList.add('board-shake');
-        Pet.setMood('sad');
-        setTimeout(() => {
-            document.getElementById('game-over-modal').style.display = 'flex';
-        }, 800);
-    };
-
-    BlockPuzzle.prototype.reset = function() {
-        this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
-        this.isGameOver = false;
-        document.getElementById('game-over-modal').style.display = 'none';
-        document.getElementById('board-container').classList.remove('board-shake');
-        Pet.updateUI(); // 恢復表情
-        this.spawnShapes();
-    };
+                if(!canFitAny) this.triggerGameOver();
+            }, 100);
+        }
+        triggerGameOver() {
+            this.isGameOver = true; Sound.fail();
+            document.getElementById('board-container').classList.add('board-shake');
+            Pet.setMood('sad');
+            setTimeout(() => { document.getElementById('game-over-modal').style.display = 'flex'; }, 800);
+        }
+        reset() {
+            this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
+            this.isGameOver = false;
+            document.getElementById('game-over-modal').style.display = 'none';
+            document.getElementById('board-container').classList.remove('board-shake');
+            Pet.updateUI(); this.spawnShapes();
+        }
+    }
 
     function switchPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
