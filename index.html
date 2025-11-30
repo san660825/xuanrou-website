@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>無尾熊許願池 🐨🧲</title>
+    <title>無尾熊許願池 🐨✨</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="theme-color" content="#ffcdd2">
     
@@ -398,7 +398,7 @@
             this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
             this.currentShape = null;
             this.ghostShape = null;
-            this.TOUCH_OFFSET = 150;
+            this.TOUCH_OFFSET = 80; // 縮短偏移量
             this.isGameOver = false;
             
             this.loop = this.loop.bind(this);
@@ -484,7 +484,7 @@
             container.appendChild(el);
         }
         
-        // 核心：磁吸感應邏輯
+        // 磁吸 + 縮短偏移
         moveShape(e) {
             const move = (ev) => {
                 if(!this.currentShape) return;
@@ -492,53 +492,38 @@
                 const el = this.currentShape.el;
                 el.style.left = (cx - 30) + 'px'; el.style.top = (cy - 30 - this.TOUCH_OFFSET) + 'px';
                 
-                // 1. 計算方塊的「視覺中心」相對於棋盤的位置
                 const boardRect = this.canvas.getBoundingClientRect();
                 const elRect = el.getBoundingClientRect();
                 
-                // 方塊中心點 (相對於棋盤左上角)
+                // 計算方塊中心相對於棋盤的位置
                 const relCenterX = (elRect.left + elRect.width/2) - boardRect.left;
                 const relCenterY = (elRect.top + elRect.height/2) - boardRect.top;
                 
-                // 粗略對應的格子中心
                 const centerGridX = Math.floor(relCenterX / this.cellSize);
                 const centerGridY = Math.floor(relCenterY / this.cellSize);
                 
-                // 2. 計算方塊矩陣的「左上角」應該在哪 (Pivot)
-                // 假設手指抓的是方塊的中心
                 const shape = this.currentShape.data;
                 const pivotX = centerGridX - Math.floor(shape.m[0].length / 2);
                 const pivotY = centerGridY - Math.floor(shape.m.length / 2);
                 
-                // 3. 磁吸搜尋：搜尋 Pivot 周圍 3x3 範圍，找最近的合法位置
-                let bestX = null;
-                let bestY = null;
-                let minDist = Infinity;
+                // 磁吸搜尋
+                let bestX = null; let bestY = null; let minDist = Infinity;
                 
                 for(let dy = -1; dy <= 1; dy++) {
                     for(let dx = -1; dx <= 1; dx++) {
-                        const tx = pivotX + dx;
-                        const ty = pivotY + dy;
+                        const tx = pivotX + dx; const ty = pivotY + dy;
                         if(this.canPlace(shape.m, tx, ty)) {
-                            // 計算距離 (曼哈頓距離簡單版)
                             const dist = Math.abs(dx) + Math.abs(dy);
-                            if(dist < minDist) {
-                                minDist = dist;
-                                bestX = tx;
-                                bestY = ty;
-                            }
+                            if(dist < minDist) { minDist = dist; bestX = tx; bestY = ty; }
                         }
                     }
                 }
                 
-                // 4. 更新 Ghost
                 if(bestX !== null) {
                     this.ghostShape = { x: bestX, y: bestY, shape: shape };
-                    this.currentShape.gx = bestX;
-                    this.currentShape.gy = bestY;
+                    this.currentShape.gx = bestX; this.currentShape.gy = bestY;
                 } else {
-                    this.ghostShape = null;
-                    this.currentShape.gx = null;
+                    this.ghostShape = null; this.currentShape.gx = null;
                 }
             };
             const end = (ev) => {
