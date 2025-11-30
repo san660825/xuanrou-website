@@ -2,27 +2,33 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>無尾熊許願池 🐨🌿</title>
+    <title>無尾熊許願池 🐨✨</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="theme-color" content="#558b2f">
+    <meta name="theme-color" content="#aed581">
     
+    <!-- 引入可愛圓體 -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Zen+Maru+Gothic:wght@500;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --bg-color: #f1f8e9;      /* 淺綠背景 */
-            --board-bg: #dcedc8;      /* 棋盤綠 */
-            --text-main: #33691e;     /* 深綠文字 */
-            --accent: #558b2f;        /* 主要按鈕綠 */
-            --accent-light: #8bc34a;  /* 亮綠 */
-            --price-color: #f57f17;   /* 金額橘色 */
+            --bg-color: #f1f8e9;
+            --dot-color: #dcedc8;
+            --board-bg: #fff;
+            --text-main: #558b2f;
+            --accent: #8bc34a;
+            --accent-shadow: #689f38;
+            --price-color: #ff8a65;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
 
         body {
             background-color: var(--bg-color);
+            /* 可愛波點背景 */
+            background-image: radial-gradient(var(--dot-color) 20%, transparent 20%);
+            background-position: 0 0;
+            background-size: 20px 20px;
             font-family: 'Zen Maru Gothic', sans-serif;
             overflow: hidden;
             height: 100vh;
@@ -30,19 +36,27 @@
             color: var(--text-main);
         }
 
-        /* === 底部導航列 === */
+        /* === 底部導航列 (漂浮雲朵感) === */
         .nav-bar {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: white; padding: 10px 30px; border-radius: 40px;
-            display: flex; gap: 40px; box-shadow: 0 10px 30px rgba(51, 105, 30, 0.15);
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 10px 30px; border-radius: 50px;
+            display: flex; gap: 40px; 
+            box-shadow: 0 10px 25px rgba(85, 139, 47, 0.2);
+            border: 2px solid #fff;
             z-index: 1000;
+            backdrop-filter: blur(5px);
         }
         .nav-item {
-            font-size: 1.5rem; color: #ccc; cursor: pointer; transition: 0.3s;
-            width: 50px; height: 50px; display: flex; justify-content: center; align-items: center;
+            font-size: 1.6rem; color: #dcedc8; cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 55px; height: 55px; display: flex; justify-content: center; align-items: center;
             border-radius: 50%;
         }
-        .nav-item.active { background: var(--accent-light); color: white; transform: translateY(-10px); box-shadow: 0 5px 15px rgba(139, 195, 74, 0.4); }
+        .nav-item.active { 
+            background: var(--accent); color: white; 
+            transform: translateY(-15px) scale(1.1); 
+            box-shadow: 0 5px 0 var(--accent-shadow);
+        }
 
         /* === 頁面容器 === */
         .page {
@@ -54,59 +68,80 @@
 
         /* === 遊戲頁面 === */
         #game-wrapper {
-            width: 100%; max-width: 500px; height: 100%; padding: 20px 20px 100px 20px;
+            width: 100%; max-width: 500px; height: 100%; padding: 20px 20px 110px 20px;
             display: flex; flex-direction: column; justify-content: space-between;
         }
         header { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        
         .score-box {
-            background: white; padding: 8px 15px; border-radius: 20px;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.05); text-align: center; min-width: 80px;
+            background: white; padding: 8px 20px; border-radius: 25px;
+            box-shadow: 0 4px 0 #e0e0e0; text-align: center; min-width: 90px;
+            border: 2px solid #fff;
         }
-        .score-val { font-size: 1.2rem; font-weight: 900; font-family: 'Fredoka'; color: var(--price-color); }
+        .score-val { font-size: 1.3rem; font-weight: 900; font-family: 'Fredoka'; color: var(--price-color); letter-spacing: 1px; }
         
+        /* 棋盤變成像相框一樣 */
         #board-container {
-            width: 100%; aspect-ratio: 1/1; background: var(--board-bg);
-            border-radius: 16px; padding: 10px; box-shadow: inset 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%; aspect-ratio: 1/1; 
+            background: #fff;
+            border-radius: 24px; padding: 12px; 
+            box-shadow: 0 8px 0 #c5e1a5, 0 15px 20px rgba(0,0,0,0.1);
+            border: 4px solid #f1f8e9;
         }
-        canvas#game-canvas { width: 100%; height: 100%; border-radius: 8px; display: block; }
-        #spawn-area { width: 100%; height: 120px; display: flex; justify-content: space-around; align-items: center; }
+        canvas#game-canvas { width: 100%; height: 100%; border-radius: 16px; display: block; }
+        #spawn-area { width: 100%; height: 130px; display: flex; justify-content: space-around; align-items: center; }
         
-        .shape-preview { width: 70px; height: 70px; transition: transform 0.1s; }
+        .shape-preview { width: 75px; height: 75px; transition: transform 0.1s; filter: drop-shadow(0 4px 0 rgba(0,0,0,0.1)); }
         .shape-preview.dragging { opacity: 0.9; z-index: 2000; position: fixed; transform: scale(1.2); pointer-events: none; }
 
         /* === 兌換商店頁面 === */
         #shop-wrapper {
-            width: 100%; max-width: 500px; height: 100%; padding: 60px 20px 100px 20px;
+            width: 100%; max-width: 500px; height: 100%; padding: 60px 20px 120px 20px;
             display: flex; flex-direction: column; align-items: center;
             overflow-y: auto;
         }
         
         .wallet-card {
-            background: linear-gradient(135deg, #689f38, #33691e); /* 森林漸層 */
-            color: white; width: 100%; padding: 20px; border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(51, 105, 30, 0.2); margin-bottom: 20px;
+            background: linear-gradient(135deg, #aed581, #7cb342);
+            color: white; width: 100%; padding: 25px; border-radius: 30px;
+            box-shadow: 0 10px 20px rgba(124, 179, 66, 0.3); margin-bottom: 25px;
             display: flex; justify-content: space-between; align-items: center;
+            border: 3px solid rgba(255,255,255,0.3);
+            position: relative; overflow: hidden;
         }
-        .coin-display { font-size: 2rem; font-weight: 900; font-family: 'Fredoka'; }
+        /* 錢包卡片上的裝飾光 */
+        .wallet-card::after {
+            content: ''; position: absolute; top: -50%; right: -50%; width: 200px; height: 200px;
+            background: rgba(255,255,255,0.1); border-radius: 50%;
+        }
+        .coin-display { font-size: 2.2rem; font-weight: 900; font-family: 'Fredoka'; text-shadow: 0 2px 0 rgba(0,0,0,0.1); }
         
-        .shop-list { width: 100%; display: flex; flex-direction: column; gap: 15px; }
+        .shop-list { width: 100%; display: flex; flex-direction: column; gap: 18px; }
         
         .coupon-item {
-            background: white; border-radius: 15px; padding: 15px;
+            background: white; border-radius: 25px; padding: 15px 20px;
             display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.2s;
-            border: 2px solid transparent;
+            box-shadow: 0 4px 0 #eceff1, 0 8px 15px rgba(0,0,0,0.05); 
+            transition: 0.1s; border: 2px solid #fff;
         }
-        .coupon-item:active { transform: scale(0.98); }
-        .coupon-icon { font-size: 2.5rem; margin-right: 15px; width: 50px; text-align: center; }
+        .coupon-item:active { transform: translateY(4px); box-shadow: 0 0 0 #eceff1; }
+        
+        .coupon-icon { font-size: 2.8rem; margin-right: 15px; width: 60px; text-align: center; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.1)); }
         .coupon-info { flex: 1; }
-        .coupon-name { font-weight: bold; font-size: 1.1rem; color: var(--text-main); }
-        .coupon-price { color: var(--price-color); font-weight: bold; font-size: 0.9rem; margin-top: 5px; }
-        .btn-redeem {
-            background: var(--accent); color: white; border: none; padding: 8px 15px;
-            border-radius: 20px; font-weight: bold; cursor: pointer;
+        .coupon-name { font-weight: bold; font-size: 1.1rem; color: var(--text-main); margin-bottom: 4px; }
+        .coupon-price { 
+            color: white; background: var(--price-color); 
+            display: inline-block; padding: 3px 10px; border-radius: 15px;
+            font-weight: bold; font-size: 0.85rem; font-family: 'Fredoka';
         }
-        .btn-redeem:disabled { background: #ccc; }
+        
+        .btn-redeem {
+            background: var(--accent); color: white; border: none; padding: 10px 20px;
+            border-radius: 25px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 0 var(--accent-shadow); transition: 0.1s;
+        }
+        .btn-redeem:active { transform: translateY(4px); box-shadow: none; }
+        .btn-redeem:disabled { background: #e0e0e0; box-shadow: none; color: #999; cursor: not-allowed; transform: none; }
 
         /* === 隱藏的後台按鈕 === */
         #secret-btn {
@@ -117,17 +152,18 @@
         /* === 彈窗 === */
         #overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 4000;
+            background: rgba(85, 139, 47, 0.8); z-index: 4000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            display: none;
+            display: none; backdrop-filter: blur(5px);
         }
         .overlay-card {
-            background: white; padding: 30px; border-radius: 20px; width: 85%; max-width: 400px;
+            background: white; padding: 30px; border-radius: 30px; width: 85%; max-width: 400px;
             text-align: center; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
         .log-list { list-style: none; text-align: left; margin-top: 15px; }
         .log-item { 
-            border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between;
+            border-bottom: 1px dashed #eee; padding: 12px 0; display: flex; justify-content: space-between;
             font-size: 0.9rem;
         }
 
@@ -139,12 +175,16 @@
             animation: floatUp 1s forwards;
         }
         @keyframes floatUp { 0% { transform:translateY(0) scale(0.5); opacity:0; } 50% { transform:translateY(-50px) scale(1.2); opacity:1; } 100% { transform:translateY(-80px) scale(1); opacity:0; } }
+        
+        /* 標題動畫 */
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        #title-trigger { animation: bounce 2s infinite ease-in-out; }
     </style>
 </head>
 <body>
 
 <!-- 隱藏後台按鈕 -->
-<div id="secret-btn" onclick="Admin.showLogs()">⚙️</div>
+<div id="secret-btn" onclick="Admin.showLogs()">❤️</div>
 
 <!-- 導航 -->
 <div class="nav-bar">
@@ -161,9 +201,11 @@
     <div id="game-wrapper">
         <header>
             <!-- 秘密點擊區域：標題 -->
-            <div id="title-trigger" style="font-weight:bold; color:var(--text-main); font-size:1.2rem; cursor:pointer;">無尾熊許願池 🐨</div>
+            <div id="title-trigger" style="font-weight:900; color:var(--text-main); font-size:1.4rem; cursor:pointer; letter-spacing:1px;">
+                <i class="fas fa-koala"></i> 無尾熊許願池
+            </div>
             <div class="score-box">
-                <div style="font-size:0.7rem; color:#888;">葉子</div>
+                <div style="font-size:0.7rem; color:#888; font-weight:bold;">LEAVES</div>
                 <div class="score-val" id="game-coins">0</div>
             </div>
         </header>
@@ -180,13 +222,15 @@
     <div id="shop-wrapper">
         <div class="wallet-card">
             <div>
-                <div style="font-size:0.8rem; opacity:0.8;">目前持有葉子</div>
+                <div style="font-size:0.9rem; opacity:0.9; font-weight:bold;">我的葉子錢包</div>
                 <div class="coin-display" id="total-coins">0</div>
             </div>
-            <i class="fas fa-leaf" style="font-size:3rem; opacity:0.5;"></i>
+            <i class="fas fa-leaf" style="font-size:3.5rem; opacity:0.8; transform: rotate(15deg);"></i>
         </div>
 
-        <h3 style="margin-bottom:15px; color:var(--text-main); align-self:flex-start;">🌿 兌換妳的願望</h3>
+        <h3 style="margin-bottom:15px; color:var(--text-main); align-self:flex-start; font-weight:900;">
+            <i class="fas fa-star" style="color:#fdd835;"></i> 兌換妳的願望
+        </h3>
         <div class="shop-list" id="shop-container"></div>
     </div>
 </div>
@@ -194,10 +238,10 @@
 <!-- 後台彈窗 -->
 <div id="overlay">
     <div class="overlay-card">
-        <h3>📋 兌換紀錄 (後台)</h3>
-        <div id="loading-text">載入中...</div>
+        <h3 style="color:var(--text-main);">📋 兌換紀錄 (後台)</h3>
+        <div id="loading-text" style="margin:20px 0; color:#888;">載入中...</div>
         <ul class="log-list" id="log-list"></ul>
-        <button onclick="Admin.close()" style="margin-top:20px; padding:10px 30px; border:none; background:#ccc; border-radius:20px;">關閉</button>
+        <button onclick="Admin.close()" style="margin-top:20px; padding:12px 40px; border:none; background:#f1f8e9; color:var(--text-main); font-weight:bold; border-radius:30px; cursor:pointer;">關閉</button>
     </div>
 </div>
 
@@ -340,7 +384,7 @@
         clear: (n) => { for(let i=0;i<n;i++) setTimeout(()=>Sound.play(440*(1+i*0.5),'sine',0.3), i*50); }
     };
 
-    // 恢復成森林色系方塊
+    // 果凍色系方塊
     const SHAPES = [
         { m: [[1]], color: '#aed581' }, { m: [[1,1]], color: '#8bc34a' }, { m: [[1],[1]], color: '#8bc34a' },
         { m: [[1,1,1]], color: '#689f38' }, { m: [[1],[1],[1]], color: '#689f38' }, { m: [[1,1],[1,1]], color: '#ffb74d' },
@@ -372,7 +416,8 @@
             requestAnimationFrame(this.loop);
         }
         drawGrid() {
-            this.ctx.strokeStyle = 'rgba(255,255,255,0.5)'; this.ctx.lineWidth = 2;
+            // 畫出淡淡的網格
+            this.ctx.strokeStyle = '#f1f8e9'; this.ctx.lineWidth = 2;
             for(let i=0; i<=this.gridSize; i++) {
                 let pos = i * this.cellSize;
                 this.ctx.beginPath(); this.ctx.moveTo(0, pos); this.ctx.lineTo(800, pos); this.ctx.stroke();
@@ -381,7 +426,7 @@
         }
         drawGhost() {
             const { x, y, shape } = this.ghostShape;
-            this.ctx.save(); this.ctx.globalAlpha = 0.4;
+            this.ctx.save(); this.ctx.globalAlpha = 0.3;
             for(let r=0; r<shape.m.length; r++) {
                 for(let c=0; c<shape.m[0].length; c++) {
                     if(shape.m[r][c]) this.drawCell(x + c, y + r, shape.color); 
@@ -396,14 +441,34 @@
                 }
             }
         }
+        // 繪製果凍方塊 (Jelly Effect)
         drawCell(x, y, color) {
-            const padding = 4; const size = this.cellSize - padding * 2;
-            const cx = x * this.cellSize + this.cellSize/2; const cy = y * this.cellSize + this.cellSize/2;
-            this.ctx.save(); this.ctx.translate(cx, cy);
+            const padding = 3; 
+            const size = this.cellSize - padding * 2;
+            const cx = x * this.cellSize + this.cellSize/2; 
+            const cy = y * this.cellSize + this.cellSize/2;
+            
+            this.ctx.save(); 
+            this.ctx.translate(cx, cy);
+            
+            // 1. 主體
             this.ctx.fillStyle = color;
-            this.ctx.beginPath(); this.ctx.roundRect(-size/2, -size/2, size, size, 10); this.ctx.fill();
-            this.ctx.fillStyle = 'rgba(255,255,255,0.3)';
-            this.ctx.beginPath(); this.ctx.arc(-size/4, -size/4, size/6, 0, Math.PI*2); this.ctx.fill();
+            this.ctx.beginPath(); 
+            this.ctx.roundRect(-size/2, -size/2, size, size, 12); // 更圓的角
+            this.ctx.fill();
+            
+            // 2. 內部高光 (讓它看起來凸凸的)
+            this.ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            this.ctx.beginPath();
+            this.ctx.ellipse(0, -size/4, size/2.5, size/5, 0, 0, Math.PI*2);
+            this.ctx.fill();
+
+            // 3. 左上角亮點 (反光)
+            this.ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            this.ctx.beginPath();
+            this.ctx.arc(-size/3.5, -size/3.5, size/10, 0, Math.PI*2);
+            this.ctx.fill();
+            
             this.ctx.restore();
         }
         spawnShapes() {
@@ -416,14 +481,24 @@
         }
         createDraggableShape(data, container) {
             const el = document.createElement('canvas');
-            el.width = 70; el.height = 70; el.className = 'shape-preview';
+            el.width = 75; el.height = 75; el.className = 'shape-preview';
             const ctx = el.getContext('2d');
             const rows = data.m.length; const cols = data.m[0].length;
-            const size = 12; const offsetX = (70 - cols*size)/2; const offsetY = (70 - rows*size)/2;
-            ctx.fillStyle = data.color;
+            const size = 13; const offsetX = (75 - cols*size)/2; const offsetY = (75 - rows*size)/2;
+            
             for(let r=0; r<rows; r++) {
                 for(let c=0; c<cols; c++) {
-                    if(data.m[r][c]) { ctx.beginPath(); ctx.roundRect(offsetX + c*size, offsetY + r*size, size-2, size-2, 3); ctx.fill(); }
+                    if(data.m[r][c]) { 
+                        // 預覽時也要畫果凍
+                        const cx = offsetX + c*size + size/2;
+                        const cy = offsetY + r*size + size/2;
+                        ctx.save(); ctx.translate(cx, cy);
+                        ctx.fillStyle = data.color;
+                        ctx.beginPath(); ctx.roundRect(-size/2+1, -size/2+1, size-2, size-2, 4); ctx.fill();
+                        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                        ctx.beginPath(); ctx.arc(-size/4, -size/4, size/6, 0, Math.PI*2); ctx.fill();
+                        ctx.restore();
+                    }
                 }
             }
             const handleStart = (e) => {
@@ -439,7 +514,7 @@
                 if(!this.currentShape) return;
                 const cx = ev.clientX || ev.touches[0].clientX; const cy = ev.clientY || ev.touches[0].clientY;
                 const el = this.currentShape.el;
-                el.style.left = (cx - 35) + 'px'; el.style.top = (cy - 35 - this.TOUCH_OFFSET) + 'px';
+                el.style.left = (cx - 37.5) + 'px'; el.style.top = (cy - 37.5 - this.TOUCH_OFFSET) + 'px';
                 const rect = this.canvas.getBoundingClientRect();
                 const x = (cx - rect.left) * (this.canvas.width / rect.width);
                 const y = (cy - this.TOUCH_OFFSET - rect.top) * (this.canvas.height / rect.height);
