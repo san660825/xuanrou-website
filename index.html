@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>無尾熊許願池 🐨💸</title>
+    <title>無尾熊許願池 🐨🧲</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="theme-color" content="#ffcdd2">
     
@@ -483,6 +483,8 @@
             el.addEventListener('mousedown', handleStart); el.addEventListener('touchstart', handleStart);
             container.appendChild(el);
         }
+        
+        // 核心：磁吸感應邏輯
         moveShape(e) {
             const move = (ev) => {
                 if(!this.currentShape) return;
@@ -490,17 +492,54 @@
                 const el = this.currentShape.el;
                 el.style.left = (cx - 30) + 'px'; el.style.top = (cy - 30 - this.TOUCH_OFFSET) + 'px';
                 
-                const rect = this.canvas.getBoundingClientRect();
-                const x = (cx - rect.left) * (this.canvas.width / rect.width);
-                const y = (cy - this.TOUCH_OFFSET - rect.top) * (this.canvas.height / rect.height);
-                const gx = Math.floor(x / this.cellSize); const gy = Math.floor(y / this.cellSize);
-                const shape = this.currentShape.data;
-                const finalX = gx - Math.floor(shape.m[0].length/2); const finalY = gy - Math.floor(shape.m.length/2);
+                // 1. 計算方塊的「視覺中心」相對於棋盤的位置
+                const boardRect = this.canvas.getBoundingClientRect();
+                const elRect = el.getBoundingClientRect();
                 
-                if(this.canPlace(shape.m, finalX, finalY)) {
-                    this.ghostShape = { x: finalX, y: finalY, shape: shape };
-                } else { this.ghostShape = null; }
-                this.currentShape.gx = finalX; this.currentShape.gy = finalY;
+                // 方塊中心點 (相對於棋盤左上角)
+                const relCenterX = (elRect.left + elRect.width/2) - boardRect.left;
+                const relCenterY = (elRect.top + elRect.height/2) - boardRect.top;
+                
+                // 粗略對應的格子中心
+                const centerGridX = Math.floor(relCenterX / this.cellSize);
+                const centerGridY = Math.floor(relCenterY / this.cellSize);
+                
+                // 2. 計算方塊矩陣的「左上角」應該在哪 (Pivot)
+                // 假設手指抓的是方塊的中心
+                const shape = this.currentShape.data;
+                const pivotX = centerGridX - Math.floor(shape.m[0].length / 2);
+                const pivotY = centerGridY - Math.floor(shape.m.length / 2);
+                
+                // 3. 磁吸搜尋：搜尋 Pivot 周圍 3x3 範圍，找最近的合法位置
+                let bestX = null;
+                let bestY = null;
+                let minDist = Infinity;
+                
+                for(let dy = -1; dy <= 1; dy++) {
+                    for(let dx = -1; dx <= 1; dx++) {
+                        const tx = pivotX + dx;
+                        const ty = pivotY + dy;
+                        if(this.canPlace(shape.m, tx, ty)) {
+                            // 計算距離 (曼哈頓距離簡單版)
+                            const dist = Math.abs(dx) + Math.abs(dy);
+                            if(dist < minDist) {
+                                minDist = dist;
+                                bestX = tx;
+                                bestY = ty;
+                            }
+                        }
+                    }
+                }
+                
+                // 4. 更新 Ghost
+                if(bestX !== null) {
+                    this.ghostShape = { x: bestX, y: bestY, shape: shape };
+                    this.currentShape.gx = bestX;
+                    this.currentShape.gy = bestY;
+                } else {
+                    this.ghostShape = null;
+                    this.currentShape.gx = null;
+                }
             };
             const end = (ev) => {
                 document.removeEventListener('mousemove', move); document.removeEventListener('touchmove', move);
@@ -520,6 +559,7 @@
             document.addEventListener('mousemove', move); document.addEventListener('touchmove', move, {passive: false});
             document.addEventListener('mouseup', end); document.addEventListener('touchend', end);
         }
+        
         canPlace(matrix, x, y) {
             if(x===undefined || y===undefined) return false;
             for(let r=0; r<matrix.length; r++) {
