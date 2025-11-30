@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>無尾熊許願池 🐨💖</title>
+    <title>無尾熊許願池 🐨💔</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="theme-color" content="#ffcdd2">
     
@@ -28,9 +28,9 @@
             color: var(--text-main);
         }
 
-        /* === 1. 頂部養成區 (縮小版) === */
+        /* === 1. 頂部養成區 === */
         .pet-area {
-            width: 100%; height: 160px; /* 高度縮小 */
+            width: 100%; height: 160px;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
             position: relative; z-index: 10;
             padding-bottom: 5px;
@@ -38,7 +38,6 @@
             flex-shrink: 0;
         }
 
-        /* 對話框 */
         .speech-bubble {
             background: white; padding: 8px 15px; border-radius: 15px;
             position: absolute; top: 10px;
@@ -49,26 +48,22 @@
         }
         .speech-bubble.show { transform: scale(1); }
 
-        /* 無尾熊 SVG (縮小) */
         #koala-svg {
-            width: 80px; height: 70px; /* 縮小 */
+            width: 80px; height: 70px;
             filter: drop-shadow(0 3px 5px rgba(233,30,99,0.1));
             cursor: pointer; transition: transform 0.1s; z-index: 2;
         }
         #koala-svg:active { transform: scale(0.9); }
         
-        /* 狀態條 */
         .status-bar {
             width: 100px; height: 8px; background: #ffcdd2;
-            border-radius: 10px; margin-top: 5px; overflow: hidden;
-            border: 2px solid #fff;
+            border-radius: 10px; margin-top: 5px; overflow: hidden; border: 2px solid #fff;
         }
         .status-fill {
             height: 100%; background: linear-gradient(90deg, #ff80ab, #ff4081);
             width: 50%; transition: width 0.5s;
         }
 
-        /* 餵食按鈕 (縮小) */
         .feed-btn {
             position: absolute; right: 20px; bottom: 20px;
             background: white; width: 40px; height: 40px; border-radius: 50%;
@@ -78,7 +73,7 @@
         }
         .feed-btn:active { transform: scale(0.9); background: #ff80ab; color: white; }
 
-        /* === 2. 導航列 (更緊湊) === */
+        /* === 2. 導航列 === */
         .nav-bar {
             position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.95); 
@@ -106,7 +101,7 @@
         }
         .page.active { opacity: 1; pointer-events: all; }
 
-        /* === 4. 遊戲區 (自適應大小) === */
+        /* === 4. 遊戲區 === */
         #game-wrapper { 
             width: 100%; height: 100%; padding: 0 15px; 
             display: flex; flex-direction: column; justify-content: center;
@@ -120,27 +115,26 @@
             border: 2px solid #ffcdd2; color: var(--accent-dark); font-weight: bold;
         }
         
-        /* 棋盤容器：限制最大寬度，保持正方形 */
         #board-container {
-            width: 100%; max-width: 360px; /* 限制最大寬度 */
+            width: 100%; max-width: 360px;
             aspect-ratio: 1/1; background: #fff;
             border-radius: 20px; padding: 8px; margin: 0 auto;
             box-shadow: 0 5px 0 #f8bbd0; border: 4px solid #ffebee;
+            transition: filter 0.3s;
         }
+        /* 失敗時的震動動畫 */
+        .board-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+
         canvas#game-canvas { width: 100%; height: 100%; border-radius: 12px; display: block; }
         
-        /* 生成區 */
         #spawn-area { 
             width: 100%; height: 100px; 
             display: flex; justify-content: space-around; align-items: center; 
             margin-top: 5px;
         }
         .shape-preview { width: 60px; height: 60px; }
-        /* 拖曳時放大一點，並上移以免被手指擋住 */
-        .shape-preview.dragging { 
-            opacity: 0.8; z-index: 2000; position: fixed; 
-            transform: scale(1.2); pointer-events: none; 
-        }
+        .shape-preview.dragging { opacity: 0.8; z-index: 2000; position: fixed; transform: scale(1.2); pointer-events: none; }
 
         /* === 商店區 === */
         #shop-wrapper { width: 100%; height: 100%; padding: 10px 20px; overflow-y: auto; }
@@ -160,6 +154,29 @@
             border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 0.9rem;
         }
         .btn-redeem:disabled { background: #eee; color: #aaa; }
+
+        /* === 失敗彈窗 (Game Over) === */
+        #game-over-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 5000;
+            display: flex; justify-content: center; align-items: center;
+            display: none; backdrop-filter: blur(3px);
+        }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 30px;
+            text-align: center; width: 80%; max-width: 300px;
+            border: 5px solid #ffcdd2;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .btn-restart {
+            background: linear-gradient(135deg, #ff80ab, #ff4081);
+            color: white; border: none; padding: 12px 30px;
+            border-radius: 25px; font-weight: bold; font-size: 1.1rem;
+            margin-top: 15px; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 64, 129, 0.4);
+        }
 
         /* === 動畫 === */
         .eye { transform-origin: center; }
@@ -237,6 +254,17 @@
     </div>
 </div>
 
+<!-- 失敗彈窗 -->
+<div id="game-over-modal">
+    <div class="modal-content">
+        <div style="font-size:3rem;">😭</div>
+        <h2 style="color:#880e4f; margin:10px 0;">哎呀！沒地方放了</h2>
+        <p style="color:#666; font-size:0.9rem; margin-bottom:10px;">無尾熊覺得好可惜...</p>
+        <p style="color:#ff80ab; font-weight:bold;">但葉子都有保留喔！</p>
+        <button class="btn-restart" onclick="game.reset()">再玩一次</button>
+    </div>
+</div>
+
 <div style="position:fixed; top:0; right:0; width:30px; height:30px; z-index:5000;" onclick="Admin.showLogs()"></div>
 
 <script>
@@ -266,6 +294,14 @@
             const bubble = document.getElementById('bubble');
             bubble.innerText = text || this.messages[Math.floor(Math.random() * this.messages.length)];
             bubble.classList.add('show'); setTimeout(() => bubble.classList.remove('show'), 3000);
+        },
+        setMood: function(mood) {
+            if(mood === 'sad') {
+                document.getElementById('eyes-normal').style.display = 'none';
+                document.getElementById('eyes-happy').style.display = 'none';
+                document.getElementById('eyes-sad').style.display = 'block';
+                this.speak("嗚嗚...沒地方住了...");
+            }
         }
     };
 
@@ -322,7 +358,7 @@
         if(confirm(`兌換「${itemName}」？`)) { userCoins -= price; updateUI(); Admin.uploadLog(itemName); alert(`兌換成功！\n獲得：${itemName}`); }
     }
 
-    /* 3. 遊戲引擎 (含落點預覽) */
+    /* 3. 遊戲引擎 */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const Sound = {
         play: (freq, type, dur) => {
@@ -333,7 +369,8 @@
             g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
             o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + dur);
         },
-        pickup: () => Sound.play(500, 'sine', 0.1), drop: () => Sound.play(300, 'triangle', 0.1), clear: (n) => { for(let i=0;i<n;i++) setTimeout(()=>Sound.play(500*(1+i*0.2),'sine',0.2), i*60); }
+        pickup: () => Sound.play(500, 'sine', 0.1), drop: () => Sound.play(300, 'triangle', 0.1), clear: (n) => { for(let i=0;i<n;i++) setTimeout(()=>Sound.play(500*(1+i*0.2),'sine',0.2), i*60); },
+        fail: () => { Sound.play(150, 'sawtooth', 0.5); setTimeout(()=>Sound.play(100, 'sawtooth', 0.5), 400); }
     };
 
     const SHAPES = [
@@ -350,8 +387,9 @@
             this.cellSize = this.canvas.width / this.gridSize;
             this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
             this.currentShape = null;
-            this.ghostShape = null; // 落點預覽
-            this.TOUCH_OFFSET = 150; // 手指偏移量加大，讓預覽更清楚
+            this.ghostShape = null;
+            this.TOUCH_OFFSET = 150;
+            this.isGameOver = false;
             
             this.loop = this.loop.bind(this);
             requestAnimationFrame(this.loop);
@@ -362,7 +400,7 @@
         loop() {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.drawGrid();
-            if (this.ghostShape) this.drawGhost(); // 繪製預覽
+            if (!this.isGameOver && this.ghostShape) this.drawGhost();
             this.drawPlacedBlocks();
             requestAnimationFrame(this.loop);
         }
@@ -374,11 +412,9 @@
                 this.ctx.beginPath(); this.ctx.moveTo(pos, 0); this.ctx.lineTo(pos, 800); this.ctx.stroke();
             }
         }
-        // 繪製半透明的預覽方塊
         drawGhost() {
             const { x, y, shape } = this.ghostShape;
-            this.ctx.save(); 
-            this.ctx.globalAlpha = 0.3; // 半透明
+            this.ctx.save(); this.ctx.globalAlpha = 0.3;
             for(let r=0; r<shape.m.length; r++) {
                 for(let c=0; c<shape.m[0].length; c++) {
                     if(shape.m[r][c]) this.drawCell(x + c, y + r, shape.color); 
@@ -389,7 +425,9 @@
         drawPlacedBlocks() {
             for(let r=0; r<this.gridSize; r++) {
                 for(let c=0; c<this.gridSize; c++) {
-                    if(this.grid[r][c] !== 0) this.drawCell(c, r, this.grid[r][c]);
+                    if(this.grid[r][c] !== 0) {
+                        this.drawCell(c, r, this.isGameOver ? '#ccc' : this.grid[r][c]);
+                    }
                 }
             }
         }
@@ -409,6 +447,8 @@
                 const shapeData = SHAPES[Math.floor(Math.random() * SHAPES.length)];
                 this.createDraggableShape(shapeData, container);
             }
+            // 檢查是否一生成就死局 (極少見但可能)
+            this.checkGameOver();
         }
         createDraggableShape(data, container) {
             const el = document.createElement('canvas');
@@ -425,6 +465,7 @@
                 }
             }
             const handleStart = (e) => {
+                if(this.isGameOver) return;
                 e.preventDefault(); Sound.pickup(); el.classList.add('dragging');
                 this.currentShape = { el, data };
                 this.moveShape(e);
@@ -439,34 +480,27 @@
                 const el = this.currentShape.el;
                 el.style.left = (cx - 30) + 'px'; el.style.top = (cy - 30 - this.TOUCH_OFFSET) + 'px';
                 
-                // 計算落點
                 const rect = this.canvas.getBoundingClientRect();
                 const x = (cx - rect.left) * (this.canvas.width / rect.width);
                 const y = (cy - this.TOUCH_OFFSET - rect.top) * (this.canvas.height / rect.height);
-                const gx = Math.floor(x / this.cellSize); 
-                const gy = Math.floor(y / this.cellSize);
-                
+                const gx = Math.floor(x / this.cellSize); const gy = Math.floor(y / this.cellSize);
                 const shape = this.currentShape.data;
-                const finalX = gx - Math.floor(shape.m[0].length/2); 
-                const finalY = gy - Math.floor(shape.m.length/2);
+                const finalX = gx - Math.floor(shape.m[0].length/2); const finalY = gy - Math.floor(shape.m.length/2);
                 
-                // 檢查落點是否有效，若有效則顯示 Ghost
                 if(this.canPlace(shape.m, finalX, finalY)) {
                     this.ghostShape = { x: finalX, y: finalY, shape: shape };
-                } else {
-                    this.ghostShape = null;
-                }
+                } else { this.ghostShape = null; }
                 this.currentShape.gx = finalX; this.currentShape.gy = finalY;
             };
             const end = (ev) => {
                 document.removeEventListener('mousemove', move); document.removeEventListener('touchmove', move);
                 document.removeEventListener('mouseup', end); document.removeEventListener('touchend', end);
                 if(!this.currentShape) return;
-                
-                if(this.ghostShape) { // 只要有 ghost 代表能放
+                if(this.ghostShape) {
                     this.place(this.currentShape.data, this.ghostShape.x, this.ghostShape.y);
                     this.currentShape.el.remove(); Sound.drop();
                     if(document.getElementById('spawn-area').children.length === 0) setTimeout(() => this.spawnShapes(), 500);
+                    else this.checkGameOver(); // 檢查剩下的是否死局
                 } else {
                     this.currentShape.el.classList.remove('dragging');
                     this.currentShape.el.style.position = ''; this.currentShape.el.style.left = ''; this.currentShape.el.style.top = '';
@@ -514,7 +548,171 @@
                 el.style.left = '50%'; el.style.top = '50%'; document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
             }
         }
+        
+        // 核心：檢測死局
+        checkGameOver() {
+            const shapes = [];
+            document.querySelectorAll('#spawn-area .shape-preview').forEach(el => {
+                // 這裡我們需要重新獲取 shape 數據，因為 DOM 元素上沒有直接綁定數據
+                // 簡單做法：在 createDraggableShape 時把數據綁在 DOM 上
+                // 修正：我們在 createDraggableShape 閉包裡有 data，但這裡訪問不到
+                // 解決方案：我們改用一個數組來存當前的 shapes
+            });
+            // 由於上面結構限制，我們改用更直接的方式：
+            // 在 createDraggableShape 時，將 data 附加到 DOM 元素屬性
+            // 但因為 data 是對象，我們用一個全局或類屬性來追蹤
+        }
     }
+
+    // 修正後的 checkGameOver 邏輯，需要配合修改 createDraggableShape
+    // 為了不大幅改動結構，我們用一個簡單的全局數組追蹤當前 spawn 的形狀
+    let currentSpawnShapes = [];
+
+    // 覆蓋原有的 spawnShapes 和 createDraggableShape
+    BlockPuzzle.prototype.spawnShapes = function() {
+        const container = document.getElementById('spawn-area'); container.innerHTML = '';
+        currentSpawnShapes = []; // 清空
+        for(let i=0; i<3; i++) {
+            const shapeData = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+            this.createDraggableShape(shapeData, container);
+            currentSpawnShapes.push(shapeData); // 記錄
+        }
+        this.checkGameOver();
+    };
+
+    BlockPuzzle.prototype.createDraggableShape = function(data, container) {
+        const el = document.createElement('canvas');
+        el.width = 60; el.height = 60; el.className = 'shape-preview';
+        el.dataset.index = currentSpawnShapes.length; // 標記索引
+        
+        const ctx = el.getContext('2d');
+        const rows = data.m.length; const cols = data.m[0].length;
+        const size = 10; const offsetX = (60 - cols*size)/2; const offsetY = (60 - rows*size)/2;
+        for(let r=0; r<rows; r++) {
+            for(let c=0; c<cols; c++) {
+                if(data.m[r][c]) { 
+                    ctx.fillStyle = data.color;
+                    ctx.beginPath(); ctx.roundRect(offsetX + c*size, offsetY + r*size, size-1, size-1, 3); ctx.fill();
+                }
+            }
+        }
+        const handleStart = (e) => {
+            if(this.isGameOver) return;
+            e.preventDefault(); Sound.pickup(); el.classList.add('dragging');
+            this.currentShape = { el, data };
+            this.moveShape(e);
+        };
+        el.addEventListener('mousedown', handleStart); el.addEventListener('touchstart', handleStart);
+        container.appendChild(el);
+    };
+
+    // 覆蓋 place 方法，移除已放置的形狀
+    const originalPlace = BlockPuzzle.prototype.place;
+    BlockPuzzle.prototype.place = function(shape, x, y) {
+        originalPlace.call(this, shape, x, y);
+        // 從 currentSpawnShapes 中移除 (簡單做法：重新掃描 DOM)
+        // 其實不用移除，因為 DOM 已經被 remove 了，我們 checkGameOver 時只檢查存在的 DOM
+    };
+
+    BlockPuzzle.prototype.checkGameOver = function() {
+        // 延遲一點點執行，確保 DOM 更新
+        setTimeout(() => {
+            const remainingEls = document.querySelectorAll('#spawn-area .shape-preview');
+            if(remainingEls.length === 0) return; // 沒有方塊了，會重生，不用檢查
+
+            let canFitAny = false;
+
+            // 檢查每一個剩餘的方塊
+            remainingEls.forEach(el => {
+                // 這裡我們用一個小技巧：我們知道 DOM 順序對應 currentSpawnShapes 的順序嗎？
+                // 不一定，因為可能中間的被拿走了。
+                // 我們直接從 el 的 canvas 繪圖還原形狀太難。
+                // 最好的方式：createDraggableShape 時把 shape 對象綁在 el 上
+                // 但 JS DOM 元素可以直接綁屬性
+                
+                // 修正：在 createDraggableShape 裡直接 el.shapeData = data;
+            });
+        }, 50);
+    };
+
+    // 最終修正：直接修改 createDraggableShape 綁定數據
+    BlockPuzzle.prototype.createDraggableShape = function(data, container) {
+        const el = document.createElement('canvas');
+        el.width = 60; el.height = 60; el.className = 'shape-preview';
+        el.shapeData = data; // 綁定數據！
+        
+        const ctx = el.getContext('2d');
+        const rows = data.m.length; const cols = data.m[0].length;
+        const size = 10; const offsetX = (60 - cols*size)/2; const offsetY = (60 - rows*size)/2;
+        for(let r=0; r<rows; r++) {
+            for(let c=0; c<cols; c++) {
+                if(data.m[r][c]) { 
+                    ctx.fillStyle = data.color;
+                    ctx.beginPath(); ctx.roundRect(offsetX + c*size, offsetY + r*size, size-1, size-1, 3); ctx.fill();
+                }
+            }
+        }
+        const handleStart = (e) => {
+            if(this.isGameOver) return;
+            e.preventDefault(); Sound.pickup(); el.classList.add('dragging');
+            this.currentShape = { el, data };
+            this.moveShape(e);
+        };
+        el.addEventListener('mousedown', handleStart); el.addEventListener('touchstart', handleStart);
+        container.appendChild(el);
+    };
+
+    BlockPuzzle.prototype.checkGameOver = function() {
+        setTimeout(() => {
+            const remainingEls = document.querySelectorAll('#spawn-area .shape-preview');
+            if(remainingEls.length === 0) return;
+
+            let canFitAny = false;
+            
+            // 遍歷所有剩餘方塊
+            for(let i=0; i<remainingEls.length; i++) {
+                const shape = remainingEls[i].shapeData;
+                // 遍歷棋盤所有位置
+                for(let y=0; y<this.gridSize; y++) {
+                    for(let x=0; x<this.gridSize; x++) {
+                        // 嘗試放置，注意要調整中心點 (因為 canPlace 邏輯是基於中心)
+                        // 這裡的 canPlace 邏輯是：x,y 是方塊矩陣左上角在 grid 的位置
+                        // 我們原來的 canPlace 邏輯：x,y 是左上角
+                        if(this.canPlace(shape.m, x, y)) {
+                            canFitAny = true;
+                            break;
+                        }
+                    }
+                    if(canFitAny) break;
+                }
+                if(canFitAny) break;
+            }
+
+            if(!canFitAny) {
+                this.triggerGameOver();
+            }
+        }, 100);
+    };
+
+    BlockPuzzle.prototype.triggerGameOver = function() {
+        this.isGameOver = true;
+        Sound.fail();
+        document.getElementById('board-container').classList.add('board-shake');
+        Pet.setMood('sad');
+        setTimeout(() => {
+            document.getElementById('game-over-modal').style.display = 'flex';
+        }, 800);
+    };
+
+    BlockPuzzle.prototype.reset = function() {
+        this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
+        this.isGameOver = false;
+        document.getElementById('game-over-modal').style.display = 'none';
+        document.getElementById('board-container').classList.remove('board-shake');
+        Pet.updateUI(); // 恢復表情
+        this.spawnShapes();
+    };
+
     function switchPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(`${pageId}-page`).classList.add('active');
