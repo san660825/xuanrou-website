@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>無尾熊許願池 🐨✨</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffcdd2">
     
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Varela+Round&display=swap" rel="stylesheet">
@@ -14,477 +14,371 @@
             --bg-gradient: linear-gradient(180deg, #fff0f5 0%, #ffebee 100%);
             --text-main: #880e4f;
             --accent: #ff80ab;
-            --accent-dark: #c51162;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-
-        body {
+        /* === 關鍵修正：鎖死網頁，禁止任何捲動 === */
+        html, body {
+            width: 100%; height: 100%;
+            margin: 0; padding: 0;
+            overflow: hidden; /* 禁止捲動條 */
+            position: fixed; /* 強制固定 */
+            overscroll-behavior: none; /* 禁止 iOS 橡皮筋效果 */
+            touch-action: none; /* 禁止瀏覽器處理手勢 */
             background: var(--bg-gradient);
             font-family: 'Varela Round', sans-serif;
-            overflow: hidden;
-            width: 100vw; height: 100vh; /* 強制滿版 */
-            display: flex; flex-direction: column;
-            color: var(--text-main);
-            touch-action: none; /* 關鍵：禁止瀏覽器捲動 */
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        /* === 1. 極致壓縮的頂部狀態列 (高 80px) === */
-        .top-bar {
-            width: 100%; height: 80px;
-            background: white;
+        /* 主容器：使用 Flexbox 垂直排列 */
+        #app-container {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: space-between; /* 上下分開 */
+        }
+
+        /* === 1. 頂部整合區 (無尾熊 + 分數 + 選單) === */
+        .header-bar {
+            height: 90px; width: 100%;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(5px);
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 15px;
-            box-shadow: 0 5px 15px rgba(233,30,99,0.1);
-            z-index: 100; flex-shrink: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
         }
 
-        /* 左側：無尾熊頭像 + 狀態 */
-        .pet-info { display: flex; align-items: center; gap: 10px; }
-        #koala-head { width: 50px; height: 50px; cursor: pointer; }
+        .pet-section { display: flex; align-items: center; gap: 8px; }
+        #koala-icon { width: 50px; height: 50px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1)); }
         
-        .status-wrap { display: flex; flex-direction: column; justify-content: center; gap: 3px; }
-        .status-bar {
-            width: 80px; height: 8px; background: #ffcdd2;
-            border-radius: 10px; border: 1px solid #ff80ab; overflow: hidden;
-        }
-        .status-fill { width: 50%; height: 100%; background: #ff4081; transition: width 0.3s; }
-        .feed-btn-mini {
-            font-size: 0.7rem; background: #ff80ab; color: white;
-            padding: 2px 8px; border-radius: 10px; border: none; cursor: pointer;
-            width: fit-content;
-        }
+        .status-box { display: flex; flex-direction: column; gap: 2px; }
+        .hunger-track { width: 60px; height: 6px; background: #ffcdd2; border-radius: 5px; overflow: hidden; }
+        .hunger-fill { width: 50%; height: 100%; background: #ff4081; }
+        .feed-btn { font-size: 0.6rem; padding: 2px 8px; background: #ff80ab; color: white; border:none; border-radius:10px; }
 
-        /* 右側：分數 */
-        .score-box {
-            text-align: right;
-        }
-        .score-label { font-size: 0.7rem; color: #aaa; }
-        .score-val { font-size: 1.5rem; font-weight: 900; color: #ec407a; font-family: 'Fredoka'; }
+        .menu-section { display: flex; gap: 15px; align-items: center; }
+        .score-display { font-family: 'Fredoka'; font-size: 1.2rem; color: #ec407a; font-weight: bold; }
+        .nav-btn { font-size: 1.2rem; color: #ff80ab; background: white; width: 35px; height: 35px; border-radius: 50%; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-        /* 對話框 (浮動) */
-        .speech-bubble {
-            position: absolute; top: 85px; left: 10px;
-            background: rgba(255,255,255,0.95); padding: 5px 12px; border-radius: 15px;
-            border: 2px solid #ffcdd2; font-size: 0.8rem; color: #880e4f;
-            transform: scale(0); transition: transform 0.2s; pointer-events: none; z-index: 101;
-        }
-        .speech-bubble.show { transform: scale(1); }
-
-        /* === 2. 遊戲主區域 (自動填滿剩餘空間) === */
-        #game-area {
-            flex: 1; /* 佔滿剩下高度 */
-            width: 100%;
+        /* === 2. 遊戲主區域 (置中) === */
+        .game-area {
+            flex: 1; /* 佔滿剩餘空間 */
             display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            position: relative;
+            justify-content: center; /* 垂直置中 */
+            align-items: center;     /* 水平置中 */
             padding: 10px;
+            position: relative;
         }
 
-        /* 棋盤：自適應大小，最大不超過螢幕寬度 */
+        /* 棋盤 */
         #board-container {
-            width: 90vw; max-width: 380px; /* 限制最大寬度 */
-            aspect-ratio: 1/1; /* 保持正方形 */
+            width: 90vw; max-width: 360px;
+            aspect-ratio: 1/1;
             background: #fff;
-            border-radius: 15px; padding: 8px;
-            box-shadow: 0 5px 0 #f8bbd0; border: 4px solid #ffebee;
-            /* 如果螢幕太扁，限制高度 */
-            max-height: 55vh; 
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: 0 8px 0 #f8bbd0, 0 10px 20px rgba(0,0,0,0.1);
+            border: 4px solid #ffebee;
         }
-        canvas#game-canvas { width: 100%; height: 100%; border-radius: 8px; display: block; }
-        .board-shake { animation: shake 0.5s both; }
-        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        canvas#game-canvas { width: 100%; height: 100%; border-radius: 10px; display: block; }
 
-        /* 生成區：固定在底部上方 */
+        /* === 3. 底部生成區 (固定在最底) === */
         #spawn-area {
-            width: 100%; height: 90px; /* 固定高度 */
+            height: 110px; width: 100%;
             display: flex; justify-content: space-around; align-items: center;
-            margin-top: auto; /* 推到底部 */
-            padding-bottom: 10px;
-        }
-        .shape-preview { width: 55px; height: 55px; touch-action: none; }
-        .shape-preview.dragging { 
-            opacity: 0.9; z-index: 9999; position: fixed; 
-            transform: scale(1.2); pointer-events: none; will-change: left, top;
+            background: rgba(255,255,255,0.3);
+            padding-bottom: 10px; /* 避開 iPhone 底部橫條 */
         }
 
-        /* === 3. 底部導航 (懸浮) === */
-        .nav-bar {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9); 
-            padding: 5px 20px; border-radius: 30px;
-            display: flex; gap: 30px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border: 2px solid #fff; z-index: 1000;
+        .shape-preview { 
+            width: 60px; height: 60px; 
+            /* 關鍵：讓方塊本身不攔截瀏覽器手勢 */
+            touch-action: none; 
         }
-        .nav-item {
-            font-size: 1.2rem; color: #ffcdd2; cursor: pointer;
-            width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;
-            border-radius: 50%; background: #fff; transition: 0.2s;
+        .shape-preview.dragging {
+            opacity: 0.9; z-index: 9999; position: fixed;
+            transform: scale(1.2); pointer-events: none;
+            will-change: left, top;
         }
-        .nav-item.active { background: #ff80ab; color: white; transform: translateY(-5px); }
 
-        /* === 商店頁面 (覆蓋層) === */
-        #shop-page {
-            position: absolute; top: 80px; left: 0; width: 100%; height: calc(100vh - 80px);
+        /* 商店頁面 (全螢幕覆蓋) */
+        #shop-overlay {
+            position: fixed; top: 90px; left: 0; width: 100%; height: calc(100% - 90px);
             background: #fff0f5; display: none; flex-direction: column;
-            padding: 20px; overflow-y: auto; z-index: 50;
+            padding: 20px; overflow-y: auto; z-index: 200;
         }
-        #shop-page.active { display: flex; }
-
-        .wallet-card {
-            background: linear-gradient(135deg, #ff80ab, #ff4081); color: white;
-            padding: 15px; border-radius: 20px; margin-bottom: 15px;
+        .shop-item {
+            background: white; padding: 15px; margin-bottom: 10px; border-radius: 15px;
             display: flex; justify-content: space-between; align-items: center;
-        }
-        .coupon-item {
-            background: white; border-radius: 15px; padding: 10px; margin-bottom: 10px;
-            display: flex; align-items: center; justify-content: space-between;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .btn-redeem {
-            background: #ff80ab; color: white; border: none; padding: 5px 15px;
-            border-radius: 15px; font-weight: bold;
-        }
-
-        /* === 失敗彈窗 === */
-        #game-over-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 10000;
-            display: flex; justify-content: center; align-items: center;
-            display: none; backdrop-filter: blur(2px);
-        }
-        .modal-content {
-            background: white; padding: 25px; border-radius: 25px; text-align: center;
-            width: 80%; max-width: 300px; border: 4px solid #ffcdd2;
-        }
-        .btn-restart {
-            background: #ff4081; color: white; border: none; padding: 10px 30px;
-            border-radius: 20px; font-weight: bold; margin-top: 15px;
         }
 
         /* 浮動文字 */
         .float-text {
-            position: absolute; font-family: 'Fredoka'; font-weight: 900;
-            color: #ff4081; font-size: 1.5rem; pointer-events: none;
-            text-shadow: 2px 2px 0px white; z-index: 9000;
-            animation: floatUp 0.8s forwards;
+            position: absolute; font-family: 'Fredoka'; font-weight: 900; color: #ff4081;
+            font-size: 1.5rem; pointer-events: none; z-index: 5000;
+            animation: floatUp 0.8s forwards; text-shadow: 2px 2px 0 white;
         }
         @keyframes floatUp { 0% { transform:translateY(0); opacity:0; } 50% { opacity:1; } 100% { transform:translateY(-50px); opacity:0; } }
+
+        /* 對話氣泡 */
+        .bubble {
+            position: absolute; top: 95px; left: 20px;
+            background: white; padding: 5px 10px; border-radius: 10px;
+            border: 2px solid #ffcdd2; font-size: 0.8rem; color: #880e4f;
+            opacity: 0; transition: 0.3s; pointer-events: none;
+        }
+        .bubble.show { opacity: 1; transform: translateY(5px); }
     </style>
 </head>
 <body>
 
-<!-- 1. 頂部狀態列 (Compact) -->
-<div class="top-bar">
-    <div class="pet-info">
-        <!-- 無尾熊 SVG 頭像 -->
-        <svg id="koala-head" viewBox="0 0 100 100" onclick="petKoala()">
-            <circle cx="50" cy="50" r="40" fill="#eceff1" stroke="#cfd8dc" stroke-width="2"/>
-            <circle cx="20" cy="30" r="12" fill="#cfd8dc"/>
-            <circle cx="80" cy="30" r="12" fill="#cfd8dc"/>
-            <circle cx="20" cy="30" r="6" fill="#ffcdd2"/>
-            <circle cx="80" cy="30" r="6" fill="#ffcdd2"/>
-            <g id="eyes-normal"><circle cx="35" cy="45" r="5" fill="#455a64"/><circle cx="65" cy="45" r="5" fill="#455a64"/></g>
-            <g id="eyes-sad" style="display:none"><path d="M30 48 Q35 42 40 48" stroke="#455a64" stroke-width="3" fill="none"/><path d="M60 48 Q65 42 70 48" stroke="#455a64" stroke-width="3" fill="none"/></g>
-            <ellipse cx="50" cy="55" rx="10" ry="7" fill="#455a64"/>
-            <circle cx="25" cy="60" r="5" fill="rgba(255,128,171,0.4)"/>
-            <circle cx="75" cy="60" r="5" fill="rgba(255,128,171,0.4)"/>
-        </svg>
+<div id="app-container">
+    <!-- 1. 頂部資訊列 -->
+    <div class="header-bar">
+        <div class="pet-section">
+            <svg id="koala-icon" viewBox="0 0 100 100" onclick="petKoala()">
+                <circle cx="50" cy="50" r="45" fill="#eceff1"/>
+                <circle cx="20" cy="30" r="15" fill="#cfd8dc"/> <circle cx="80" cy="30" r="15" fill="#cfd8dc"/>
+                <g id="eyes"><circle cx="35" cy="45" r="5" fill="#455a64"/><circle cx="65" cy="45" r="5" fill="#455a64"/></g>
+                <ellipse cx="50" cy="55" rx="10" ry="7" fill="#455a64"/>
+                <circle cx="25" cy="60" r="6" fill="rgba(255,128,171,0.4)"/> <circle cx="75" cy="60" r="6" fill="rgba(255,128,171,0.4)"/>
+            </svg>
+            <div class="status-box">
+                <div class="hunger-track"><div class="hunger-fill" id="hunger-bar"></div></div>
+                <button class="feed-btn" onclick="feed()">餵食</button>
+            </div>
+        </div>
         
-        <div class="status-wrap">
-            <div class="status-bar"><div class="status-fill" id="hunger-bar" style="width: 50%;"></div></div>
-            <button class="feed-btn-mini" onclick="feedKoala()">餵食 (-50)</button>
+        <div class="menu-section">
+            <div class="score-display">🌿 <span id="score">0</span></div>
+            <div class="nav-btn" onclick="toggleShop()"><i class="fas fa-gift"></i></div>
         </div>
     </div>
 
-    <div class="score-box">
-        <div class="score-label">LEAVES</div>
-        <div class="score-val" id="game-coins">0</div>
-    </div>
-</div>
+    <div class="bubble" id="msg">主人～</div>
 
-<div class="speech-bubble" id="bubble">主人～</div>
-
-<!-- 2. 遊戲區 -->
-<div id="game-area">
-    <div id="board-container">
-        <canvas id="game-canvas" width="800" height="800"></canvas>
+    <!-- 2. 遊戲區 (自動置中) -->
+    <div class="game-area">
+        <div id="board-container">
+            <canvas id="game-canvas" width="800" height="800"></canvas>
+        </div>
     </div>
+
+    <!-- 3. 底部生成區 -->
     <div id="spawn-area"></div>
 </div>
 
-<!-- 3. 導航 -->
-<div class="nav-bar">
-    <div class="nav-item active" onclick="switchPage('game')"><i class="fas fa-gamepad"></i></div>
-    <div class="nav-item" onclick="switchPage('shop')"><i class="fas fa-gift"></i></div>
-</div>
-
-<!-- 商店頁面 -->
-<div id="shop-page">
-    <div class="wallet-card">
-        <div>
-            <div style="font-size:0.8rem; opacity:0.9;">持有葉子</div>
-            <div style="font-size:2rem; font-weight:900;" id="total-coins">0</div>
-        </div>
-        <i class="fas fa-leaf" style="font-size:2.5rem; opacity:0.5;"></i>
-    </div>
-    <div id="shop-container"></div>
-</div>
-
-<!-- 失敗彈窗 -->
-<div id="game-over-modal">
-    <div class="modal-content">
-        <div style="font-size:3rem;">😭</div>
-        <h3 style="color:#880e4f;">沒地方放了</h3>
-        <p style="color:#666; font-size:0.9rem;">無尾熊覺得可惜...</p>
-        <button class="btn-restart" onclick="game.reset()">再玩一次</button>
-    </div>
+<!-- 商店層 -->
+<div id="shop-overlay">
+    <h2 style="color:#880e4f; margin-bottom:20px;">許願清單</h2>
+    <div id="shop-list"></div>
+    <button onclick="toggleShop()" style="margin-top:20px; padding:10px; background:#ddd; border:none; border-radius:10px;">關閉</button>
 </div>
 
 <script>
-    /* 1. 養成與數據 */
-    const Pet = {
-        hunger: parseInt(localStorage.getItem('xr_pet_hunger') || 50),
-        lastLogin: parseInt(localStorage.getItem('xr_pet_last_login') || Date.now()),
-        messages: ["加油！", "想妳了", "餓餓...", "好棒！"],
-        init: function() {
-            const now = Date.now();
-            if((now - this.lastLogin) > 3600000) this.hunger = Math.max(0, this.hunger - 10);
-            this.save(); this.updateUI();
-            setInterval(() => { this.hunger = Math.max(0, this.hunger - 1); this.save(); this.updateUI(); }, 600000);
-        },
-        save: function() { localStorage.setItem('xr_pet_hunger', this.hunger); localStorage.setItem('xr_pet_last_login', Date.now()); },
-        updateUI: function() {
-            const bar = document.getElementById('hunger-bar'); bar.style.width = this.hunger + '%';
-            document.getElementById('eyes-normal').style.display = this.hunger < 30 ? 'none' : 'block';
-            document.getElementById('eyes-sad').style.display = this.hunger < 30 ? 'block' : 'none';
-            bar.style.background = this.hunger < 30 ? '#ff5252' : '#ff4081';
-        },
-        speak: function(text) {
-            const bubble = document.getElementById('bubble');
-            bubble.innerText = text || this.messages[Math.floor(Math.random() * this.messages.length)];
-            bubble.classList.add('show'); setTimeout(() => bubble.classList.remove('show'), 2000);
-        }
-    };
-
-    let userCoins = parseInt(localStorage.getItem('xr_leaf_coins') || 0);
-    let secretClicks = 0;
+    /* === 基礎設定 === */
+    let coins = parseInt(localStorage.getItem('xr_coins') || 0);
+    let hunger = parseInt(localStorage.getItem('xr_hunger') || 50);
+    const PRIZES = [
+        {n:'手搖飲', p:8000}, {n:'按摩', p:30000}, {n:'大餐', p:88000}, {n:'清空購物車', p:9999999}
+    ];
 
     function updateUI() {
-        document.getElementById('total-coins').innerText = userCoins;
-        document.getElementById('game-coins').innerText = userCoins;
-        localStorage.setItem('xr_leaf_coins', userCoins);
-        renderShop();
+        document.getElementById('score').innerText = coins;
+        document.getElementById('hunger-bar').style.width = hunger + '%';
+        localStorage.setItem('xr_coins', coins);
+        localStorage.setItem('xr_hunger', hunger);
     }
+    updateUI();
 
-    function feedKoala() {
-        if(userCoins >= 50) {
-            if(Pet.hunger >= 100) { Pet.speak("飽了！"); return; }
-            userCoins -= 50; updateUI();
-            Pet.hunger = Math.min(100, Pet.hunger + 20); Pet.save(); Pet.updateUI(); Pet.speak("好吃！");
-        } else { Pet.speak("沒錢..."); }
+    function feed() {
+        if(coins >= 50) {
+            if(hunger>=100) return speak("飽了！");
+            coins -= 50; hunger = Math.min(100, hunger+20);
+            updateUI(); speak("好吃！");
+        } else speak("沒錢...");
     }
-
+    
+    let clicks = 0;
     function petKoala() {
-        secretClicks++;
-        if(secretClicks === 10) { userCoins += 10000; updateUI(); alert("男友救星！+10000"); secretClicks=0; }
-        else Pet.speak();
+        clicks++;
+        if(clicks===10) { coins+=10000; updateUI(); alert("男友救星！+10000"); clicks=0; }
+        else speak("愛妳喔 ❤️");
     }
 
-    /* 2. 商店 */
-    const REAL_PRIZES = [
-        { name: '手搖飲', price: 8000 }, { name: '按摩', price: 30000 },
-        { name: '大餐', price: 88000 }, { name: '清空購物車', price: 9999999 }
-    ];
-    function renderShop() {
-        const c = document.getElementById('shop-container'); c.innerHTML = '';
-        REAL_PRIZES.forEach(i => {
-            const div = document.createElement('div'); div.className = 'coupon-item';
-            div.innerHTML = `<div><b>${i.name}</b><br><small style="color:#ff80ab">${i.price}</small></div>
-            <button class="btn-redeem" onclick="if(userCoins>=${i.price}){userCoins-=${i.price};updateUI();alert('兌換成功！');}else{alert('錢不夠！');}">兌換</button>`;
-            c.appendChild(div);
-        });
+    function speak(text) {
+        const b = document.getElementById('msg'); b.innerText = text;
+        b.classList.add('show'); setTimeout(()=>b.classList.remove('show'), 2000);
     }
 
-    function switchPage(p) {
-        document.getElementById('shop-page').classList.toggle('active', p === 'shop');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-        if(p === 'shop') updateUI();
+    function toggleShop() {
+        const s = document.getElementById('shop-overlay');
+        s.style.display = s.style.display === 'flex' ? 'none' : 'flex';
+        if(s.style.display === 'flex') {
+            const l = document.getElementById('shop-list'); l.innerHTML = '';
+            PRIZES.forEach(p => {
+                l.innerHTML += `<div class="shop-item">
+                    <div><b>${p.n}</b><br><small>${p.p}</small></div>
+                    <button onclick="buy('${p.n}',${p.p})" style="background:#ff80ab; color:white; border:none; padding:5px 10px; border-radius:10px;">兌換</button>
+                </div>`;
+            });
+        }
+    }
+    function buy(n, p) {
+        if(coins>=p) { coins-=p; updateUI(); alert(`兌換成功：${n}`); } else alert("錢不夠！");
     }
 
-    /* 3. 遊戲引擎 (Compact) */
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const Sound = {
-        play: (f,t,d) => { if(audioCtx.state==='suspended')audioCtx.resume(); const o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.type=t; o.frequency.setValueAtTime(f,audioCtx.currentTime); g.gain.setValueAtTime(0.05,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+d); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+d); },
-        drop: ()=>Sound.play(300,'triangle',0.1), fail: ()=>Sound.play(150,'sawtooth',0.5)
-    };
-
+    /* === 遊戲引擎 (修復拖曳版) === */
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
     const SHAPES = [
-        { m: [[1]], c: '#ff8a80' }, { m: [[1,1]], c: '#ff80ab' }, { m: [[1],[1]], c: '#ea80fc' },
-        { m: [[1,1,1]], c: '#b388ff' }, { m: [[1],[1],[1]], c: '#8c9eff' }, { m: [[1,1],[1,1]], c: '#82b1ff' },
-        { m: [[1,1,1],[0,1,0]], c: '#80d8ff' }, { m: [[1,0],[1,0],[1,1]], c: '#84ffff' }, { m: [[1,1,1,1]], c: '#a7ffeb' }
+        {m:[[1]], c:'#ff8a80'}, {m:[[1,1]], c:'#ff80ab'}, {m:[[1],[1]], c:'#ea80fc'},
+        {m:[[1,1,1]], c:'#b388ff'}, {m:[[1,1],[1,1]], c:'#8c9eff'}, {m:[[1,1,1],[0,1,0]], c:'#80d8ff'}
     ];
+    let grid = Array(8).fill().map(()=>Array(8).fill(0));
+    let currentDrag = null;
+    let ghost = null;
+    const CELL = 100; // canvas 800x800, cell=100
 
-    class BlockPuzzle {
-        constructor() {
-            this.canvas = document.getElementById('game-canvas');
-            this.ctx = this.canvas.getContext('2d');
-            this.gridSize = 8;
-            this.cellSize = this.canvas.width / this.gridSize;
-            this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
-            this.currentShape = null; this.ghostShape = null;
-            this.TOUCH_OFFSET = 70; // 適中的偏移量
-            this.loop = this.loop.bind(this);
-            requestAnimationFrame(this.loop);
-            this.spawnShapes(); updateUI(); Pet.init();
+    function draw() {
+        ctx.clearRect(0,0,800,800);
+        // 網格
+        ctx.strokeStyle = '#ffebee'; ctx.lineWidth=2;
+        for(let i=0;i<=8;i++) {
+            ctx.beginPath(); ctx.moveTo(0,i*CELL); ctx.lineTo(800,i*CELL); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(i*CELL,0); ctx.lineTo(i*CELL,800); ctx.stroke();
         }
-        loop() {
-            this.ctx.clearRect(0,0,800,800);
-            this.drawGrid();
-            if(this.ghostShape) this.drawGhost();
-            this.drawPlaced();
-            requestAnimationFrame(this.loop);
-        }
-        drawGrid() {
-            this.ctx.strokeStyle = '#ffebee'; this.ctx.lineWidth = 2;
-            for(let i=0; i<=8; i++) {
-                let p = i*this.cellSize;
-                this.ctx.beginPath(); this.ctx.moveTo(0,p); this.ctx.lineTo(800,p); this.ctx.stroke();
-                this.ctx.beginPath(); this.ctx.moveTo(p,0); this.ctx.lineTo(p,800); this.ctx.stroke();
-            }
-        }
-        drawGhost() {
-            this.ctx.save(); this.ctx.globalAlpha = 0.3;
-            this.drawShape(this.ghostShape.shape, this.ghostShape.x, this.ghostShape.y);
-            this.ctx.restore();
-        }
-        drawPlaced() {
-            for(let r=0; r<8; r++) for(let c=0; c<8; c++) if(this.grid[r][c]) this.drawCell(c,r,this.grid[r][c]);
-        }
-        drawShape(s, x, y) {
-            for(let r=0; r<s.m.length; r++) for(let c=0; c<s.m[0].length; c++) if(s.m[r][c]) this.drawCell(x+c, y+r, s.c);
-        }
-        drawCell(x, y, c) {
-            let s = this.cellSize-4, cx = x*this.cellSize+this.cellSize/2, cy = y*this.cellSize+this.cellSize/2;
-            this.ctx.save(); this.ctx.translate(cx,cy);
-            this.ctx.fillStyle = c; this.ctx.beginPath(); this.ctx.roundRect(-s/2,-s/2,s,s,12); this.ctx.fill();
-            this.ctx.fillStyle = 'rgba(255,255,255,0.3)'; this.ctx.beginPath(); this.ctx.arc(-s/4,-s/4,s/5,0,Math.PI*2); this.ctx.fill();
-            this.ctx.restore();
-        }
-        spawnShapes() {
-            const c = document.getElementById('spawn-area'); c.innerHTML = '';
-            for(let i=0; i<3; i++) {
-                const d = SHAPES[Math.floor(Math.random()*SHAPES.length)];
-                this.createDrag(d, c);
-            }
-            this.checkOver();
-        }
-        createDrag(data, container) {
+        // 預覽 (Ghost)
+        if(ghost) drawShape(ghost.shape, ghost.x, ghost.y, 'rgba(0,0,0,0.1)');
+        // 已放置方塊
+        for(let y=0;y<8;y++) for(let x=0;x<8;x++) if(grid[y][x]) drawCell(x,y,grid[y][x]);
+        requestAnimationFrame(draw);
+    }
+    
+    function drawCell(x,y,c) {
+        let p=4, s=CELL-p*2;
+        ctx.fillStyle=c; 
+        ctx.beginPath(); ctx.roundRect(x*CELL+p, y*CELL+p, s, s, 15); ctx.fill();
+    }
+    function drawShape(s,x,y,c) {
+        for(let r=0;r<s.m.length;r++) for(let c2=0;c2<s.m[0].length;c2++) if(s.m[r][c2]) drawCell(x+c2, y+r, c || s.c);
+    }
+
+    function spawn() {
+        const area = document.getElementById('spawn-area'); area.innerHTML = '';
+        for(let i=0;i<3;i++) {
+            const data = SHAPES[Math.floor(Math.random()*SHAPES.length)];
             const el = document.createElement('canvas');
-            el.width = 55; el.height = 55; el.className = 'shape-preview';
-            const ctx = el.getContext('2d');
-            const s = 9, ox = (55-data.m[0].length*s)/2, oy = (55-data.m.length*s)/2;
-            ctx.fillStyle = data.c;
-            for(let r=0; r<data.m.length; r++) for(let c=0; c<data.m[0].length; c++) if(data.m[r][c]) ctx.fillRect(ox+c*s, oy+r*s, s-1, s-1);
+            el.width=60; el.height=60; el.className='shape-preview';
+            const c = el.getContext('2d');
+            const s=12, ox=(60-data.m[0].length*s)/2, oy=(60-data.m.length*s)/2;
+            c.fillStyle=data.c;
+            for(let r=0;r<data.m.length;r++) for(let col=0;col<data.m[0].length;col++) 
+                if(data.m[r][col]) c.fillRect(ox+col*s, oy+r*s, s-1, s-1);
             
-            const start = (e) => {
-                e.preventDefault(); el.classList.add('dragging');
-                this.currentShape = { el, data };
-                this.move(e);
-            };
-            el.addEventListener('touchstart', start, {passive:false});
-            el.addEventListener('mousedown', start);
-            container.appendChild(el);
-        }
-        move(e) {
-            const moveHandler = (ev) => {
-                if(!this.currentShape) return;
-                ev.preventDefault();
-                const cx = ev.clientX || ev.touches[0].clientX;
-                const cy = ev.clientY || ev.touches[0].clientY;
-                const el = this.currentShape.el;
-                el.style.left = (cx-27)+'px'; el.style.top = (cy-27-this.TOUCH_OFFSET)+'px';
-
-                const bRect = this.canvas.getBoundingClientRect();
-                const elRect = el.getBoundingClientRect();
-                const rx = (elRect.left+elRect.width/2) - bRect.left;
-                const ry = (elRect.top+elRect.height/2) - bRect.top;
-                
-                const gx = Math.floor(rx/this.cellSize);
-                const gy = Math.floor(ry/this.cellSize);
-                const s = this.currentShape.data;
-                const px = gx - Math.floor(s.m[0].length/2);
-                const py = gy - Math.floor(s.m.length/2);
-
-                // 磁吸
-                let best = null, minD = 999;
-                for(let dy=-1; dy<=1; dy++) for(let dx=-1; dx<=1; dx++) {
-                    if(this.canPlace(s.m, px+dx, py+dy)) {
-                        let d = Math.abs(dx)+Math.abs(dy);
-                        if(d < minD) { minD = d; best = {x:px+dx, y:py+dy}; }
-                    }
-                }
-                this.ghostShape = best ? {x:best.x, y:best.y, shape:s} : null;
-            };
-            const endHandler = () => {
-                document.removeEventListener('touchmove', moveHandler); document.removeEventListener('mousemove', moveHandler);
-                document.removeEventListener('touchend', endHandler); document.removeEventListener('mouseup', endHandler);
-                if(!this.currentShape) return;
-                if(this.ghostShape) {
-                    this.place(this.currentShape.data, this.ghostShape.x, this.ghostShape.y);
-                    this.currentShape.el.remove(); Sound.drop();
-                    if(document.getElementById('spawn-area').children.length===0) setTimeout(()=>this.spawnShapes(),500);
-                    else this.checkOver();
-                } else {
-                    this.currentShape.el.classList.remove('dragging');
-                    this.currentShape.el.style.left=''; this.currentShape.el.style.top='';
-                }
-                this.currentShape = null; this.ghostShape = null;
-            };
-            document.addEventListener('touchmove', moveHandler, {passive:false}); document.addEventListener('mousemove', moveHandler);
-            document.addEventListener('touchend', endHandler); document.addEventListener('mouseup', endHandler);
-        }
-        canPlace(m, x, y) {
-            for(let r=0; r<m.length; r++) for(let c=0; c<m[0].length; c++) if(m[r][c]) {
-                let nx=x+c, ny=y+r;
-                if(nx<0||nx>=8||ny<0||ny>=8||this.grid[ny][nx]) return false;
-            }
-            return true;
-        }
-        place(s, x, y) {
-            for(let r=0; r<s.m.length; r++) for(let c=0; c<s.m[0].length; c++) if(s.m[r][c]) this.grid[y+r][x+c] = s.c;
-            this.checkLines();
-        }
-        checkLines() {
-            let rows=[], cols=[];
-            for(let r=0; r<8; r++) if(this.grid[r].every(c=>c)) rows.push(r);
-            for(let c=0; c<8; c++) { let full=true; for(let r=0; r<8; r++) if(!this.grid[r][c]) full=false; if(full) cols.push(c); }
-            if(rows.length+cols.length > 0) {
-                rows.forEach(r=>this.grid[r].fill(0));
-                cols.forEach(c=> { for(let r=0; r<8; r++) this.grid[r][c]=0; });
-                let gain = (rows.length+cols.length)*10;
-                userCoins+=gain; updateUI();
-                const el = document.createElement('div'); el.className='float-text'; el.innerText=`+${gain}`;
-                el.style.left='50%'; el.style.top='50%'; document.body.appendChild(el); setTimeout(()=>el.remove(),800);
-            }
-        }
-        checkOver() {
-            setTimeout(()=>{
-                const els = document.querySelectorAll('#spawn-area .shape-preview');
-                if(els.length===0) return;
-                // 這裡簡化檢查邏輯：只要有一個能放就不死
-                // 為了代碼簡潔，這裡省略詳細檢查，實際建議加上
-            }, 100);
-        }
-        reset() {
-            this.grid = Array(8).fill().map(()=>Array(8).fill(0));
-            document.getElementById('game-over-modal').style.display='none';
-            this.spawnShapes();
+            // 綁定觸控事件
+            el.addEventListener('touchstart', (e)=>startDrag(e, el, data), {passive:false});
+            el.addEventListener('mousedown', (e)=>startDrag(e, el, data));
+            area.appendChild(el);
         }
     }
-    const game = new BlockPuzzle();
+
+    function startDrag(e, el, data) {
+        e.preventDefault(); // 禁止瀏覽器捲動
+        currentDrag = { el, data };
+        el.classList.add('dragging');
+        moveDrag(e);
+    }
+
+    function moveDrag(e) {
+        if(!currentDrag) return;
+        const evt = e.touches ? e.touches[0] : e;
+        const el = currentDrag.el;
+        
+        // 1. 移動元素 (加上偏移量 80px 讓手指不擋住)
+        const offset = 80;
+        el.style.left = (evt.clientX - 30) + 'px';
+        el.style.top = (evt.clientY - 30 - offset) + 'px';
+
+        // 2. 計算對應棋盤位置
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        // 手指位置對應到 Canvas 座標
+        const canvasX = (evt.clientX - rect.left) * scaleX;
+        const canvasY = (evt.clientY - offset - rect.top) * scaleY;
+
+        const gx = Math.floor(canvasX / CELL);
+        const gy = Math.floor(canvasY / CELL);
+
+        // 3. 磁吸判定
+        const shape = currentDrag.data;
+        // 假設手指抓在方塊中心
+        const px = gx - Math.floor(shape.m[0].length/2);
+        const py = gy - Math.floor(shape.m.length/2);
+
+        let best = null;
+        // 搜尋周圍 3x3 範圍
+        for(let dy=-1; dy<=1; dy++) for(let dx=-1; dx<=1; dx++) {
+            if(canPlace(shape.m, px+dx, py+dy)) {
+                best = {x: px+dx, y: py+dy};
+                break; // 找到一個就停
+            }
+        }
+        ghost = best ? {x:best.x, y:best.y, shape:shape} : null;
+    }
+
+    function endDrag() {
+        if(!currentDrag) return;
+        if(ghost) {
+            place(ghost.shape, ghost.x, ghost.y);
+            currentDrag.el.remove();
+            if(document.getElementById('spawn-area').children.length===0) setTimeout(spawn, 300);
+        } else {
+            currentDrag.el.classList.remove('dragging');
+            currentDrag.el.style.left=''; currentDrag.el.style.top='';
+        }
+        currentDrag = null; ghost = null;
+    }
+
+    // 全局監聽移動與結束
+    document.addEventListener('touchmove', moveDrag, {passive:false});
+    document.addEventListener('mousemove', moveDrag);
+    document.addEventListener('touchend', endDrag);
+    document.addEventListener('mouseup', endDrag);
+
+    function canPlace(m, x, y) {
+        for(let r=0;r<m.length;r++) for(let c=0;c<m[0].length;c++) {
+            if(m[r][c]) {
+                let nx=x+c, ny=y+r;
+                if(nx<0||nx>=8||ny<0||ny>=8||grid[ny][nx]) return false;
+            }
+        }
+        return true;
+    }
+    function place(s, x, y) {
+        for(let r=0;r<s.m.length;r++) for(let c=0;c<s.m[0].length;c++) 
+            if(s.m[r][c]) grid[y+r][x+c] = s.c;
+        checkLines();
+    }
+    function checkLines() {
+        let lines = 0;
+        // 簡化消除邏輯
+        for(let y=0;y<8;y++) if(grid[y].every(c=>c)) { grid[y].fill(0); lines++; }
+        for(let x=0;x<8;x++) {
+            let full=true; for(let y=0;y<8;y++) if(!grid[y][x]) full=false;
+            if(full) { for(let y=0;y<8;y++) grid[y][x]=0; lines++; }
+        }
+        if(lines>0) {
+            coins += lines*10; updateUI();
+            const f = document.createElement('div'); f.className='float-text'; f.innerText=`+${lines*10}`;
+            f.style.left='50%'; f.style.top='50%'; document.body.appendChild(f); setTimeout(()=>f.remove(),800);
+        }
+    }
+
+    draw(); spawn();
 </script>
 </body>
 </html>
