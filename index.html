@@ -11,7 +11,7 @@
 
     <style>
         :root {
-            --bg-color: #fff0f5; /* 淺粉紅背景 */
+            --bg-color: #fff0f5;
             --board-bg: #fce4ec;
             --text-main: #880e4f;
             --accent: #ec407a;
@@ -28,7 +28,6 @@
             color: var(--text-main);
         }
 
-        /* === 底部導航列 === */
         .nav-bar {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: white; padding: 10px 30px; border-radius: 40px;
@@ -42,7 +41,6 @@
         }
         .nav-item.active { background: var(--accent); color: white; transform: translateY(-10px); box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3); }
 
-        /* === 頁面容器 === */
         .page {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -50,7 +48,6 @@
         }
         .page.active { opacity: 1; pointer-events: all; transform: scale(1); }
 
-        /* === 遊戲頁面 === */
         #game-wrapper {
             width: 100%; max-width: 500px; height: 100%; padding: 20px 20px 100px 20px;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -72,7 +69,6 @@
         .shape-preview { width: 70px; height: 70px; transition: transform 0.1s; }
         .shape-preview.dragging { opacity: 0.9; z-index: 2000; position: fixed; transform: scale(1.2); pointer-events: none; }
 
-        /* === 兌換商店頁面 === */
         #shop-wrapper {
             width: 100%; max-width: 500px; height: 100%; padding: 60px 20px 100px 20px;
             display: flex; flex-direction: column; align-items: center;
@@ -106,13 +102,11 @@
         }
         .btn-redeem:disabled { background: #ccc; }
 
-        /* === 隱藏的後台按鈕 === */
         #secret-btn {
-            position: fixed; top: 10px; right: 10px; opacity: 0.1; font-size: 1.5rem;
+            position: fixed; top: 10px; right: 10px; opacity: 0.05; font-size: 1.5rem;
             z-index: 3000; cursor: pointer;
         }
 
-        /* === 彈窗 === */
         #overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); z-index: 4000;
@@ -128,9 +122,7 @@
             border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between;
             font-size: 0.9rem;
         }
-        .log-time { color: #888; font-size: 0.7rem; }
 
-        /* 浮動文字 */
         .float-text {
             position: absolute; font-family: 'Fredoka'; font-weight: 900;
             color: #ec407a; font-size: 2rem; pointer-events: none;
@@ -142,10 +134,9 @@
 </head>
 <body>
 
-<!-- 隱藏後台按鈕 (右上角，幾乎透明) -->
+<!-- 隱藏後台按鈕 -->
 <div id="secret-btn" onclick="Admin.showLogs()">⚙️</div>
 
-<!-- 底部導航 -->
 <div class="nav-bar">
     <div class="nav-item active" onclick="switchPage('game')">
         <i class="fas fa-gamepad"></i>
@@ -155,11 +146,11 @@
     </div>
 </div>
 
-<!-- 1. 遊戲頁面 -->
 <div id="game-page" class="page active">
     <div id="game-wrapper">
         <header>
-            <div style="font-weight:bold; color:var(--text-main); font-size:1.2rem;">無尾熊許願池 🐨</div>
+            <!-- 秘密點擊區域：標題 -->
+            <div id="title-trigger" style="font-weight:bold; color:var(--text-main); font-size:1.2rem; cursor:pointer;">無尾熊許願池 🐨</div>
             <div class="score-box">
                 <div style="font-size:0.7rem; color:#888;">愛心幣</div>
                 <div class="score-val" id="game-coins">0</div>
@@ -173,7 +164,6 @@
     </div>
 </div>
 
-<!-- 2. 兌換商店頁面 -->
 <div id="shop-page" class="page">
     <div id="shop-wrapper">
         <div class="wallet-card">
@@ -185,13 +175,10 @@
         </div>
 
         <h3 style="margin-bottom:15px; color:var(--text-main); align-self:flex-start;">✨ 兌換妳的願望</h3>
-        <div class="shop-list" id="shop-container">
-            <!-- JS 生成商品 -->
-        </div>
+        <div class="shop-list" id="shop-container"></div>
     </div>
 </div>
 
-<!-- 後台紀錄彈窗 -->
 <div id="overlay">
     <div class="overlay-card">
         <h3>📋 兌換紀錄 (後台)</h3>
@@ -203,23 +190,21 @@
 
 <script>
     /* =================================================================
-       ⚠️ 設定區：請在此修改
+       ⚠️ 設定區：請在此填入你的 Dreamlo Keys
     ================================================================= */
-    
-    // 1. Dreamlo API Keys (請填入你的 Key)
     const DreamloConfig = {
-        privateKey: "", // 上傳用 (長的那串)
-        publicKey:  "", // 讀取用 (短的那串)
+        privateKey: "", 
+        publicKey:  "", 
     };
 
-    // 2. 獎品列表 (你可以自由新增或修改)
+    /* ⚠️ 獎品列表 (通貨膨脹版) */
     const REAL_PRIZES = [
-        { id: 'tea', name: '一杯手搖飲 (任選)', price: 500, icon: '🧋' },
-        { id: 'massage', name: '肩頸按摩券 (20分)', price: 1000, icon: '💆‍♀️' },
-        { id: 'food', name: '請吃一頓大餐', price: 3000, icon: '🍽️' },
-        { id: 'movie', name: '電影之夜 (含爆米花)', price: 5000, icon: '🎬' },
-        { id: 'wish', name: '無條件答應一個願望', price: 10000, icon: '🧞‍♂️' },
-        { id: 'cart', name: '清空購物車 (上限5000)', price: 50000, icon: '🛍️' }
+        { id: 'tea', name: '一杯手搖飲', price: 2500, icon: '🧋' },
+        { id: 'massage', name: '肩頸按摩 (20分)', price: 12000, icon: '💆‍♀️' },
+        { id: 'food', name: '請吃大餐', price: 35000, icon: '🍽️' },
+        { id: 'movie', name: '電影之夜', price: 50000, icon: '🎬' },
+        { id: 'wish', name: '無條件願望券', price: 200000, icon: '🧞‍♂️' },
+        { id: 'cart', name: '清空購物車', price: 999999, icon: '🛍️' }
     ];
 
     /* =========================================
@@ -237,7 +222,6 @@
     function renderShop() {
         const container = document.getElementById('shop-container');
         container.innerHTML = '';
-        
         REAL_PRIZES.forEach(item => {
             const canBuy = userCoins >= item.price;
             const div = document.createElement('div');
@@ -246,7 +230,7 @@
                 <div class="coupon-icon">${item.icon}</div>
                 <div class="coupon-info">
                     <div class="coupon-name">${item.name}</div>
-                    <div class="coupon-price">${item.price} 愛心幣</div>
+                    <div class="coupon-price">${item.price.toLocaleString()} 愛心幣</div>
                 </div>
                 <button class="btn-redeem" ${canBuy ? '' : 'disabled'} onclick="redeemItem('${item.name}', ${item.price})">
                     ${canBuy ? '兌換' : '不足'}
@@ -257,92 +241,68 @@
     }
 
     function redeemItem(itemName, price) {
-        if(confirm(`確定要花 ${price} 愛心幣兌換「${itemName}」嗎？\n(兌換後請截圖或直接跟男友說 XD)`)) {
+        if(confirm(`確定要花 ${price} 愛心幣兌換「${itemName}」嗎？`)) {
             userCoins -= price;
             updateUI();
-            
-            // 上傳到雲端 (偷吃步：把商品名當作玩家名上傳)
             Admin.uploadLog(itemName);
-            
             alert(`🎉 兌換成功！\n\n妳獲得了：${itemName}\n\n(系統已偷偷通知男友準備履約)`);
         }
     }
 
+    /* 秘密開掛功能 */
+    let clickCount = 0;
+    document.getElementById('title-trigger').addEventListener('click', () => {
+        clickCount++;
+        if(clickCount === 10) {
+            userCoins += 10000;
+            updateUI();
+            alert("💖 男友救星啟動！\n已偷偷匯入 10,000 愛心幣。");
+            clickCount = 0;
+        }
+    });
+
     /* =========================================
-       2. 後台系統 (Dreamlo Integration)
+       2. 後台系統
     ========================================= */
     const Admin = {
         uploadLog: function(itemName) {
             if(!DreamloConfig.privateKey) return;
-            // 格式：名字=兌換項目, 分數=時間戳記(確保順序)
-            // 為了避免中文亂碼，這裡做簡單處理，但 Dreamlo 支援 UTF8 通常沒問題
             const msg = `兌換：${itemName}`;
-            // 使用負的時間戳記，這樣最新的會在最上面 (因為排行榜是分數高到低)
-            // 或者我們用正的時間戳記，然後讀取時自己反轉
-            // 這裡我們用一個隨機大數減去時間，確保最新的分數最高
             const score = 2000000000 - Math.floor(Date.now() / 1000); 
-            
-            // 為了不覆蓋，我們在名字後面加個隨機碼
             const uniqueName = `${msg}_${Math.floor(Math.random()*100)}`;
-            
             const url = `https://www.dreamlo.com/lb/${DreamloConfig.privateKey}/add/${encodeURIComponent(uniqueName)}/${score}`;
             fetch(url).catch(e => console.log("Upload failed"));
         },
-
         showLogs: function() {
             document.getElementById('overlay').style.display = 'flex';
             const list = document.getElementById('log-list');
             const loading = document.getElementById('loading-text');
             list.innerHTML = '';
             loading.style.display = 'block';
-
-            if(!DreamloConfig.publicKey) {
-                loading.innerText = "尚未設定 API Key";
-                return;
-            }
-
+            if(!DreamloConfig.publicKey) { loading.innerText = "尚未設定 API Key"; return; }
             const url = `https://www.dreamlo.com/lb/${DreamloConfig.publicKey}/json`;
-            fetch(url)
-                .then(res => res.json())
-                .then(data => {
-                    loading.style.display = 'none';
-                    let entries = [];
-                    if(data.dreamlo && data.dreamlo.leaderboard && data.dreamlo.leaderboard.entry) {
-                        entries = data.dreamlo.leaderboard.entry;
-                        if(!Array.isArray(entries)) entries = [entries];
-                    }
-                    
-                    if(entries.length === 0) {
-                        list.innerHTML = '<li>尚無兌換紀錄</li>';
-                        return;
-                    }
-
-                    // 顯示資料
-                    entries.forEach(entry => {
-                        // 還原名字 (去掉隨機碼)
-                        let displayName = entry.name.split('_')[0];
-                        // 還原時間 (大約)
-                        // 這裡不精確還原時間了，直接顯示項目就好
-                        
-                        const li = document.createElement('li');
-                        li.className = 'log-item';
-                        li.innerHTML = `
-                            <span style="font-weight:bold; color:#880e4f;">${displayName}</span>
-                            <span style="color:#ec407a;">已兌換</span>
-                        `;
-                        list.appendChild(li);
-                    });
-                })
-                .catch(e => loading.innerText = "讀取失敗");
+            fetch(url).then(res => res.json()).then(data => {
+                loading.style.display = 'none';
+                let entries = [];
+                if(data.dreamlo && data.dreamlo.leaderboard && data.dreamlo.leaderboard.entry) {
+                    entries = data.dreamlo.leaderboard.entry;
+                    if(!Array.isArray(entries)) entries = [entries];
+                }
+                if(entries.length === 0) { list.innerHTML = '<li>尚無兌換紀錄</li>'; return; }
+                entries.forEach(entry => {
+                    let displayName = entry.name.split('_')[0];
+                    const li = document.createElement('li');
+                    li.className = 'log-item';
+                    li.innerHTML = `<span style="font-weight:bold; color:#880e4f;">${displayName}</span><span style="color:#ec407a;">已兌換</span>`;
+                    list.appendChild(li);
+                });
+            }).catch(e => loading.innerText = "讀取失敗");
         },
-        
-        close: function() {
-            document.getElementById('overlay').style.display = 'none';
-        }
+        close: function() { document.getElementById('overlay').style.display = 'none'; }
     };
 
     /* =========================================
-       3. 頁面切換
+       3. 頁面切換與遊戲
     ========================================= */
     function switchPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -352,9 +312,6 @@
         if(pageId === 'shop') updateUI();
     }
 
-    /* =========================================
-       4. 遊戲引擎 (簡化版 Block Puzzle)
-    ========================================= */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const Sound = {
         play: (freq, type, dur) => {
@@ -387,13 +344,11 @@
             this.TOUCH_OFFSET = 100;
             this.currentShape = null;
             this.ghostShape = null;
-            
             this.loop = this.loop.bind(this);
             requestAnimationFrame(this.loop);
             this.spawnShapes();
             updateUI();
         }
-
         loop() {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.drawGrid();
@@ -401,7 +356,6 @@
             this.drawPlacedBlocks();
             requestAnimationFrame(this.loop);
         }
-
         drawGrid() {
             this.ctx.strokeStyle = 'white'; this.ctx.lineWidth = 2;
             for(let i=0; i<=this.gridSize; i++) {
@@ -410,7 +364,6 @@
                 this.ctx.beginPath(); this.ctx.moveTo(pos, 0); this.ctx.lineTo(pos, 800); this.ctx.stroke();
             }
         }
-
         drawGhost() {
             const { x, y, shape } = this.ghostShape;
             this.ctx.save(); this.ctx.globalAlpha = 0.4;
@@ -421,7 +374,6 @@
             }
             this.ctx.restore();
         }
-
         drawPlacedBlocks() {
             for(let r=0; r<this.gridSize; r++) {
                 for(let c=0; c<this.gridSize; c++) {
@@ -429,7 +381,6 @@
                 }
             }
         }
-
         drawCell(x, y, color) {
             const padding = 4; const size = this.cellSize - padding * 2;
             const cx = x * this.cellSize + this.cellSize/2; const cy = y * this.cellSize + this.cellSize/2;
@@ -440,7 +391,6 @@
             this.ctx.beginPath(); this.ctx.arc(-size/4, -size/4, size/6, 0, Math.PI*2); this.ctx.fill();
             this.ctx.restore();
         }
-
         spawnShapes() {
             const container = document.getElementById('spawn-area');
             container.innerHTML = '';
@@ -449,7 +399,6 @@
                 this.createDraggableShape(shapeData, container);
             }
         }
-
         createDraggableShape(data, container) {
             const el = document.createElement('canvas');
             el.width = 70; el.height = 70; el.className = 'shape-preview';
@@ -470,21 +419,18 @@
             el.addEventListener('mousedown', handleStart); el.addEventListener('touchstart', handleStart);
             container.appendChild(el);
         }
-
         moveShape(e) {
             const move = (ev) => {
                 if(!this.currentShape) return;
                 const cx = ev.clientX || ev.touches[0].clientX; const cy = ev.clientY || ev.touches[0].clientY;
                 const el = this.currentShape.el;
                 el.style.left = (cx - 35) + 'px'; el.style.top = (cy - 35 - this.TOUCH_OFFSET) + 'px';
-                
                 const rect = this.canvas.getBoundingClientRect();
                 const x = (cx - rect.left) * (this.canvas.width / rect.width);
                 const y = (cy - this.TOUCH_OFFSET - rect.top) * (this.canvas.height / rect.height);
                 const gx = Math.floor(x / this.cellSize); const gy = Math.floor(y / this.cellSize);
                 const shape = this.currentShape.data;
                 const finalX = gx - Math.floor(shape.m[0].length/2); const finalY = gy - Math.floor(shape.m.length/2);
-
                 if(this.canPlace(shape.m, finalX, finalY)) {
                     this.ghostShape = { x: finalX, y: finalY, shape: shape };
                 } else { this.ghostShape = null; }
@@ -500,7 +446,6 @@
             document.addEventListener('mousemove', move); document.addEventListener('touchmove', move, {passive: false});
             document.addEventListener('mouseup', end); document.addEventListener('touchend', end);
         }
-
         tryPlaceShape(mx, my) {
             this.ghostShape = null;
             const rect = this.canvas.getBoundingClientRect();
@@ -509,7 +454,6 @@
             const gx = Math.floor(x / this.cellSize); const gy = Math.floor(y / this.cellSize);
             const shape = this.currentShape.data;
             const finalX = gx - Math.floor(shape.m[0].length/2); const finalY = gy - Math.floor(shape.m.length/2);
-
             if(this.canPlace(shape.m, finalX, finalY)) {
                 this.place(shape, finalX, finalY);
                 this.currentShape.el.remove(); Sound.drop();
@@ -520,7 +464,6 @@
             }
             this.currentShape = null;
         }
-
         canPlace(matrix, x, y) {
             for(let r=0; r<matrix.length; r++) {
                 for(let c=0; c<matrix[0].length; c++) {
@@ -532,7 +475,6 @@
             }
             return true;
         }
-
         place(shape, x, y) {
             for(let r=0; r<shape.m.length; r++) {
                 for(let c=0; c<shape.m[0].length; c++) {
@@ -541,7 +483,6 @@
             }
             this.checkLines();
         }
-
         checkLines() {
             let rowsToClear = []; let colsToClear = [];
             for(let r=0; r<this.gridSize; r++) if(this.grid[r].every(cell => cell !== 0)) rowsToClear.push(r);
@@ -554,24 +495,19 @@
                 rowsToClear.forEach(r => this.grid[r].fill(0));
                 colsToClear.forEach(c => { for(let r=0; r<this.gridSize; r++) this.grid[r][c] = 0; });
                 Sound.clear(totalLines);
-                
-                // 獎勵機制：1行=10幣, Combo加倍
                 let coinsEarned = totalLines * 10;
                 if(totalLines > 1) coinsEarned *= totalLines;
-                
                 userCoins += coinsEarned;
                 updateUI();
                 this.showFloatText(`+${coinsEarned} ❤️`);
             }
         }
-
         showFloatText(text) {
             const el = document.createElement('div'); el.className = 'float-text'; el.innerText = text;
             el.style.left = '50%'; el.style.top = '40%'; el.style.transform = 'translate(-50%, -50%)';
             document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
         }
     }
-
     const game = new BlockPuzzle();
     document.body.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
 </script>
