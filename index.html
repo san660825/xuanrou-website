@@ -12,9 +12,6 @@
     <style>
         :root {
             --bg-color: #fff0f5;
-            --primary: #ff80ab;
-            --secondary: #8c9eff;
-            --text: #880e4f;
             --glass: rgba(255, 255, 255, 0.85);
         }
 
@@ -46,42 +43,28 @@
             position: relative; z-index: 1;
         }
 
-        /* === 1. 頂部玻璃質感列 === */
+        /* === 頂部列 === */
         .header-bar {
             height: 90px; width: 94%; margin: 10px auto 0;
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border-radius: 25px;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 15px;
-            box-shadow: 0 8px 32px rgba(255, 128, 171, 0.15);
+            background: var(--glass); backdrop-filter: blur(10px);
+            border-radius: 25px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 15px; box-shadow: 0 8px 32px rgba(255, 128, 171, 0.15);
             border: 2px solid rgba(255, 255, 255, 0.8);
         }
-
         .pet-section { display: flex; align-items: center; gap: 12px; }
-        
-        /* 呼吸的無尾熊 */
         #koala-icon { 
-            width: 55px; height: 55px; 
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); 
-            animation: breathe 3s infinite ease-in-out;
-            cursor: pointer;
+            width: 55px; height: 55px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); 
+            animation: breathe 3s infinite ease-in-out; cursor: pointer;
         }
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         
         .status-box { display: flex; flex-direction: column; gap: 4px; }
-        .hunger-track { 
-            width: 70px; height: 8px; background: #ffebee; 
-            border-radius: 10px; overflow: hidden; border: 1px solid #ffcdd2; 
-        }
+        .hunger-track { width: 70px; height: 8px; background: #ffebee; border-radius: 10px; overflow: hidden; border: 1px solid #ffcdd2; }
         .hunger-fill { width: 50%; height: 100%; background: linear-gradient(90deg, #ff80ab, #ff4081); transition: width 0.5s; }
-        
         .feed-btn { 
-            font-size: 0.7rem; padding: 4px 10px; 
-            background: linear-gradient(135deg, #ff80ab, #ff4081); 
-            color: white; border:none; border-radius: 15px; 
-            font-weight: bold; box-shadow: 0 2px 5px rgba(255, 64, 129, 0.3);
-            transition: transform 0.1s;
+            font-size: 0.7rem; padding: 4px 10px; background: linear-gradient(135deg, #ff80ab, #ff4081); 
+            color: white; border:none; border-radius: 15px; font-weight: bold; 
+            box-shadow: 0 2px 5px rgba(255, 64, 129, 0.3); transition: transform 0.1s;
         }
         .feed-btn:active { transform: scale(0.9); }
 
@@ -92,15 +75,13 @@
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
         }
         .nav-btn { 
-            font-size: 1.2rem; color: white; 
-            background: #8c9eff; width: 40px; height: 40px; 
+            font-size: 1.2rem; color: white; background: #8c9eff; width: 40px; height: 40px; 
             border-radius: 50%; display:flex; align-items:center; justify-content:center; 
-            box-shadow: 0 4px 10px rgba(140, 158, 255, 0.4);
-            transition: transform 0.1s;
+            box-shadow: 0 4px 10px rgba(140, 158, 255, 0.4); transition: transform 0.1s;
         }
         .nav-btn:active { transform: scale(0.9); }
 
-        /* === 2. 遊戲區 === */
+        /* === 遊戲區 === */
         .game-area {
             flex: 1; display: flex; flex-direction: column;
             justify-content: center; align-items: center;
@@ -108,23 +89,21 @@
         }
         #board-container {
             width: 90vw; max-width: 360px; aspect-ratio: 1/1;
-            background: rgba(255,255,255,0.9); 
-            border-radius: 24px; padding: 10px;
+            background: rgba(255,255,255,0.9); border-radius: 24px; padding: 10px;
             box-shadow: 0 15px 35px rgba(255, 128, 171, 0.15), inset 0 -5px 0 rgba(0,0,0,0.05);
-            border: 4px solid white;
+            border: 4px solid white; transition: transform 0.3s;
         }
-        canvas#game-canvas { width: 100%; height: 100%; border-radius: 16px; display: block; }
         .board-shake { animation: shake 0.5s both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        canvas#game-canvas { width: 100%; height: 100%; border-radius: 16px; display: block; }
 
-        /* === 3. 底部生成區 === */
+        /* === 生成區 === */
         #spawn-area {
             height: 120px; width: 100%;
             display: flex; justify-content: space-around; align-items: center;
             background: rgba(255,255,255,0.5);
             border-top-left-radius: 30px; border-top-right-radius: 30px;
-            backdrop-filter: blur(5px);
-            padding-bottom: 15px;
+            backdrop-filter: blur(5px); padding-bottom: 15px;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
         }
         .shape-preview { width: 60px; height: 60px; touch-action: none; filter: drop-shadow(0 4px 0 rgba(0,0,0,0.1)); }
@@ -139,11 +118,9 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 240, 245, 0.95); z-index: 200;
             display: none; flex-direction: column; padding: 20px;
-            backdrop-filter: blur(10px);
-            animation: slideUp 0.3s ease-out;
+            backdrop-filter: blur(10px); animation: slideUp 0.3s ease-out;
         }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
         .shop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; margin-top: 40px; }
         .shop-item {
             background: white; padding: 15px; margin-bottom: 15px; border-radius: 20px;
@@ -164,7 +141,6 @@
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
         .btn-restart { 
             background: linear-gradient(135deg, #ff80ab, #ff4081); 
             color: white; border: none; padding: 12px 35px; 
@@ -172,26 +148,13 @@
             font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255, 64, 129, 0.4);
         }
 
-        .float-text { 
-            position: absolute; font-family: 'Fredoka'; font-weight: 900; 
-            color: #ff4081; font-size: 1.8rem; pointer-events: none; z-index: 5000; 
-            animation: floatUp 1s forwards; text-shadow: 3px 3px 0 white; 
-        }
-        
-        .bubble { 
-            position: absolute; top: 100px; left: 20px; 
-            background: white; padding: 8px 15px; border-radius: 20px; 
-            border-bottom-left-radius: 2px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            font-size: 0.9rem; color: #880e4f; font-weight: bold;
-            opacity: 0; transition: 0.3s; pointer-events: none; 
-        }
+        .float-text { position: absolute; font-family: 'Fredoka'; font-weight: 900; color: #ff4081; font-size: 1.8rem; pointer-events: none; z-index: 5000; animation: floatUp 1s forwards; text-shadow: 3px 3px 0 white; }
+        .bubble { position: absolute; top: 100px; left: 20px; background: white; padding: 8px 15px; border-radius: 20px; border-bottom-left-radius: 2px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); font-size: 0.9rem; color: #880e4f; font-weight: bold; opacity: 0; transition: 0.3s; pointer-events: none; }
         .bubble.show { opacity: 1; transform: translateY(-5px); }
     </style>
 </head>
 <body>
 
-<!-- 背景裝飾 -->
 <div class="bg-blob blob-1"></div>
 <div class="bg-blob blob-2"></div>
 <div class="bg-blob blob-3"></div>
@@ -246,29 +209,23 @@
 </div>
 
 <script>
-    /* === 粒子特效系統 (Confetti) === */
+    /* === 粒子特效 === */
     const particles = [];
     class Particle {
         constructor(x, y, color) {
             this.x = x; this.y = y; this.color = color;
             this.size = Math.random() * 15 + 5;
-            this.speedX = Math.random() * 6 - 3;
-            this.speedY = Math.random() * 6 - 3;
+            this.speedX = Math.random() * 6 - 3; this.speedY = Math.random() * 6 - 3;
             this.life = 1.0;
         }
-        update() {
-            this.x += this.speedX; this.y += this.speedY;
-            this.life -= 0.02; this.size *= 0.95;
-        }
+        update() { this.x += this.speedX; this.y += this.speedY; this.life -= 0.02; this.size *= 0.95; }
         draw(ctx) {
             ctx.globalAlpha = this.life; ctx.fillStyle = this.color;
             ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
             ctx.globalAlpha = 1.0;
         }
     }
-    function createExplosion(x, y, color) {
-        for(let i=0; i<10; i++) particles.push(new Particle(x, y, color));
-    }
+    function createExplosion(x, y, color) { for(let i=0; i<10; i++) particles.push(new Particle(x, y, color)); }
 
     /* === 養成數據 === */
     let coins = parseInt(localStorage.getItem('xr_coins') || 0);
@@ -287,7 +244,6 @@
             if(hunger>=100) return speak("飽了！");
             coins -= 50; hunger = Math.min(100, hunger+20);
             updateUI(); speak("好吃！");
-            // 噴愛心
             const rect = document.getElementById('koala-icon').getBoundingClientRect();
             createExplosion(rect.left+25, rect.top+25, '#ff4081');
         } else speak("沒錢...");
@@ -299,7 +255,6 @@
         if(clicks===10) { coins+=10000; updateUI(); alert("男友救星！+10000"); clicks=0; }
         else speak("愛妳喔 ❤️");
     }
-
     function speak(text) {
         const b = document.getElementById('msg'); b.innerText = text;
         b.classList.add('show'); setTimeout(()=>b.classList.remove('show'), 2000);
@@ -313,14 +268,12 @@
             PRIZES.forEach(p => {
                 l.innerHTML += `<div class="shop-item">
                     <div><b style="font-size:1.1rem; color:#555;">${p.n}</b><br><small style="color:#ff80ab; font-weight:bold;">${p.p.toLocaleString()} 🌿</small></div>
-                    <button onclick="buy('${p.n}',${p.p})" style="background:linear-gradient(135deg, #8c9eff, #536dfe); color:white; border:none; padding:8px 15px; border-radius:15px; font-weight:bold; box-shadow:0 3px 10px rgba(83,109,254,0.3);">兌換</button>
+                    <button onclick="buy('${p.n}',${p.p})" style="background:linear-gradient(135deg, #8c9eff, #536dfe); color:white; border:none; padding:8px 15px; border-radius:15px; font-weight:bold;">兌換</button>
                 </div>`;
             });
         }
     }
-    function buy(n, p) {
-        if(coins>=p) { coins-=p; updateUI(); alert(`兌換成功：${n}`); } else alert("錢不夠！");
-    }
+    function buy(n, p) { if(coins>=p) { coins-=p; updateUI(); alert(`兌換成功：${n}`); } else alert("錢不夠！"); }
 
     /* === 遊戲引擎 === */
     const canvas = document.getElementById('game-canvas');
@@ -333,36 +286,33 @@
     let currentDrag = null; let ghost = null;
     const CELL = 100;
 
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const Sound = {
+        play: (f,t,d) => { if(audioCtx.state==='suspended')audioCtx.resume(); const o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.type=t; o.frequency.setValueAtTime(f,audioCtx.currentTime); g.gain.setValueAtTime(0.05,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+d); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+d); },
+        drop: ()=>Sound.play(300,'triangle',0.1), fail: ()=>Sound.play(150,'sawtooth',0.5)
+    };
+
     function draw() {
         ctx.clearRect(0,0,800,800);
-        
-        // 繪製粒子
         for(let i=particles.length-1; i>=0; i--) {
             particles[i].update(); particles[i].draw(ctx);
             if(particles[i].life <= 0) particles.splice(i, 1);
         }
-
-        // 網格 (虛線更可愛)
         ctx.strokeStyle = '#fce4ec'; ctx.lineWidth=3; ctx.setLineDash([10, 10]);
         for(let i=0;i<=8;i++) {
             ctx.beginPath(); ctx.moveTo(0,i*CELL); ctx.lineTo(800,i*CELL); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(i*CELL,0); ctx.lineTo(i*CELL,800); ctx.stroke();
         }
         ctx.setLineDash([]);
-
         if(ghost) drawShape(ghost.shape, ghost.x, ghost.y, 'rgba(0,0,0,0.1)');
         for(let y=0;y<8;y++) for(let x=0;x<8;x++) if(grid[y][x]) drawCell(x,y,grid[y][x]);
-        
         requestAnimationFrame(draw);
     }
     
     function drawCell(x,y,c) {
         let p=6, s=CELL-p*2;
-        ctx.fillStyle=c; 
-        // 圓角矩形 + 高光 (果凍感)
-        ctx.beginPath(); ctx.roundRect(x*CELL+p, y*CELL+p, s, s, 20); ctx.fill();
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-        ctx.beginPath(); ctx.arc(x*CELL+p+15, y*CELL+p+15, 8, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle=c; ctx.beginPath(); ctx.roundRect(x*CELL+p, y*CELL+p, s, s, 20); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.beginPath(); ctx.arc(x*CELL+p+15, y*CELL+p+15, 8, 0, Math.PI*2); ctx.fill();
     }
     function drawShape(s,x,y,c) {
         for(let r=0;r<s.m.length;r++) for(let c2=0;c2<s.m[0].length;c2++) if(s.m[r][c2]) drawCell(x+c2, y+r, c || s.c);
@@ -374,13 +324,14 @@
             const data = SHAPES[Math.floor(Math.random()*SHAPES.length)];
             const el = document.createElement('canvas');
             el.width=60; el.height=60; el.className='shape-preview';
+            // 關鍵：將數據綁定到 DOM 元素上，方便後續檢查死局
+            el.shapeData = data; 
+            
             const c = el.getContext('2d');
             const s=12, ox=(60-data.m[0].length*s)/2, oy=(60-data.m.length*s)/2;
             c.fillStyle=data.c;
             for(let r=0;r<data.m.length;r++) for(let col=0;col<data.m[0].length;col++) 
-                if(data.m[r][col]) {
-                    c.beginPath(); c.roundRect(ox+col*s, oy+r*s, s-1, s-1, 3); c.fill();
-                }
+                if(data.m[r][col]) { c.beginPath(); c.roundRect(ox+col*s, oy+r*s, s-1, s-1, 3); c.fill(); }
             
             el.addEventListener('touchstart', (e)=>startDrag(e, el, data), {passive:false});
             el.addEventListener('mousedown', (e)=>startDrag(e, el, data));
@@ -429,6 +380,7 @@
         if(ghost) {
             place(ghost.shape, ghost.x, ghost.y);
             currentDrag.el.remove();
+            Sound.drop();
             if(document.getElementById('spawn-area').children.length===0) setTimeout(spawn, 300);
             else checkOver();
         } else {
@@ -458,27 +410,18 @@
         checkLines();
     }
     function checkLines() {
-        let lines = 0;
-        let clearedCells = []; // 記錄消除的格子座標以產生特效
-
+        let lines = 0; let clearedCells = [];
         for(let y=0;y<8;y++) if(grid[y].every(c=>c)) { 
-            grid[y].fill(0); lines++; 
-            for(let x=0; x<8; x++) clearedCells.push({x, y});
+            grid[y].fill(0); lines++; for(let x=0; x<8; x++) clearedCells.push({x, y});
         }
         for(let x=0;x<8;x++) {
             let full=true; for(let y=0;y<8;y++) if(!grid[y][x]) full=false;
-            if(full) { 
-                for(let y=0;y<8;y++) { grid[y][x]=0; clearedCells.push({x, y}); }
-                lines++; 
-            }
+            if(full) { for(let y=0;y<8;y++) { grid[y][x]=0; clearedCells.push({x, y}); } lines++; }
         }
-        
         if(lines>0) {
             coins += lines*10; updateUI();
             const f = document.createElement('div'); f.className='float-text'; f.innerText=`+${lines*10}`;
             f.style.left='50%'; f.style.top='50%'; document.body.appendChild(f); setTimeout(()=>f.remove(),800);
-            
-            // 觸發粒子特效
             clearedCells.forEach(cell => {
                 createExplosion(cell.x*CELL + CELL/2, cell.y*CELL + CELL/2, '#ff4081');
                 createExplosion(cell.x*CELL + CELL/2, cell.y*CELL + CELL/2, '#8c9eff');
@@ -486,17 +429,45 @@
         }
     }
 
+    /* === 核心：死局偵測 === */
     function checkOver() {
-        setTimeout(()=>{
+        setTimeout(() => {
             const els = document.querySelectorAll('#spawn-area .shape-preview');
-            if(els.length===0) return;
-        }, 100);
+            if (els.length === 0) return;
+
+            let canMove = false;
+            // 遍歷所有剩下的方塊
+            for (let i = 0; i < els.length; i++) {
+                const shape = els[i].shapeData;
+                // 遍歷棋盤所有位置
+                for (let y = 0; y < 8; y++) {
+                    for (let x = 0; x < 8; x++) {
+                        if (canPlace(shape.m, x, y)) {
+                            canMove = true;
+                            break;
+                        }
+                    }
+                    if (canMove) break;
+                }
+                if (canMove) break;
+            }
+
+            // 如果完全沒地方放
+            if (!canMove) {
+                Sound.fail();
+                document.getElementById('board-container').classList.add('board-shake');
+                setTimeout(() => {
+                    document.getElementById('game-over-modal').style.display = 'flex';
+                }, 800);
+            }
+        }, 200);
     }
 
     const game = {
         reset: function() {
             grid = Array(8).fill().map(()=>Array(8).fill(0));
             document.getElementById('game-over-modal').style.display='none';
+            document.getElementById('board-container').classList.remove('board-shake');
             spawn();
         }
     };
