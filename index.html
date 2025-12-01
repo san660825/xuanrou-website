@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>無尾熊糖果屋 🐨🍬</title>
+    <title>無尾熊糖果屋 🐨✨</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#fff0f5">
     
@@ -15,7 +15,6 @@
             --glass: rgba(255, 255, 255, 0.85);
         }
 
-        /* === 核心設定：鎖死畫面 === */
         html, body {
             width: 100%; height: 100%; margin: 0; padding: 0;
             overflow: hidden; position: fixed;
@@ -31,7 +30,7 @@
             filter: blur(40px); opacity: 0.6; z-index: -1;
             animation: float 10s infinite ease-in-out;
         }
-        .blob-1 { width: 200px; height: 200px; background: #ffcdd2; top: -50px; left: -50px; animation-delay: 0s; }
+        .blob-1 { width: 200px; height: 200px; background: #ffcdd2; top: -50px; left: -50px; }
         .blob-2 { width: 250px; height: 250px; background: #e1bee7; bottom: -50px; right: -50px; animation-delay: -5s; }
         .blob-3 { width: 150px; height: 150px; background: #b3e5fc; top: 40%; left: 60%; animation-delay: -2s; }
         @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20px, -20px); } }
@@ -49,7 +48,7 @@
             background: var(--glass); backdrop-filter: blur(10px);
             border-radius: 25px; display: flex; align-items: center; justify-content: space-between;
             padding: 0 15px; box-shadow: 0 8px 32px rgba(255, 128, 171, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.8); z-index: 100;
         }
         .pet-section { display: flex; align-items: center; gap: 12px; }
         #koala-icon { 
@@ -148,9 +147,40 @@
             font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255, 64, 129, 0.4);
         }
 
+        /* === 特效樣式 === */
         .float-text { position: absolute; font-family: 'Fredoka'; font-weight: 900; color: #ff4081; font-size: 1.8rem; pointer-events: none; z-index: 5000; animation: floatUp 1s forwards; text-shadow: 3px 3px 0 white; }
         .bubble { position: absolute; top: 100px; left: 20px; background: white; padding: 8px 15px; border-radius: 20px; border-bottom-left-radius: 2px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); font-size: 0.9rem; color: #880e4f; font-weight: bold; opacity: 0; transition: 0.3s; pointer-events: none; }
         .bubble.show { opacity: 1; transform: translateY(-5px); }
+
+        /* 漣漪特效 */
+        .ripple {
+            position: absolute; width: 20px; height: 20px;
+            background: rgba(255, 128, 171, 0.4);
+            border-radius: 50%; pointer-events: none;
+            transform: translate(-50%, -50%);
+            animation: rippleAnim 0.6s linear forwards;
+            z-index: 9999;
+        }
+        @keyframes rippleAnim {
+            0% { width: 0; height: 0; opacity: 0.8; }
+            100% { width: 150px; height: 150px; opacity: 0; }
+        }
+
+        /* 誇誇彈幕 */
+        .praise-text {
+            position: absolute; left: 50%; top: 40%;
+            transform: translate(-50%, -50%);
+            font-family: 'Fredoka'; font-size: 3rem; font-weight: 900;
+            color: #fff; -webkit-text-stroke: 2px #ff4081;
+            text-shadow: 0 5px 15px rgba(255, 64, 129, 0.4);
+            pointer-events: none; z-index: 6000;
+            animation: popPraise 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes popPraise {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) rotate(-10deg); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(5deg); }
+            100% { opacity: 0; transform: translate(-50%, -80%) scale(1) rotate(0deg); }
+        }
     </style>
 </head>
 <body>
@@ -209,23 +239,57 @@
 </div>
 
 <script>
-    /* === 粒子特效 === */
+    /* === 特效系統 === */
     const particles = [];
     class Particle {
-        constructor(x, y, color) {
+        constructor(x, y, color, type = 'circle') {
             this.x = x; this.y = y; this.color = color;
-            this.size = Math.random() * 15 + 5;
-            this.speedX = Math.random() * 6 - 3; this.speedY = Math.random() * 6 - 3;
-            this.life = 1.0;
+            this.size = Math.random() * 12 + 4;
+            this.speedX = Math.random() * 8 - 4; this.speedY = Math.random() * 8 - 4;
+            this.life = 1.0; this.type = type;
         }
         update() { this.x += this.speedX; this.y += this.speedY; this.life -= 0.02; this.size *= 0.95; }
         draw(ctx) {
             ctx.globalAlpha = this.life; ctx.fillStyle = this.color;
-            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); 
+            if(this.type === 'rect') ctx.rect(this.x, this.y, this.size, this.size);
+            else ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); 
+            ctx.fill();
             ctx.globalAlpha = 1.0;
         }
     }
-    function createExplosion(x, y, color) { for(let i=0; i<10; i++) particles.push(new Particle(x, y, color)); }
+    function createExplosion(x, y, color) { 
+        for(let i=0; i<12; i++) particles.push(new Particle(x, y, color)); 
+    }
+    function createDust(x, y) {
+        for(let i=0; i<4; i++) particles.push(new Particle(x, y, '#fff', 'rect'));
+    }
+
+    // 點擊漣漪
+    document.addEventListener('touchstart', (e) => {
+        const t = e.touches[0];
+        createRipple(t.clientX, t.clientY);
+    }, {passive: true});
+    document.addEventListener('mousedown', (e) => {
+        createRipple(e.clientX, e.clientY);
+    });
+
+    function createRipple(x, y) {
+        const r = document.createElement('div');
+        r.className = 'ripple';
+        r.style.left = x + 'px'; r.style.top = y + 'px';
+        document.body.appendChild(r);
+        setTimeout(() => r.remove(), 600);
+    }
+
+    function showPraise() {
+        const words = ["好棒！", "太強了！", "天才！", "完美！", "超厲害！"];
+        const text = words[Math.floor(Math.random() * words.length)];
+        const el = document.createElement('div');
+        el.className = 'praise-text'; el.innerText = text;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 800);
+    }
 
     /* === 養成數據 === */
     let coins = parseInt(localStorage.getItem('xr_coins') || 0);
@@ -285,6 +349,7 @@
     let grid = Array(8).fill().map(()=>Array(8).fill(0));
     let currentDrag = null; let ghost = null;
     const CELL = 100;
+    let flashLines = []; // 記錄要閃爍的行/列
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const Sound = {
@@ -294,18 +359,35 @@
 
     function draw() {
         ctx.clearRect(0,0,800,800);
+        
+        // 粒子
         for(let i=particles.length-1; i>=0; i--) {
             particles[i].update(); particles[i].draw(ctx);
             if(particles[i].life <= 0) particles.splice(i, 1);
         }
+
+        // 網格
         ctx.strokeStyle = '#fce4ec'; ctx.lineWidth=3; ctx.setLineDash([10, 10]);
         for(let i=0;i<=8;i++) {
             ctx.beginPath(); ctx.moveTo(0,i*CELL); ctx.lineTo(800,i*CELL); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(i*CELL,0); ctx.lineTo(i*CELL,800); ctx.stroke();
         }
         ctx.setLineDash([]);
+
         if(ghost) drawShape(ghost.shape, ghost.x, ghost.y, 'rgba(0,0,0,0.1)');
         for(let y=0;y<8;y++) for(let x=0;x<8;x++) if(grid[y][x]) drawCell(x,y,grid[y][x]);
+
+        // 閃爍特效
+        if(flashLines.length > 0) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            flashLines.forEach(f => {
+                if(f.type === 'row') ctx.fillRect(0, f.index*CELL, 800, CELL);
+                else ctx.fillRect(f.index*CELL, 0, CELL, 800);
+                f.life -= 0.1;
+            });
+            flashLines = flashLines.filter(f => f.life > 0);
+        }
+        
         requestAnimationFrame(draw);
     }
     
@@ -324,9 +406,7 @@
             const data = SHAPES[Math.floor(Math.random()*SHAPES.length)];
             const el = document.createElement('canvas');
             el.width=60; el.height=60; el.className='shape-preview';
-            // 關鍵：將數據綁定到 DOM 元素上，方便後續檢查死局
             el.shapeData = data; 
-            
             const c = el.getContext('2d');
             const s=12, ox=(60-data.m[0].length*s)/2, oy=(60-data.m.length*s)/2;
             c.fillStyle=data.c;
@@ -406,59 +486,60 @@
     }
     function place(s, x, y) {
         for(let r=0;r<s.m.length;r++) for(let c=0;c<s.m[0].length;c++) 
-            if(s.m[r][c]) grid[y+r][x+c] = s.c;
+            if(s.m[r][c]) {
+                grid[y+r][x+c] = s.c;
+                // 落地灰塵特效
+                createDust((x+c)*CELL+CELL/2, (y+r)*CELL+CELL);
+            }
         checkLines();
     }
     function checkLines() {
         let lines = 0; let clearedCells = [];
+        
         for(let y=0;y<8;y++) if(grid[y].every(c=>c)) { 
-            grid[y].fill(0); lines++; for(let x=0; x<8; x++) clearedCells.push({x, y});
+            grid[y].fill(0); lines++; flashLines.push({type:'row', index:y, life:1.0});
+            for(let x=0; x<8; x++) clearedCells.push({x, y});
         }
         for(let x=0;x<8;x++) {
             let full=true; for(let y=0;y<8;y++) if(!grid[y][x]) full=false;
-            if(full) { for(let y=0;y<8;y++) { grid[y][x]=0; clearedCells.push({x, y}); } lines++; }
+            if(full) { 
+                for(let y=0;y<8;y++) { grid[y][x]=0; clearedCells.push({x, y}); } 
+                lines++; flashLines.push({type:'col', index:x, life:1.0});
+            }
         }
+        
         if(lines>0) {
             coins += lines*10; updateUI();
             const f = document.createElement('div'); f.className='float-text'; f.innerText=`+${lines*10}`;
             f.style.left='50%'; f.style.top='50%'; document.body.appendChild(f); setTimeout(()=>f.remove(),800);
+            
             clearedCells.forEach(cell => {
                 createExplosion(cell.x*CELL + CELL/2, cell.y*CELL + CELL/2, '#ff4081');
                 createExplosion(cell.x*CELL + CELL/2, cell.y*CELL + CELL/2, '#8c9eff');
             });
+            showPraise();
         }
     }
 
-    /* === 核心：死局偵測 === */
     function checkOver() {
         setTimeout(() => {
             const els = document.querySelectorAll('#spawn-area .shape-preview');
             if (els.length === 0) return;
-
             let canMove = false;
-            // 遍歷所有剩下的方塊
             for (let i = 0; i < els.length; i++) {
                 const shape = els[i].shapeData;
-                // 遍歷棋盤所有位置
                 for (let y = 0; y < 8; y++) {
                     for (let x = 0; x < 8; x++) {
-                        if (canPlace(shape.m, x, y)) {
-                            canMove = true;
-                            break;
-                        }
+                        if (canPlace(shape.m, x, y)) { canMove = true; break; }
                     }
                     if (canMove) break;
                 }
                 if (canMove) break;
             }
-
-            // 如果完全沒地方放
             if (!canMove) {
                 Sound.fail();
                 document.getElementById('board-container').classList.add('board-shake');
-                setTimeout(() => {
-                    document.getElementById('game-over-modal').style.display = 'flex';
-                }, 800);
+                setTimeout(() => { document.getElementById('game-over-modal').style.display = 'flex'; }, 800);
             }
         }, 200);
     }
