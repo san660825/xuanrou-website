@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <title>無尾熊糖果屋 🐨✨</title>
+    <title>無尾熊糖果屋 🐨🎁</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#fff0f5">
     
@@ -12,7 +12,7 @@
     <style>
         :root {
             --bg-color: #fff0f5;
-            --glass: rgba(255, 255, 255, 0.85);
+            --glass: rgba(255, 255, 255, 0.9);
         }
 
         html, body {
@@ -24,7 +24,7 @@
             user-select: none; -webkit-user-select: none;
         }
 
-        /* === 動態背景 === */
+        /* 背景漂浮物 */
         .bg-blob {
             position: absolute; border-radius: 50%;
             filter: blur(40px); opacity: 0.6; z-index: -1;
@@ -32,7 +32,6 @@
         }
         .blob-1 { width: 200px; height: 200px; background: #ffcdd2; top: -50px; left: -50px; }
         .blob-2 { width: 250px; height: 250px; background: #e1bee7; bottom: -50px; right: -50px; animation-delay: -5s; }
-        .blob-3 { width: 150px; height: 150px; background: #b3e5fc; top: 40%; left: 60%; animation-delay: -2s; }
         @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20px, -20px); } }
 
         #app-container {
@@ -90,10 +89,17 @@
             width: 90vw; max-width: 360px; aspect-ratio: 1/1;
             background: rgba(255,255,255,0.9); border-radius: 24px; padding: 10px;
             box-shadow: 0 15px 35px rgba(255, 128, 171, 0.15), inset 0 -5px 0 rgba(0,0,0,0.05);
-            border: 4px solid white; transition: transform 0.3s;
+            border: 4px solid white; transition: transform 0.1s;
         }
-        .board-shake { animation: shake 0.5s both; }
-        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        /* 強力震動動畫 */
+        .shake-hard { animation: shakeHard 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shakeHard { 
+            10%, 90% { transform: translate3d(-2px, 0, 0) rotate(-1deg); } 
+            20%, 80% { transform: translate3d(4px, 0, 0) rotate(1deg); } 
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); } 
+            40%, 60% { transform: translate3d(6px, 0, 0); } 
+        }
+
         canvas#game-canvas { width: 100%; height: 100%; border-radius: 16px; display: block; }
 
         /* === 生成區 === */
@@ -127,6 +133,29 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 2px solid white;
         }
         
+        /* === 獎勵兌換彈窗 (Unboxing) === */
+        #reward-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 5000;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .reward-content { position: relative; text-align: center; animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        @keyframes bounceIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        
+        .light-rays {
+            position: absolute; top: 50%; left: 50%; width: 500px; height: 500px;
+            background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.1) 0deg 10deg, transparent 10deg 20deg);
+            transform: translate(-50%, -50%); z-index: -1;
+            animation: spin 10s linear infinite;
+        }
+        @keyframes spin { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+        
+        .reward-icon { font-size: 6rem; margin-bottom: 20px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3)); }
+        .reward-title { color: white; font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; text-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .reward-name { color: #ff80ab; font-size: 2rem; font-weight: 900; background: white; padding: 5px 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        /* === 失敗彈窗 === */
         #game-over-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 10000;
@@ -139,7 +168,6 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.2);
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .btn-restart { 
             background: linear-gradient(135deg, #ff80ab, #ff4081); 
             color: white; border: none; padding: 12px 35px; 
@@ -147,47 +175,29 @@
             font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255, 64, 129, 0.4);
         }
 
-        /* === 特效樣式 === */
+        /* === 特效文字 === */
         .float-text { position: absolute; font-family: 'Fredoka'; font-weight: 900; color: #ff4081; font-size: 1.8rem; pointer-events: none; z-index: 5000; animation: floatUp 1s forwards; text-shadow: 3px 3px 0 white; }
+        @keyframes floatUp { 0% { transform:translateY(0) scale(1); opacity:1; } 100% { transform:translateY(-80px) scale(1.2); opacity:0; } }
+        
+        .combo-text {
+            position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%);
+            font-family: 'Fredoka'; font-weight: 900; font-size: 4rem;
+            background: linear-gradient(to bottom, #ffeb3b, #ff9800);
+            -webkit-background-clip: text; color: transparent;
+            text-shadow: 0 5px 0 rgba(0,0,0,0.1);
+            pointer-events: none; z-index: 6000;
+            animation: popCombo 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes popCombo { 0% { transform: translate(-50%, -50%) scale(0); } 50% { transform: translate(-50%, -50%) scale(1.2); } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
+
         .bubble { position: absolute; top: 100px; left: 20px; background: white; padding: 8px 15px; border-radius: 20px; border-bottom-left-radius: 2px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); font-size: 0.9rem; color: #880e4f; font-weight: bold; opacity: 0; transition: 0.3s; pointer-events: none; }
         .bubble.show { opacity: 1; transform: translateY(-5px); }
-
-        /* 漣漪特效 */
-        .ripple {
-            position: absolute; width: 20px; height: 20px;
-            background: rgba(255, 128, 171, 0.4);
-            border-radius: 50%; pointer-events: none;
-            transform: translate(-50%, -50%);
-            animation: rippleAnim 0.6s linear forwards;
-            z-index: 9999;
-        }
-        @keyframes rippleAnim {
-            0% { width: 0; height: 0; opacity: 0.8; }
-            100% { width: 150px; height: 150px; opacity: 0; }
-        }
-
-        /* 誇誇彈幕 */
-        .praise-text {
-            position: absolute; left: 50%; top: 40%;
-            transform: translate(-50%, -50%);
-            font-family: 'Fredoka'; font-size: 3rem; font-weight: 900;
-            color: #fff; -webkit-text-stroke: 2px #ff4081;
-            text-shadow: 0 5px 15px rgba(255, 64, 129, 0.4);
-            pointer-events: none; z-index: 6000;
-            animation: popPraise 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        @keyframes popPraise {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) rotate(-10deg); }
-            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(5deg); }
-            100% { opacity: 0; transform: translate(-50%, -80%) scale(1) rotate(0deg); }
-        }
     </style>
 </head>
 <body>
 
 <div class="bg-blob blob-1"></div>
 <div class="bg-blob blob-2"></div>
-<div class="bg-blob blob-3"></div>
 
 <div id="app-container">
     <div class="header-bar">
@@ -221,6 +231,7 @@
     <div id="spawn-area"></div>
 </div>
 
+<!-- 商店 -->
 <div id="shop-overlay">
     <div class="shop-header">
         <h1 style="color:#880e4f; margin:0;">許願清單 ✨</h1>
@@ -229,6 +240,18 @@
     <div id="shop-list"></div>
 </div>
 
+<!-- 🎁 獎勵兌換彈窗 -->
+<div id="reward-modal" onclick="this.style.display='none'">
+    <div class="reward-content">
+        <div class="light-rays"></div>
+        <div class="reward-icon" id="reward-icon">🎁</div>
+        <div class="reward-title">兌換成功！</div>
+        <div class="reward-name" id="reward-name">神秘禮物</div>
+        <div style="color:white; margin-top:10px; font-size:0.8rem;">(點擊關閉)</div>
+    </div>
+</div>
+
+<!-- 失敗彈窗 -->
 <div id="game-over-modal">
     <div class="modal-content">
         <div style="font-size:4rem;">😭</div>
@@ -239,7 +262,7 @@
 </div>
 
 <script>
-    /* === 特效系統 === */
+    /* === 粒子特效系統 === */
     const particles = [];
     class Particle {
         constructor(x, y, color, type = 'circle') {
@@ -258,43 +281,19 @@
             ctx.globalAlpha = 1.0;
         }
     }
-    function createExplosion(x, y, color) { 
-        for(let i=0; i<12; i++) particles.push(new Particle(x, y, color)); 
-    }
-    function createDust(x, y) {
-        for(let i=0; i<4; i++) particles.push(new Particle(x, y, '#fff', 'rect'));
-    }
-
-    // 點擊漣漪
-    document.addEventListener('touchstart', (e) => {
-        const t = e.touches[0];
-        createRipple(t.clientX, t.clientY);
-    }, {passive: true});
-    document.addEventListener('mousedown', (e) => {
-        createRipple(e.clientX, e.clientY);
-    });
-
-    function createRipple(x, y) {
-        const r = document.createElement('div');
-        r.className = 'ripple';
-        r.style.left = x + 'px'; r.style.top = y + 'px';
-        document.body.appendChild(r);
-        setTimeout(() => r.remove(), 600);
-    }
-
-    function showPraise() {
-        const words = ["好棒！", "太強了！", "天才！", "完美！", "超厲害！"];
-        const text = words[Math.floor(Math.random() * words.length)];
-        const el = document.createElement('div');
-        el.className = 'praise-text'; el.innerText = text;
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 800);
-    }
+    function createExplosion(x, y, color) { for(let i=0; i<12; i++) particles.push(new Particle(x, y, color)); }
+    function createDust(x, y) { for(let i=0; i<5; i++) particles.push(new Particle(x, y, '#fff', 'rect')); }
 
     /* === 養成數據 === */
     let coins = parseInt(localStorage.getItem('xr_coins') || 0);
     let hunger = parseInt(localStorage.getItem('xr_hunger') || 50);
-    const PRIZES = [{n:'手搖飲', p:8000}, {n:'按摩', p:30000}, {n:'大餐', p:88000}, {n:'清空購物車', p:9999999}];
+    // 加入 icon 屬性
+    const PRIZES = [
+        {n:'手搖飲', p:8000, icon:'🧋'}, 
+        {n:'肩頸按摩', p:30000, icon:'💆‍♀️'}, 
+        {n:'大餐', p:88000, icon:'🍽️'}, 
+        {n:'清空購物車', p:9999999, icon:'🛍️'}
+    ];
 
     function updateUI() {
         document.getElementById('score').innerText = coins;
@@ -324,6 +323,7 @@
         b.classList.add('show'); setTimeout(()=>b.classList.remove('show'), 2000);
     }
 
+    /* === 商店與獎勵展示 === */
     function toggleShop() {
         const s = document.getElementById('shop-overlay');
         s.style.display = s.style.display === 'flex' ? 'none' : 'flex';
@@ -331,13 +331,29 @@
             const l = document.getElementById('shop-list'); l.innerHTML = '';
             PRIZES.forEach(p => {
                 l.innerHTML += `<div class="shop-item">
-                    <div><b style="font-size:1.1rem; color:#555;">${p.n}</b><br><small style="color:#ff80ab; font-weight:bold;">${p.p.toLocaleString()} 🌿</small></div>
-                    <button onclick="buy('${p.n}',${p.p})" style="background:linear-gradient(135deg, #8c9eff, #536dfe); color:white; border:none; padding:8px 15px; border-radius:15px; font-weight:bold;">兌換</button>
+                    <div style="display:flex; align-items:center;">
+                        <span style="font-size:2rem; margin-right:10px;">${p.icon}</span>
+                        <div><b style="font-size:1rem; color:#555;">${p.n}</b><br><small style="color:#ff80ab; font-weight:bold;">${p.p.toLocaleString()} 🌿</small></div>
+                    </div>
+                    <button onclick="buy('${p.n}',${p.p}, '${p.icon}')" style="background:linear-gradient(135deg, #8c9eff, #536dfe); color:white; border:none; padding:8px 15px; border-radius:15px; font-weight:bold;">兌換</button>
                 </div>`;
             });
         }
     }
-    function buy(n, p) { if(coins>=p) { coins-=p; updateUI(); alert(`兌換成功：${n}`); } else alert("錢不夠！"); }
+    function buy(n, p, icon) { 
+        if(coins>=p) { 
+            coins-=p; updateUI(); 
+            toggleShop(); // 關閉商店
+            showReward(n, icon); // 顯示大獎
+        } else alert("錢不夠！"); 
+    }
+    function showReward(name, icon) {
+        document.getElementById('reward-name').innerText = name;
+        document.getElementById('reward-icon').innerText = icon;
+        document.getElementById('reward-modal').style.display = 'flex';
+        // 噴彩帶
+        for(let i=0; i<5; i++) setTimeout(()=>createExplosion(window.innerWidth/2, window.innerHeight/2, ['#ffeb3b','#ff4081','#00e5ff'][i%3]), i*200);
+    }
 
     /* === 遊戲引擎 === */
     const canvas = document.getElementById('game-canvas');
@@ -349,7 +365,8 @@
     let grid = Array(8).fill().map(()=>Array(8).fill(0));
     let currentDrag = null; let ghost = null;
     const CELL = 100;
-    let flashLines = []; // 記錄要閃爍的行/列
+    let flashLines = [];
+    let comboCount = 0; // 連擊計數
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const Sound = {
@@ -359,25 +376,19 @@
 
     function draw() {
         ctx.clearRect(0,0,800,800);
-        
-        // 粒子
         for(let i=particles.length-1; i>=0; i--) {
             particles[i].update(); particles[i].draw(ctx);
             if(particles[i].life <= 0) particles.splice(i, 1);
         }
-
-        // 網格
         ctx.strokeStyle = '#fce4ec'; ctx.lineWidth=3; ctx.setLineDash([10, 10]);
         for(let i=0;i<=8;i++) {
             ctx.beginPath(); ctx.moveTo(0,i*CELL); ctx.lineTo(800,i*CELL); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(i*CELL,0); ctx.lineTo(i*CELL,800); ctx.stroke();
         }
         ctx.setLineDash([]);
-
         if(ghost) drawShape(ghost.shape, ghost.x, ghost.y, 'rgba(0,0,0,0.1)');
         for(let y=0;y<8;y++) for(let x=0;x<8;x++) if(grid[y][x]) drawCell(x,y,grid[y][x]);
 
-        // 閃爍特效
         if(flashLines.length > 0) {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
             flashLines.forEach(f => {
@@ -387,7 +398,6 @@
             });
             flashLines = flashLines.filter(f => f.life > 0);
         }
-        
         requestAnimationFrame(draw);
     }
     
@@ -430,7 +440,6 @@
         const evt = e.touches ? e.touches[0] : e;
         const el = currentDrag.el;
         const offset = 80; const elWidth = 60;
-        
         el.style.left = (evt.clientX - elWidth/2) + 'px';
         el.style.top = (evt.clientY - elWidth/2 - offset) + 'px';
 
@@ -488,14 +497,12 @@
         for(let r=0;r<s.m.length;r++) for(let c=0;c<s.m[0].length;c++) 
             if(s.m[r][c]) {
                 grid[y+r][x+c] = s.c;
-                // 落地灰塵特效
                 createDust((x+c)*CELL+CELL/2, (y+r)*CELL+CELL);
             }
         checkLines();
     }
     function checkLines() {
         let lines = 0; let clearedCells = [];
-        
         for(let y=0;y<8;y++) if(grid[y].every(c=>c)) { 
             grid[y].fill(0); lines++; flashLines.push({type:'row', index:y, life:1.0});
             for(let x=0; x<8; x++) clearedCells.push({x, y});
@@ -509,15 +516,30 @@
         }
         
         if(lines>0) {
-            coins += lines*10; updateUI();
-            const f = document.createElement('div'); f.className='float-text'; f.innerText=`+${lines*10}`;
+            comboCount++;
+            let bonus = lines * 10 * comboCount;
+            coins += bonus; updateUI();
+            
+            // 顯示分數
+            const f = document.createElement('div'); f.className='float-text'; f.innerText=`+${bonus}`;
             f.style.left='50%'; f.style.top='50%'; document.body.appendChild(f); setTimeout(()=>f.remove(),800);
             
+            // 顯示 Combo
+            if(comboCount > 1) {
+                const c = document.createElement('div'); c.className='combo-text'; c.innerText=`COMBO x${comboCount}!`;
+                document.body.appendChild(c); setTimeout(()=>c.remove(), 800);
+                // 強力震動
+                document.getElementById('board-container').classList.remove('shake-hard');
+                void document.getElementById('board-container').offsetWidth; // 重置動畫
+                document.getElementById('board-container').classList.add('shake-hard');
+            }
+
             clearedCells.forEach(cell => {
                 createExplosion(cell.x*CELL + CELL/2, cell.y*CELL + CELL/2, '#ff4081');
                 createExplosion(cell.x*CELL + CELL/2, cell.y*CELL + CELL/2, '#8c9eff');
             });
-            showPraise();
+        } else {
+            comboCount = 0; // 斷連
         }
     }
 
@@ -549,6 +571,7 @@
             grid = Array(8).fill().map(()=>Array(8).fill(0));
             document.getElementById('game-over-modal').style.display='none';
             document.getElementById('board-container').classList.remove('board-shake');
+            comboCount = 0;
             spawn();
         }
     };
